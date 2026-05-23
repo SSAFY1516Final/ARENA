@@ -1,0 +1,40 @@
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: arena-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: arena
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-arena-root-password}
+      TZ: Asia/Seoul
+    ports:
+      - "${MYSQL_PORT:-3306}:3306"
+    volumes:
+      - arena-mysql-data:/var/lib/mysql
+      - ./src/main/resources/db/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -uroot -p$${MYSQL_ROOT_PASSWORD} --silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build: .
+    container_name: arena-app
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      DB_URL: jdbc:mysql://mysql:3306/arena?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+      DB_USERNAME: root
+      DB_PASSWORD: ${MYSQL_ROOT_PASSWORD:-arena-root-password}
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET is required. Copy .env.example to .env and set JWT_SECRET.}
+      JWT_EXPIRATION_SECONDS: ${JWT_EXPIRATION_SECONDS:-86400}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:?OPENAI_API_KEY is required. Copy .env.example to .env and set OPENAI_API_KEY.}
+      SPRING_AI_OPENAI_CHAT_OPTIONS_MODEL: ${OPENAI_MODEL:-gpt-4o-mini}
+    ports:
+      - "${APP_PORT:-8080}:8080"
+
+volumes:
+  arena-mysql-data:

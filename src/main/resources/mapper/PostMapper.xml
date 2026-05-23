@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssafy.arena.mapper.PostMapper">
+    <sql id="postListProjection">
+        p.id AS post_id,
+        p.title,
+        ds.mode,
+        p.summary_card,
+        u.nickname AS author_nickname,
+        (SELECT COUNT(*) FROM comments c WHERE c.post_id = p.id AND c.deleted_at IS NULL) AS comment_count,
+        p.vote_option_a,
+        p.vote_option_b,
+        (SELECT COUNT(*) FROM post_votes pv WHERE pv.post_id = p.id AND pv.choice = 'A') AS vote_count_a,
+        (SELECT COUNT(*) FROM post_votes pv WHERE pv.post_id = p.id AND pv.choice = 'B') AS vote_count_b,
+        CASE
+            WHEN (SELECT COUNT(*) FROM post_votes pv WHERE pv.post_id = p.id) = 0 THEN 0.0
+            ELSE ROUND((SELECT COUNT(*) FROM post_votes pv WHERE pv.post_id = p.id AND pv.choice = 'A') * 1000.0 / (SELECT COUNT(*) FROM post_votes pv WHERE pv.post_id = p.id)) / 10.0
+        END AS vote_ratio_a,
+        CASE
+            WHEN (SELECT COUNT(*) FROM post_votes pv WHERE pv.post_id = p.id) = 0 THEN 0.0
+            ELSE ROUND((SELECT COUNT(*) FROM post_votes pv WHERE pv.post_id = p.id AND pv.choice = 'B') * 1000.0 / (SELECT COUNT(*) FROM post_votes pv WHERE pv.post_id = p.id)) / 10.0
+        END AS vote_ratio_b,
+        p.created_at
+    </sql>
+
+    <insert id="insert" parameterType="com.ssafy.arena.domain.Post" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO posts (
+            debate_session_id, user_id, title, summary_card, vote_option_a, vote_option_b, is_public
+        )
+        VALUES (
+            #{debateSessionId}, #{userId}, #{title}, #{summaryCard}, #{voteOptionA}, #{voteOptionB}, #{isPublic}
+        )
+    </insert>
+
+    <select id="findById" resultType="com.ssafy.arena.domain.Post">
+        SELECT id, debate_session_id, user_id, title, summary_card, vote_option_a, vote_option_b,
+               is_public, created_at, updated_at
+        FROM posts
+        WHERE id = #{id}
+    </select>
+
+    <select id="findListItemById" resultType="com.ssafy.arena.dto.post.PostListItem">
+        SELECT <include refid="postListProjection"/>
+        FROM posts p
+        JOIN debate_sessions ds ON ds.id = p.debate_session_id
+        JOIN users u ON u.id = p.user_id
+        WHERE p.id = #{id}
+    </select>
+
+    <select id="findPosts" parameterType="com.ssafy.arena.dto.post.PostSearchCondition" resultType="com.ssafy.arena.dto.post.PostListItem">
+        SELECT <include refid="postListProjection"/>
+        FROM posts p
+        JOIN debate_sessions ds ON ds.id = p.debate_session_id
+        JOIN users u ON u.id = p.user_id
+        WHERE p.is_public = TRUE
+        <if test="keyword != null">
+            AND (p.title LIKE CONCAT('%', #{keyword}, '%')
+                OR p.summary_card LIKE CONCAT('%', #{keyword}, '%')
+                OR ds.topic LIKE CONCAT('%', #{keyword}, '%'))
+        </if>
+        <if test="mode != null">
+            AND ds.mode = #{mode}
+        </if>
+        <choose>
+            <when test="sort == 'comments'">
+                ORDER BY comment_count DESC, p.created_at DESC
+            </when>
+            <when test="sort == 'votes'">
+                ORDER BY (vote_count_a + vote_count_b) DESC, p.created_at DESC
+            </when>
+            <otherwise>
+                ORDER BY p.created_at DESC
+            </otherwise>
+        </choose>
+        LIMIT #{size} OFFSET #{offset}
+    </select>
+
+    <select id="countPosts" parameterType="com.ssafy.arena.dto.post.PostSearchCondition" resultType="int">
+        SELECT COUNT(*)
+        FROM posts p
+        JOIN debate_sessions ds ON ds.id = p.debate_session_id
+        WHERE p.is_public = TRUE
+        <if test="keyword != null">
+            AND (p.title LIKE CONCAT('%', #{keyword}, '%')
+                OR p.summary_card LIKE CONCAT('%', #{keyword}, '%')
+                OR ds.topic LIKE CONCAT('%', #{keyword}, '%'))
+        </if>
+        <if test="mode != null">
+            AND ds.mode = #{mode}
+        </if>
+    </select>
+
+    <delete id="deleteById">
+        DELETE FROM posts
+        WHERE id = #{id}
+    </delete>
+
+    <select id="countVotes" resultType="int">
+        SELECT COUNT(*)
+        FROM post_votes
+        WHERE post_id = #{postId}
+          AND choice = #{choice}
+    </select>
+
+    <insert id="upsertVote">
+        INSERT INTO post_votes (post_id, user_id, choice)
+        VALUES (#{postId}, #{userId}, #{choice})
+        ON DUPLICATE KEY UPDATE choice = VALUES(choice), updated_at = CURRENT_TIMESTAMP
+    </insert>
+</mapper>

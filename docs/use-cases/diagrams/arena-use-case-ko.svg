@@ -1,0 +1,137 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1050" viewBox="0 0 1600 1050">
+  <defs>
+    <style>
+      .bg { fill: #f8fafc; }
+      .panel { fill: #ffffff; stroke: #cbd5e1; stroke-width: 2; }
+      .system { fill: #ffffff; stroke: #0f766e; stroke-width: 3; }
+      .actor-line { stroke: #111827; stroke-width: 3; stroke-linecap: round; fill: none; }
+      .line { stroke: #64748b; stroke-width: 2; fill: none; }
+      .ai-line { stroke: #f97316; stroke-width: 2.4; fill: none; stroke-dasharray: 7 5; }
+      .req-line { stroke: #0f766e; stroke-width: 2; fill: none; stroke-dasharray: 8 6; }
+      .title { font: 700 34px Arial, 'Apple SD Gothic Neo', sans-serif; fill: #111827; }
+      .subtitle { font: 500 16px Arial, 'Apple SD Gothic Neo', sans-serif; fill: #64748b; }
+      .label { font: 700 18px Arial, 'Apple SD Gothic Neo', sans-serif; fill: #111827; text-anchor: middle; }
+      .small { font: 600 13px Arial, 'Apple SD Gothic Neo', sans-serif; fill: #475569; text-anchor: middle; }
+      .uc { fill: #ffffff; stroke: #334155; stroke-width: 2; }
+      .uc-auth { fill: #ecfeff; stroke: #0891b2; }
+      .uc-board { fill: #f0fdf4; stroke: #16a34a; }
+      .uc-debate { fill: #eff6ff; stroke: #2563eb; }
+      .uc-comment { fill: #fff7ed; stroke: #f97316; }
+      .uc-error { fill: #fef2f2; stroke: #dc2626; }
+    </style>
+    <marker id="arrow" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L10,4 L0,8 z" fill="#64748b"/>
+    </marker>
+    <marker id="arrowAi" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L10,4 L0,8 z" fill="#f97316"/>
+    </marker>
+    <marker id="arrowReq" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L10,4 L0,8 z" fill="#0f766e"/>
+    </marker>
+  </defs>
+
+  <rect class="bg" x="0" y="0" width="1600" height="1050"/>
+  <text class="title" x="80" y="70">ARENA(아레나) 유스케이스 다이어그램</text>
+  <text class="subtitle" x="80" y="102">AI 토론 커뮤니티 MVP · 비회원/회원/AI 서버 관점</text>
+
+  <rect class="system" x="360" y="150" width="850" height="790" rx="18"/>
+  <text class="label" x="785" y="190">ARENA(아레나) System</text>
+
+  <!-- Actors -->
+  <g transform="translate(145 275)">
+    <circle class="actor-line" cx="0" cy="0" r="24"/>
+    <path class="actor-line" d="M0 24 L0 95 M-45 52 L45 52 M0 95 L-38 150 M0 95 L38 150"/>
+    <text class="label" x="0" y="190">비회원</text>
+  </g>
+  <g transform="translate(145 690)">
+    <circle class="actor-line" cx="0" cy="0" r="24"/>
+    <path class="actor-line" d="M0 24 L0 95 M-45 52 L45 52 M0 95 L-38 150 M0 95 L38 150"/>
+    <text class="label" x="0" y="190">회원</text>
+  </g>
+  <g transform="translate(1400 472)">
+    <circle class="actor-line" cx="0" cy="0" r="24"/>
+    <path class="actor-line" d="M0 24 L0 95 M-45 52 L45 52 M0 95 L-38 150 M0 95 L38 150"/>
+    <text class="label" x="0" y="190">AI 서버</text>
+    <text class="small" x="0" y="214">Spring AI</text>
+  </g>
+
+  <!-- Use cases: auth -->
+  <ellipse class="uc uc-auth" cx="525" cy="260" rx="115" ry="38"/>
+  <text class="label" x="525" y="267">회원가입</text>
+  <ellipse class="uc uc-auth" cx="780" cy="260" rx="115" ry="38"/>
+  <text class="label" x="780" y="267">로그인</text>
+  <ellipse class="uc uc-auth" cx="1035" cy="260" rx="115" ry="38"/>
+  <text class="label" x="1035" y="267">로그아웃</text>
+
+  <!-- Use cases: board -->
+  <ellipse class="uc uc-board" cx="580" cy="380" rx="145" ry="38"/>
+  <text class="label" x="580" y="387">게시판 목록 조회</text>
+  <ellipse class="uc uc-board" cx="945" cy="380" rx="145" ry="38"/>
+  <text class="label" x="945" y="387">게시글 상세 조회</text>
+  <ellipse class="uc uc-board" cx="580" cy="450" rx="145" ry="34"/>
+  <text class="label" x="580" y="457">게시글 검색/필터</text>
+  <ellipse class="uc uc-board" cx="945" cy="450" rx="145" ry="34"/>
+  <text class="label" x="945" y="457">게시글 투표</text>
+
+  <!-- Use cases: debate -->
+  <ellipse class="uc uc-debate" cx="545" cy="520" rx="120" ry="38"/>
+  <text class="label" x="545" y="527">토론 생성</text>
+  <ellipse class="uc uc-debate" cx="820" cy="520" rx="145" ry="38"/>
+  <text class="label" x="820" y="527">다음 토론 턴 생성</text>
+  <ellipse class="uc uc-debate" cx="1085" cy="520" rx="120" ry="38"/>
+  <text class="label" x="1085" y="527">토론 중단</text>
+  <ellipse class="uc uc-debate" cx="820" cy="650" rx="145" ry="38"/>
+  <text class="label" x="820" y="657">중단된 토론 공유</text>
+  <ellipse class="uc uc-debate" cx="1085" cy="650" rx="120" ry="38"/>
+  <text class="label" x="1085" y="657">AI 요약 생성</text>
+
+  <!-- Use cases: comments -->
+  <ellipse class="uc uc-comment" cx="545" cy="790" rx="120" ry="38"/>
+  <text class="label" x="545" y="797">댓글 작성</text>
+  <ellipse class="uc uc-comment" cx="820" cy="790" rx="135" ry="38"/>
+  <text class="label" x="820" y="797">본인 댓글 삭제</text>
+  <ellipse class="uc uc-comment" cx="1085" cy="790" rx="135" ry="38"/>
+  <text class="label" x="1085" y="797">본인 게시글 삭제</text>
+  <ellipse class="uc uc-error" cx="820" cy="900" rx="125" ry="34"/>
+  <text class="label" x="820" y="907">AI 장애 처리</text>
+
+  <!-- Guest lines -->
+  <path class="line" marker-end="url(#arrow)" d="M200 330 C280 310, 360 280, 410 265"/>
+  <path class="line" marker-end="url(#arrow)" d="M200 355 C330 360, 430 372, 440 378"/>
+  <path class="line" marker-end="url(#arrow)" d="M200 375 C415 390, 655 392, 800 382"/>
+  <path class="line" marker-end="url(#arrow)" d="M200 395 C330 430, 430 445, 440 448"/>
+  <path class="line" marker-end="url(#arrow)" d="M200 320 C355 270, 590 260, 665 260"/>
+
+  <!-- Member lines -->
+  <path class="line" marker-end="url(#arrow)" d="M205 735 C300 650, 390 555, 425 525"/>
+  <path class="line" marker-end="url(#arrow)" d="M205 748 C390 650, 620 550, 675 525"/>
+  <path class="line" marker-end="url(#arrow)" d="M205 760 C480 640, 870 540, 968 523"/>
+  <path class="line" marker-end="url(#arrow)" d="M205 785 C380 735, 575 675, 675 655"/>
+  <path class="line" marker-end="url(#arrow)" d="M205 772 C450 600, 780 470, 800 455"/>
+  <path class="line" marker-end="url(#arrow)" d="M205 805 C320 800, 395 794, 425 792"/>
+  <path class="line" marker-end="url(#arrow)" d="M205 825 C435 820, 620 800, 685 793"/>
+  <path class="line" marker-end="url(#arrow)" d="M205 845 C540 845, 870 810, 955 794"/>
+  <path class="line" marker-end="url(#arrow)" d="M205 715 C500 610, 920 290, 935 268"/>
+
+  <!-- AI lines -->
+  <path class="ai-line" marker-end="url(#arrowAi)" d="M1245 530 C1300 520, 1328 515, 1360 520"/>
+  <path class="ai-line" marker-end="url(#arrowAi)" d="M1220 650 C1300 620, 1335 588, 1360 560"/>
+  <path class="ai-line" marker-end="url(#arrowAi)" d="M945 900 C1100 890, 1260 840, 1362 610"/>
+
+  <!-- Include/extend lines -->
+  <path class="req-line" marker-end="url(#arrowReq)" d="M958 640 C1005 620, 1050 575, 1070 558"/>
+  <text class="small" x="1030" y="612">requires</text>
+  <path class="req-line" marker-end="url(#arrowReq)" d="M665 790 C705 790, 730 790, 760 790"/>
+  <text class="small" x="710" y="778">owner only</text>
+  <path class="req-line" marker-end="url(#arrowReq)" d="M955 790 C990 790, 1010 790, 1040 790"/>
+  <text class="small" x="1005" y="778">owner only</text>
+
+  <!-- Legend -->
+  <rect class="panel" x="80" y="925" width="1220" height="70" rx="12"/>
+  <ellipse class="uc uc-auth" cx="140" cy="960" rx="42" ry="18"/><text class="small" x="220" y="965">인증</text>
+  <ellipse class="uc uc-board" cx="310" cy="960" rx="42" ry="18"/><text class="small" x="395" y="965">게시판</text>
+  <ellipse class="uc uc-debate" cx="500" cy="960" rx="42" ry="18"/><text class="small" x="590" y="965">토론</text>
+  <ellipse class="uc uc-comment" cx="690" cy="960" rx="42" ry="18"/><text class="small" x="780" y="965">댓글</text>
+  <ellipse class="uc uc-error" cx="880" cy="960" rx="42" ry="18"/><text class="small" x="980" y="965">장애/예외</text>
+  <path class="ai-line" d="M1070 960 L1135 960"/><text class="small" x="1225" y="965">AI 서버 연동</text>
+</svg>

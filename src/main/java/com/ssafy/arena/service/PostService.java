@@ -1,0 +1,96 @@
+package com.ssafy.arena.service;
+
+import com.ssafy.arena.domain.*;
+import com.ssafy.arena.dto.comment.*;
+import com.ssafy.arena.dto.debate.*;
+import com.ssafy.arena.dto.post.*;
+import com.ssafy.arena.common.ApiException;
+import com.ssafy.arena.mapper.CommentMapper;
+import com.ssafy.arena.mapper.DebateMapper;
+import com.ssafy.arena.mapper.PostMapper;
+import java.util.List;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+@RequiredArgsConstructor
+@Transactional(readOnly = true)
+public class PostService {
+    private final PostMapper postMapper;
+    private final DebateMapper debateMapper;
+    private final CommentMapper commentMapper;
+
+    public PostListResponse list(int page, int size, String keyword, DebateMode mode, String sort) {
+        int safePage = Math.max(page, 1);
+        int safeSize = Math.min(Math.max(size, 1), 50);
+        String safeSort = switch (sort == null ? "latest" : sort) {
+            case "comments", "votes" -> sort;
+            default -> "latest";
+        };
+        PostSearchCondition condition = new PostSearchCondition(
+                (safePage - 1) * safeSize,
+                safeSize,
+                blankToNull(keyword),
+                mode,
+                safeSort
+        );
+        return new PostListResponse(
+                postMapper.findPosts(condition),
+                safePage,
+                safeSize,
+                postMapper.countPosts(condition)
+        );
+    }
+
+    public PostDetailResponse detail(Long postId) {
+        Post post = requirePost(postId);
+        PostListItem item = postMapper.findListItemById(postId);
+        DebateSummary summary = debateMapper.findSummary(post.getDebateSessionId());
+        List<DebateMessage> messages = debateMapper.findMessages(post.getDebateSessionId());
+        List<CommentResponse> comments = commentMapper.findByPostId(postId);
+        return new PostDetailResponse(item, DebateSummaryResponse.from(summary), messages, comments);
+    }
+
+    @Transactional
+    public void delete(Long userId, Long postId) {
+        Post post = requirePost(postId);
+        if (!post.getUserId().equals(userId)) {
+            throw new ApiException(HttpStatus.FORBIDDEN, "not post owner");
+        }
+        postMapper.deleteById(postId);
+    }
+
+    @Transactional
+    public VoteResponse vote(Long userId, Long postId, VoteRequest request) {
+        Post post = requirePost(postId);
+        postMapper.upsertVote(postId, userId, request.choice());
+        return voteSummary(post);
+    }
+
+    private VoteResponse voteSummary(Post post) {
+        int countA = nullToZero(postMapper.countVotes(post.getId(), VoteChoice.A));
+        int countB = nullToZero(postMapper.countVotes(post.getId(), VoteChoice.B));
+        int total = countA + countB;
+        double ratioA = total == 0 ? 0.0 : Math.round((countA * 1000.0 / total)) / 10.0;
+        double ratioB = total == 0 ? 0.0 : Math.round((countB * 1000.0 / total)) / 10.0;
+        return new VoteResponse(post.getId(), post.getVoteOptionA(), post.getVoteOptionB(), countA, countB, ratioA, ratioB);
+    }
+
+    private Post requirePost(Long postId) {
+        Post post = postMapper.findById(postId);
+        if (post == null) {
+            throw new ApiException(HttpStatus.NOT_FOUND, "post not found");
+        }
+        return post;
+    }
+
+    private String blankToNull(String value) {
+        return value == null || value.isBlank() ? null : value;
+    }
+
+    private int nullToZero(Integer value) {
+        return value == null ? 0 : value;
+    }
+}
