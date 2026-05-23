@@ -1,0 +1,37 @@
+flowchart LR
+  User["사용자"]
+
+  subgraph System["ARENA(아레나)"]
+    UC_Auth(["회원 관리"])
+    UC_CreateDebate(["AI 토론 생성"])
+    UC_RunDebate(["AI 토론 진행"])
+    UC_Summarize(["토론 결과 요약"])
+    UC_Share(["토론 결과 공유"])
+    UC_ViewShared(["공유된 토론 조회"])
+    UC_SearchFilter(["게시글 검색/필터"])
+    UC_Vote(["게시글 투표"])
+    UC_Comment(["댓글 작성"])
+    UC_ManageOwn(["내 콘텐츠 관리"])
+  end
+
+  User --> UC_Auth
+  User --> UC_CreateDebate
+  User --> UC_RunDebate
+  User --> UC_Summarize
+  User --> UC_Share
+  User --> UC_ViewShared
+  User --> UC_SearchFilter
+  User --> UC_Vote
+  User --> UC_Comment
+  User --> UC_ManageOwn
+
+  UC_Share -. "include" .-> UC_Summarize
+  UC_SearchFilter -. "extend" .-> UC_ViewShared
+  UC_Vote -. "extend" .-> UC_ViewShared
+  UC_Comment -. "extend" .-> UC_ViewShared
+  UC_ManageOwn -. "extend" .-> UC_ViewShared
+
+  classDef actor fill:#f8fafc,stroke:#111827,stroke-width:2px,color:#111827;
+  classDef usecase fill:#ffffff,stroke:#0f766e,stroke-width:2px,color:#111827;
+  class User actor;
+  class UC_Auth,UC_CreateDebate,UC_RunDebate,UC_Summarize,UC_Share,UC_ViewShared,UC_SearchFilter,UC_Vote,UC_Comment,UC_ManageOwn usecase;

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssafy.arena.mapper.DebateMapper">
+    <insert id="insertSession" parameterType="com.ssafy.arena.domain.DebateSession" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO debate_sessions (user_id, topic, mode, status, peak_reached)
+        VALUES (#{userId}, #{topic}, #{mode}, #{status}, #{peakReached})
+    </insert>
+
+    <select id="findSessionById" resultType="com.ssafy.arena.domain.DebateSession">
+        SELECT id, user_id, topic, mode, status, peak_reached, created_at, stopped_at
+        FROM debate_sessions
+        WHERE id = #{id}
+    </select>
+
+    <update id="updateSessionStatus">
+        UPDATE debate_sessions
+        SET status = #{status},
+            stopped_at = CASE WHEN #{status} = 'STOPPED' THEN CURRENT_TIMESTAMP ELSE stopped_at END
+        WHERE id = #{id}
+    </update>
+
+    <update id="updatePeakReached">
+        UPDATE debate_sessions
+        SET peak_reached = #{peakReached}
+        WHERE id = #{id}
+    </update>
+
+    <insert id="insertMessage" parameterType="com.ssafy.arena.domain.DebateMessage" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO debate_messages (debate_session_id, speaker, round_no, content)
+        VALUES (#{debateSessionId}, #{speaker}, #{roundNo}, #{content})
+    </insert>
+
+    <select id="findMessages" resultType="com.ssafy.arena.domain.DebateMessage">
+        SELECT id, debate_session_id, speaker, round_no, content, created_at
+        FROM debate_messages
+        WHERE debate_session_id = #{debateSessionId}
+        ORDER BY round_no ASC, id ASC
+    </select>
+
+    <select id="findNextRoundNo" resultType="int">
+        SELECT COALESCE(MAX(round_no), 0) + 1
+        FROM debate_messages
+        WHERE debate_session_id = #{debateSessionId}
+    </select>
+
+    <insert id="insertSummary" parameterType="com.ssafy.arena.domain.DebateSummary" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO debate_summaries (
+            debate_session_id, core_arguments, highlight, decision_criteria, remaining_issue, summary_text
+        )
+        VALUES (
+            #{debateSessionId}, #{coreArguments}, #{highlight}, #{decisionCriteria}, #{remainingIssue}, #{summaryText}
+        )
+    </insert>
+
+    <select id="findSummary" resultType="com.ssafy.arena.domain.DebateSummary">
+        SELECT id, debate_session_id, core_arguments, highlight, decision_criteria, remaining_issue, summary_text, created_at
+        FROM debate_summaries
+        WHERE debate_session_id = #{debateSessionId}
+    </select>
+</mapper>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssafy.arena.mapper.CommentMapper">
+    <insert id="insert" parameterType="com.ssafy.arena.domain.Comment" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO comments (post_id, user_id, content)
+        VALUES (#{postId}, #{userId}, #{content})
+    </insert>
+
+    <select id="findById" resultType="com.ssafy.arena.domain.Comment">
+        SELECT id, post_id, user_id, content, created_at, updated_at, deleted_at
+        FROM comments
+        WHERE id = #{id}
+    </select>
+
+    <select id="findByPostId" resultType="com.ssafy.arena.dto.comment.CommentResponse">
+        SELECT c.id AS comment_id,
+               c.post_id,
+               u.nickname AS author_nickname,
+               c.content,
+               c.created_at
+        FROM comments c
+        JOIN users u ON u.id = c.user_id
+        WHERE c.post_id = #{postId}
+          AND c.deleted_at IS NULL
+        ORDER BY c.created_at ASC, c.id ASC
+    </select>
+
+    <update id="softDelete">
+        UPDATE comments
+        SET deleted_at = CURRENT_TIMESTAMP
+        WHERE id = #{id}
+    </update>
+</mapper>
