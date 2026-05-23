@@ -6,10 +6,7 @@
 # Note that environment variables can be set in several places
 # See https://docs.gitlab.com/ee/ci/variables/#cicd-variable-precedence
 stages:
-- test
 - secret-detection
-sast:
-  stage: test
 include:
 - template: Security/Secret-Detection.gitlab-ci.yml
 variables:
