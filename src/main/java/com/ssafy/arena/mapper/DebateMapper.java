@@ -11,6 +11,8 @@ public interface DebateMapper {
 
     DebateSession findSessionById(@Param("id") Long id);
 
+    List<DebateSession> findSessionsByUserId(@Param("userId") Long userId);
+
     void updateSessionStatus(@Param("id") Long id, @Param("status") DebateStatus status);
 
     void updatePeakReached(@Param("id") Long id, @Param("peakReached") boolean peakReached);

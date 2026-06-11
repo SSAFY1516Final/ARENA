@@ -24,3 +24,7 @@ arena:
   jwt:
     secret: ${JWT_SECRET:arena-local-development-secret-key-32bytes}
     expiration-seconds: ${JWT_EXPIRATION_SECONDS:86400}
+  kakao:
+    rest-api-key: ${KAKAO_REST_API_KEY:}
+    client-secret: ${KAKAO_CLIENT_SECRET:}
+    redirect-uri: ${KAKAO_REDIRECT_URI:http://localhost:5173/auth/kakao/callback}

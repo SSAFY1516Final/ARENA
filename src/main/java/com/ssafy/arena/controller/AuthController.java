@@ -3,6 +3,7 @@ package com.ssafy.arena.controller;
 import com.ssafy.arena.domain.User;
 import com.ssafy.arena.dto.user.*;
 import com.ssafy.arena.security.JwtTokenProvider;
+import com.ssafy.arena.service.KakaoOAuthClient;
 import com.ssafy.arena.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class AuthController {
     private final UserService userService;
+    private final KakaoOAuthClient kakaoOAuthClient;
     private final JwtTokenProvider jwtTokenProvider;
 
     @PostMapping("/signup")
@@ -29,6 +31,13 @@ public class AuthController {
     @PostMapping("/login")
     public TokenResponse login(@Valid @RequestBody LoginRequest request) {
         User user = userService.authenticate(request);
+        return TokenResponse.bearer(jwtTokenProvider.createToken(user.getId(), user.getLoginId(), user.getRole()));
+    }
+
+    @PostMapping("/kakao")
+    public TokenResponse kakaoLogin(@Valid @RequestBody KakaoLoginRequest request) {
+        KakaoUserProfile profile = kakaoOAuthClient.fetchProfile(request.code(), request.redirectUri());
+        User user = userService.findOrCreateKakaoUser(profile);
         return TokenResponse.bearer(jwtTokenProvider.createToken(user.getId(), user.getLoginId(), user.getRole()));
     }
 

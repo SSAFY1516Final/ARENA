@@ -14,6 +14,13 @@
         WHERE id = #{id}
     </select>
 
+    <select id="findSessionsByUserId" resultType="com.ssafy.arena.domain.DebateSession">
+        SELECT id, user_id, topic, mode, status, peak_reached, created_at, stopped_at
+        FROM debate_sessions
+        WHERE user_id = #{userId}
+        ORDER BY created_at DESC, id DESC
+    </select>
+
     <update id="updateSessionStatus">
         UPDATE debate_sessions
         SET status = #{status},

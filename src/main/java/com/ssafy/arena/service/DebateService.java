@@ -36,6 +36,23 @@ public class DebateService {
         return session;
     }
 
+    public List<DebateListItem> listMyDebates(Long userId) {
+        return debateMapper.findSessionsByUserId(userId).stream()
+                .map(DebateListItem::from)
+                .toList();
+    }
+
+    public DebateDetailResponse detail(Long userId, Long debateId) {
+        DebateSession session = getOwnedSession(userId, debateId);
+        DebateSummary summary = debateMapper.findSummary(debateId);
+        DebateSummaryResponse summaryResponse = summary == null ? null : DebateSummaryResponse.from(summary);
+        return new DebateDetailResponse(
+                CreateDebateResponse.from(session),
+                debateMapper.findMessages(debateId),
+                summaryResponse
+        );
+    }
+
     @Transactional
     public DebateMessageResponse nextTurn(Long userId, Long debateId) {
         DebateSession session = getOwnedSession(userId, debateId);

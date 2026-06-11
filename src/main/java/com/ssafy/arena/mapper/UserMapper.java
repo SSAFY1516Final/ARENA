@@ -14,6 +14,8 @@ public interface UserMapper {
 
     User findByLoginId(@Param("loginId") String loginId);
 
+    User findByProvider(@Param("provider") String provider, @Param("providerId") String providerId);
+
     User findByNickname(@Param("nickname") String nickname);
 
     List<User> findAll();

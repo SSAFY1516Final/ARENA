@@ -17,6 +17,8 @@ cp .env.example .env
 ```env
 OPENAI_API_KEY=sk-your-openai-api-key
 JWT_SECRET=change-this-to-a-long-random-secret-key-32chars
+KAKAO_REST_API_KEY=your-kakao-rest-api-key
+KAKAO_REDIRECT_URI=http://localhost:5173/auth/kakao/callback
 ```
 
 필수 값:
@@ -25,6 +27,7 @@ JWT_SECRET=change-this-to-a-long-random-secret-key-32chars
 | --- | --- |
 | `OPENAI_API_KEY` | Spring AI가 OpenAI API를 호출할 때 사용하는 API 키입니다. |
 | `JWT_SECRET` | JWT access token 서명에 사용하는 시크릿입니다. 최소 32자 이상의 임의 문자열을 권장합니다. |
+| `KAKAO_REST_API_KEY` | 카카오 OAuth 인가 코드 교환에 사용하는 Kakao Developers REST API 키입니다. |
 
 선택 값:
 
@@ -35,6 +38,8 @@ JWT_SECRET=change-this-to-a-long-random-secret-key-32chars
 | `MYSQL_ROOT_PASSWORD` | `arena-root-password` | Docker MySQL root 비밀번호입니다. |
 | `MYSQL_PORT` | `3306` | 호스트에 노출할 MySQL 포트입니다. |
 | `APP_PORT` | `8080` | 호스트에 노출할 Spring Boot 포트입니다. |
+| `KAKAO_CLIENT_SECRET` | 빈 값 | 카카오 앱에서 Client Secret을 사용하는 경우 설정합니다. |
+| `KAKAO_REDIRECT_URI` | `http://localhost:5173/auth/kakao/callback` | 카카오 로그인 Redirect URI입니다. |
 
 `.env`는 git에 포함하지 않습니다.
 
@@ -56,20 +61,12 @@ docker compose up --build
 
 ### 3. 인증 흐름
 
-회원가입:
+ARENA의 서비스 로그인은 카카오 OAuth를 사용합니다. 프론트엔드는 카카오 인가 페이지로 이동하고, 백엔드는 인가 코드를 카카오 access token과 사용자 프로필로 교환한 뒤 우리 서비스 JWT를 발급합니다.
 
 ```bash
-curl -X POST http://localhost:8080/api/auth/signup \
+curl -X POST http://localhost:8080/api/auth/kakao \
   -H "Content-Type: application/json" \
-  -d '{"loginId":"user01","nickname":"토론러","password":"password123!"}'
-```
-
-로그인 후 JWT 발급:
-
-```bash
-curl -X POST http://localhost:8080/api/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"loginId":"user01","password":"password123!"}'
+  -d '{"code":"{kakaoAuthorizationCode}","redirectUri":"http://localhost:5173/auth/kakao/callback"}'
 ```
 
 인증이 필요한 API는 응답받은 토큰을 `Authorization` 헤더에 넣어 호출합니다.
@@ -78,7 +75,14 @@ curl -X POST http://localhost:8080/api/auth/login \
 Authorization: Bearer {accessToken}
 ```
 
-회원가입으로 생성되는 계정의 기본 권한은 `USER`입니다. `ADMIN` 권한이 있는 사용자는 관리자 API로 전체 사용자 조회, 사용자 권한 변경, 게시글 공개/비공개 처리를 수행할 수 있습니다.
+카카오 로그인으로 처음 들어온 사용자는 `USER` 권한으로 자동 가입됩니다. `ADMIN` 권한이 있는 사용자는 관리자 API로 전체 사용자 조회, 사용자 권한 변경, 게시글 공개/비공개 처리를 수행할 수 있습니다.
+
+개발/테스트용 일반 회원가입과 로그인 API도 유지되어 있습니다.
+
+```http
+POST /api/auth/signup
+POST /api/auth/login
+```
 
 관리자 전용 API:
 
@@ -91,10 +95,32 @@ PATCH /api/admin/posts/{postId}/visibility
 이미 생성된 MySQL DB를 유지해서 실행 중이라면 다음 컬럼을 한 번 추가해야 합니다.
 
 ```sql
-ALTER TABLE users ADD COLUMN role VARCHAR(20) NOT NULL DEFAULT 'USER';
+ALTER TABLE users ADD COLUMN provider VARCHAR(20) NOT NULL DEFAULT 'LOCAL';
+ALTER TABLE users ADD COLUMN provider_id VARCHAR(100) NULL;
+ALTER TABLE users MODIFY COLUMN password_hash VARCHAR(255) NULL;
+CREATE UNIQUE INDEX uk_users_provider ON users(provider, provider_id);
 ```
 
-### 4. 종료
+### 4. Vue 프론트엔드 실행
+
+프론트엔드는 `frontend/` 폴더에 포함되어 있습니다.
+
+```bash
+cd frontend
+cp .env.example .env
+npm install
+npm run dev
+```
+
+프론트 환경변수:
+
+| 변수 | 기본값 | 설명 |
+| --- | --- | --- |
+| `VITE_API_BASE_URL` | `http://localhost:8080` | Spring Boot API 서버 주소 |
+| `VITE_KAKAO_REST_API_KEY` | 없음 | Kakao Developers REST API 키 |
+| `VITE_KAKAO_REDIRECT_URI` | `http://localhost:5173/auth/kakao/callback` | 카카오 Redirect URI |
+
+### 5. 종료
 
 ```bash
 docker compose down
@@ -161,7 +187,7 @@ ARENA는 실용 판정과 예능 배틀 두 가지 모드를 제공합니다.
 
 ## 사용자 흐름
 
-1. 사용자가 회원가입 후 로그인합니다.
+1. 사용자가 카카오 OAuth로 로그인합니다.
 2. 토론 주제와 토론 모드를 선택합니다.
 3. 냉정파와 열정파의 AI 토론을 확인합니다.
 4. 토론이 충분히 진행되면 사용자가 토론을 멈춥니다.
@@ -190,6 +216,7 @@ ARENA는 실용 판정과 예능 배틀 두 가지 모드를 제공합니다.
 | --- | --- |
 | Language | Java 17 |
 | Backend | Spring Boot 3.x |
+| Frontend | Vue 3, Vite, Pinia |
 | Security | Spring Security, JWT |
 | Persistence | MyBatis Mapper XML |
 | Database | MySQL |
@@ -219,6 +246,9 @@ Spring Boot 애플리케이션은 회원, JWT 인증, 토론 상태, 게시판, 
 | --- | --- | --- |
 | 인증 | `POST /api/auth/signup` | 회원가입 |
 | 인증 | `POST /api/auth/login` | JWT 발급 |
+| 인증 | `POST /api/auth/kakao` | 카카오 OAuth 로그인 후 JWT 발급 |
+| 토론 | `GET /api/debates` | 내 토론 목록 조회 |
+| 토론 | `GET /api/debates/{debateId}` | 내 토론 상세 조회 |
 | 관리자 | `GET /api/admin/users` | 전체 사용자 조회 |
 | 관리자 | `PATCH /api/admin/users/{userId}/role` | 사용자 권한 변경 |
 | 관리자 | `PATCH /api/admin/posts/{postId}/visibility` | 게시글 공개 여부 변경 |

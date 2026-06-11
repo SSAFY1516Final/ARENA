@@ -20,6 +20,8 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class UserService implements UserDetailsService {
+    private static final String KAKAO_PROVIDER = "KAKAO";
+
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
 
@@ -40,6 +42,25 @@ public class UserService implements UserDetailsService {
                 .build();
         userMapper.insert(user);
         return user;
+    }
+
+    @Transactional
+    public User findOrCreateKakaoUser(KakaoUserProfile profile) {
+        User user = userMapper.findByProvider(KAKAO_PROVIDER, profile.providerId());
+        if (user != null) {
+            return user;
+        }
+
+        User kakaoUser = User.builder()
+                .loginId("kakao_" + profile.providerId())
+                .nickname(resolveUniqueNickname(profile.nickname(), profile.providerId()))
+                .passwordHash(null)
+                .provider(KAKAO_PROVIDER)
+                .providerId(profile.providerId())
+                .role(UserRole.USER)
+                .build();
+        userMapper.insert(kakaoUser);
+        return kakaoUser;
     }
 
     public User authenticate(LoginRequest request) {
@@ -80,5 +101,18 @@ public class UserService implements UserDetailsService {
             throw new UsernameNotFoundException(username);
         }
         return new UserPrincipal(user);
+    }
+
+    private String resolveUniqueNickname(String nickname, String providerId) {
+        String baseNickname = (nickname == null || nickname.isBlank()) ? "카카오사용자" : nickname.trim();
+        if (userMapper.findByNickname(baseNickname) == null) {
+            return baseNickname;
+        }
+        String suffix = providerId.length() > 6 ? providerId.substring(providerId.length() - 6) : providerId;
+        String candidate = baseNickname + "_" + suffix;
+        if (candidate.length() > 50) {
+            candidate = candidate.substring(0, 50);
+        }
+        return candidate;
     }
 }

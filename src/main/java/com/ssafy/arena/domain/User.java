@@ -15,6 +15,8 @@ public class User {
     private String loginId;
     private String nickname;
     private String passwordHash;
+    private String provider;
+    private String providerId;
     private UserRole role;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

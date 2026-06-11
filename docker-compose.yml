@@ -31,6 +31,9 @@ services:
       DB_PASSWORD: ${MYSQL_ROOT_PASSWORD:-arena-root-password}
       JWT_SECRET: ${JWT_SECRET:?JWT_SECRET is required. Copy .env.example to .env and set JWT_SECRET.}
       JWT_EXPIRATION_SECONDS: ${JWT_EXPIRATION_SECONDS:-86400}
+      KAKAO_REST_API_KEY: ${KAKAO_REST_API_KEY:-}
+      KAKAO_CLIENT_SECRET: ${KAKAO_CLIENT_SECRET:-}
+      KAKAO_REDIRECT_URI: ${KAKAO_REDIRECT_URI:-http://localhost:5173/auth/kakao/callback}
       OPENAI_API_KEY: ${OPENAI_API_KEY:?OPENAI_API_KEY is required. Copy .env.example to .env and set OPENAI_API_KEY.}
       SPRING_AI_OPENAI_CHAT_OPTIONS_MODEL: ${OPENAI_MODEL:-gpt-4o-mini}
     ports:
