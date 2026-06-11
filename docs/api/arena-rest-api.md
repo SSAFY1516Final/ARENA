@@ -31,6 +31,7 @@
 | POST /api/auth/logout | 필요 |
 | GET /api/posts | 불필요 |
 | GET /api/posts/{postId} | 불필요 |
+| /api/admin/** | ADMIN 권한 필요 |
 | 그 외 /api/** | 필요 |
 
 인증이 필요한 API는 다음 헤더를 전달한다.
@@ -94,6 +95,8 @@ Response:
   "accessToken": "eyJhbGciOiJIUzI1NiJ9..."
 }
 ```
+
+발급된 JWT에는 `sub`, `userId`, `role`, `iat`, `exp` 클레임이 포함된다. `role`은 `USER` 또는 `ADMIN`이다.
 
 Status:
 
@@ -424,7 +427,100 @@ Status:
 | 작성자 아님 | 403 Forbidden |
 | 댓글 없음 | 404 Not Found |
 
-## 7. AI 생성 정책
+## 7. 관리자 API
+
+관리자 API는 `ADMIN` 권한을 가진 JWT로만 호출할 수 있다. `USER` 권한 토큰으로 호출하면 403 Forbidden을 반환한다.
+
+### GET /api/admin/users
+
+전체 사용자 목록을 조회한다.
+
+Response:
+
+```json
+[
+  {
+    "userId": 1,
+    "loginId": "admin",
+    "nickname": "관리자",
+    "role": "ADMIN",
+    "createdAt": "2026-06-11T10:30:00"
+  },
+  {
+    "userId": 2,
+    "loginId": "user01",
+    "nickname": "토론러",
+    "role": "USER",
+    "createdAt": "2026-06-11T10:35:00"
+  }
+]
+```
+
+### PATCH /api/admin/users/{userId}/role
+
+사용자 권한을 변경한다. 관리자가 자기 자신의 권한을 `USER`로 낮추는 요청은 거부한다.
+
+Request:
+
+```json
+{
+  "role": "ADMIN"
+}
+```
+
+Response:
+
+```json
+{
+  "userId": 2,
+  "loginId": "user01",
+  "nickname": "토론러",
+  "role": "ADMIN",
+  "createdAt": "2026-06-11T10:35:00"
+}
+```
+
+Status:
+
+| 상황 | 코드 |
+| --- | --- |
+| 성공 | 200 OK |
+| USER 권한 접근 | 403 Forbidden |
+| 사용자 없음 | 404 Not Found |
+| 자기 자신의 ADMIN 권한 해제 | 409 Conflict |
+| 검증 실패 | 400 Bad Request |
+
+### PATCH /api/admin/posts/{postId}/visibility
+
+게시글 공개 여부를 변경한다. `false`로 변경된 게시글은 공개 목록/상세 조회 대상에서 제외된다.
+
+Request:
+
+```json
+{
+  "isPublic": false
+}
+```
+
+Response:
+
+```json
+{
+  "postId": 5,
+  "isPublic": false
+}
+```
+
+Status:
+
+| 상황 | 코드 |
+| --- | --- |
+| 성공 | 200 OK |
+| USER 권한 접근 | 403 Forbidden |
+| 게시글 없음 | 404 Not Found |
+| 검증 실패 | 400 Bad Request |
+
+## 8. AI 생성 정책
 
 AI 발화와 요약은 Spring Boot 내부의 Spring AI `ChatClient`가 OpenAI API를 호출해 생성한다.
 

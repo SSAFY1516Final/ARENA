@@ -97,6 +97,12 @@
         WHERE id = #{id}
     </delete>
 
+    <update id="updateVisibility">
+        UPDATE posts
+        SET is_public = #{isPublic}
+        WHERE id = #{id}
+    </update>
+
     <select id="countVotes" resultType="int">
         SELECT COUNT(*)
         FROM post_votes

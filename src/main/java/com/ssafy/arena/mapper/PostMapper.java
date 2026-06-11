@@ -21,6 +21,8 @@ public interface PostMapper {
 
     void deleteById(@Param("id") Long id);
 
+    void updateVisibility(@Param("id") Long id, @Param("isPublic") boolean isPublic);
+
     Integer countVotes(@Param("postId") Long postId, @Param("choice") VoteChoice choice);
 
     void upsertVote(@Param("postId") Long postId, @Param("userId") Long userId, @Param("choice") VoteChoice choice);

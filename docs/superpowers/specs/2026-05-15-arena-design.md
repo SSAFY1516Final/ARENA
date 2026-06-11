@@ -16,6 +16,7 @@ MVP 포함 범위는 다음과 같습니다.
 
 - 회원가입
 - 로그인/JWT 인증
+- USER/ADMIN 권한 기반 인가
 - 토론 주제 생성
 - 토론 모드 선택
 - AI 토론 턴 생성
@@ -25,6 +26,7 @@ MVP 포함 범위는 다음과 같습니다.
 - 게시판 공유
 - 게시글 상세 조회
 - 댓글 작성과 삭제
+- 관리자 사용자 조회, 권한 변경, 게시글 공개 여부 변경
 
 ## 3. 사용자와 사용 사례
 
@@ -166,6 +168,7 @@ Spring Boot는 서비스 상태, 회원, 인증/인가, 게시판, 댓글, 모�
 - login_id
 - nickname
 - password_hash
+- role: USER 또는 ADMIN
 - created_at
 - updated_at
 
@@ -239,6 +242,12 @@ Spring Boot는 서비스 상태, 회원, 인증/인가, 게시판, 댓글, 모�
 - `POST /api/auth/signup`
 - `POST /api/auth/login`
 
+### 관리자
+
+- `GET /api/admin/users`
+- `PATCH /api/admin/users/{id}/role`
+- `PATCH /api/admin/posts/{id}/visibility`
+
 ### 토론
 
 - `POST /api/debates`
@@ -270,6 +279,10 @@ Spring AI는 토론 턴 생성과 토론 요약 생성에 사용합니다. 브�
 ## 14. 보안
 
 - Spring Security가 JWT Bearer Token 인증을 검증합니다.
+- JWT에는 `userId`와 `role` 클레임을 포함합니다.
+- `ROLE_USER`는 일반 사용자 기능을 사용합니다.
+- `ROLE_ADMIN`은 일반 사용자 기능과 관리자 API를 모두 사용합니다.
+- `/api/admin/**` 경로는 `ROLE_ADMIN`만 접근할 수 있습니다.
 - 비밀번호는 BCrypt로 저장합니다.
 - 게시판 목록과 게시글 상세 읽기는 공개합니다.
 - 토론 생성은 로그인이 필요합니다.
@@ -277,6 +290,8 @@ Spring AI는 토론 턴 생성과 토론 요약 생성에 사용합니다. 브�
 - 댓글 작성은 로그인이 필요합니다.
 - 게시글 삭제는 작성자만 가능합니다.
 - 댓글 삭제는 작성자만 가능합니다.
+- 관리자는 전체 사용자 조회, 사용자 권한 변경, 게시글 공개 여부 변경을 수행할 수 있습니다.
+- 관리자는 자기 자신의 관리자 권한을 직접 해제할 수 없습니다.
 - OpenAI API 키는 Spring 서버 환경변수에만 존재합니다.
 - OpenAI API 키는 브라우저에 전달하지 않습니다.
 
@@ -301,6 +316,8 @@ Spring AI는 토론 턴 생성과 토론 요약 생성에 사용합니다. 브�
 
 - 회원가입, 로그인, JWT 인증
 - 접근 제어
+- USER/ADMIN 권한 처리
+- 관리자 API
 - 토론 생성
 - 실용 판정/예능 배틀 턴 생성
 - 토론 메시지 저장

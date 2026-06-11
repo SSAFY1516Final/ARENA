@@ -1,6 +1,7 @@
 package com.ssafy.arena.security;
 
 import com.ssafy.arena.config.JwtProperties;
+import com.ssafy.arena.domain.UserRole;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -20,12 +21,13 @@ public class JwtTokenProvider {
         this.secretKey = Keys.hmacShaKeyFor(properties.secret().getBytes(StandardCharsets.UTF_8));
     }
 
-    public String createToken(Long userId, String loginId) {
+    public String createToken(Long userId, String loginId, UserRole role) {
         Instant now = Instant.now();
         Instant expiresAt = now.plusSeconds(properties.expirationSeconds());
         return Jwts.builder()
                 .subject(loginId)
                 .claim("userId", userId)
+                .claim("role", (role == null ? UserRole.USER : role).name())
                 .issuedAt(Date.from(now))
                 .expiration(Date.from(expiresAt))
                 .signWith(secretKey)
@@ -39,6 +41,10 @@ public class JwtTokenProvider {
     public boolean isValid(String token) {
         claims(token);
         return true;
+    }
+
+    public UserRole getRole(String token) {
+        return UserRole.valueOf(claims(token).get("role", String.class));
     }
 
     private Claims claims(String token) {

@@ -11,6 +11,7 @@ import static org.mockito.Mockito.when;
 
 import com.ssafy.arena.mapper.CommentMapper;
 import com.ssafy.arena.mapper.DebateMapper;
+import com.ssafy.arena.common.ApiException;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,6 +19,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
 
 @ExtendWith(MockitoExtension.class)
 class PostServiceTest {
@@ -69,5 +71,32 @@ class PostServiceTest {
         assertThat(response.voteCountB()).isEqualTo(1);
         assertThat(response.voteRatioA()).isEqualTo(75.0);
         assertThat(response.voteRatioB()).isEqualTo(25.0);
+    }
+
+    @Test
+    void updateVisibilityChangesPostPublicFlagForAdmin() {
+        Post post = Post.builder()
+                .id(5L)
+                .isPublic(true)
+                .build();
+        when(postMapper.findById(5L)).thenReturn(post);
+
+        Post updated = postService.updateVisibility(5L, false);
+
+        verify(postMapper).updateVisibility(5L, false);
+        assertThat(updated.getIsPublic()).isFalse();
+    }
+
+    @Test
+    void detailRejectsPrivatePost() {
+        when(postMapper.findById(5L)).thenReturn(Post.builder()
+                .id(5L)
+                .isPublic(false)
+                .build());
+
+        org.assertj.core.api.Assertions.assertThatThrownBy(() -> postService.detail(5L))
+                .isInstanceOf(ApiException.class)
+                .extracting("status")
+                .isEqualTo(HttpStatus.NOT_FOUND);
     }
 }

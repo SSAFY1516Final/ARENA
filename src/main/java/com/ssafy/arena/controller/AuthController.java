@@ -29,7 +29,7 @@ public class AuthController {
     @PostMapping("/login")
     public TokenResponse login(@Valid @RequestBody LoginRequest request) {
         User user = userService.authenticate(request);
-        return TokenResponse.bearer(jwtTokenProvider.createToken(user.getId(), user.getLoginId()));
+        return TokenResponse.bearer(jwtTokenProvider.createToken(user.getId(), user.getLoginId(), user.getRole()));
     }
 
     @PostMapping("/logout")

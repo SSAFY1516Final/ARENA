@@ -78,6 +78,22 @@ curl -X POST http://localhost:8080/api/auth/login \
 Authorization: Bearer {accessToken}
 ```
 
+회원가입으로 생성되는 계정의 기본 권한은 `USER`입니다. `ADMIN` 권한이 있는 사용자는 관리자 API로 전체 사용자 조회, 사용자 권한 변경, 게시글 공개/비공개 처리를 수행할 수 있습니다.
+
+관리자 전용 API:
+
+```http
+GET /api/admin/users
+PATCH /api/admin/users/{userId}/role
+PATCH /api/admin/posts/{postId}/visibility
+```
+
+이미 생성된 MySQL DB를 유지해서 실행 중이라면 다음 컬럼을 한 번 추가해야 합니다.
+
+```sql
+ALTER TABLE users ADD COLUMN role VARCHAR(20) NOT NULL DEFAULT 'USER';
+```
+
 ### 4. 종료
 
 ```bash
@@ -131,6 +147,10 @@ ARENA는 실용 판정과 예능 배틀 두 가지 모드를 제공합니다.
 
 요약된 토론은 게시글로 공유할 수 있습니다. 게시글에는 토론 주제, 요약 카드, 양측 선택지, 토론 로그, 댓글, 투표 결과가 함께 제공됩니다. 사용자는 다른 사용자의 고민과 논쟁을 탐색하고, 의견을 남기거나 선택지에 투표할 수 있습니다.
 
+### 관리자 기능
+
+관리자는 서비스 운영을 위해 전체 사용자 목록을 조회하고, 사용자 권한을 `USER` 또는 `ADMIN`으로 변경할 수 있습니다. 또한 부적절한 게시글은 삭제하지 않고 공개 여부를 변경해 목록과 상세 조회에서 숨길 수 있습니다.
+
 ### 투표와 비율 표시
 
 게시글에는 두 개의 선택지가 제공됩니다. 사용자는 둘 중 하나에 투표할 수 있으며, 게시글에서는 각 선택지의 득표 수와 비율을 확인할 수 있습니다. 이미 투표한 사용자가 다시 투표하면 기존 선택이 변경되는 방식으로 동작합니다.
@@ -162,6 +182,7 @@ ARENA는 실용 판정과 예능 배틀 두 가지 모드를 제공합니다.
 | 게시글 | 게시판에 공유된 토론 콘텐츠 |
 | 댓글 | 게시글에 남기는 사용자 의견 |
 | 투표 | 게시글의 두 선택지에 대한 사용자 선택 |
+| 권한 | USER, ADMIN 기반 접근 제어 |
 
 ## 기술 구성
 
@@ -191,3 +212,13 @@ Browser
 ```
 
 Spring Boot 애플리케이션은 회원, JWT 인증, 토론 상태, 게시판, 댓글, 투표 데이터를 관리합니다. Spring AI는 OpenAI API를 호출해 AI 발화 생성과 요약 생성을 담당합니다.
+
+## 주요 API
+
+| 구분 | API | 설명 |
+| --- | --- | --- |
+| 인증 | `POST /api/auth/signup` | 회원가입 |
+| 인증 | `POST /api/auth/login` | JWT 발급 |
+| 관리자 | `GET /api/admin/users` | 전체 사용자 조회 |
+| 관리자 | `PATCH /api/admin/users/{userId}/role` | 사용자 권한 변경 |
+| 관리자 | `PATCH /api/admin/posts/{postId}/visibility` | 게시글 공개 여부 변경 |

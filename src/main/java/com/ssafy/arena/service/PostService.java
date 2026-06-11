@@ -46,6 +46,9 @@ public class PostService {
 
     public PostDetailResponse detail(Long postId) {
         Post post = requirePost(postId);
+        if (!Boolean.TRUE.equals(post.getIsPublic())) {
+            throw new ApiException(HttpStatus.NOT_FOUND, "post not found");
+        }
         PostListItem item = postMapper.findListItemById(postId);
         DebateSummary summary = debateMapper.findSummary(post.getDebateSessionId());
         List<DebateMessage> messages = debateMapper.findMessages(post.getDebateSessionId());
@@ -67,6 +70,14 @@ public class PostService {
         Post post = requirePost(postId);
         postMapper.upsertVote(postId, userId, request.choice());
         return voteSummary(post);
+    }
+
+    @Transactional
+    public Post updateVisibility(Long postId, boolean isPublic) {
+        Post post = requirePost(postId);
+        postMapper.updateVisibility(postId, isPublic);
+        post.setIsPublic(isPublic);
+        return post;
     }
 
     private VoteResponse voteSummary(Post post) {

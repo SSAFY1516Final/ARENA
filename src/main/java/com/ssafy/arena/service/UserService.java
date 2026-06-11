@@ -2,10 +2,12 @@ package com.ssafy.arena.service;
 
 import com.ssafy.arena.domain.User;
 import com.ssafy.arena.domain.UserPrincipal;
+import com.ssafy.arena.domain.UserRole;
 import com.ssafy.arena.dto.user.*;
 import com.ssafy.arena.common.ApiException;
 import com.ssafy.arena.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
+import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -34,6 +36,7 @@ public class UserService implements UserDetailsService {
                 .loginId(request.loginId())
                 .nickname(request.nickname())
                 .passwordHash(passwordEncoder.encode(request.password()))
+                .role(UserRole.USER)
                 .build();
         userMapper.insert(user);
         return user;
@@ -52,6 +55,21 @@ public class UserService implements UserDetailsService {
         if (user == null) {
             throw new ApiException(HttpStatus.NOT_FOUND, "user not found");
         }
+        return user;
+    }
+
+    public List<User> listUsers() {
+        return userMapper.findAll();
+    }
+
+    @Transactional
+    public User updateRole(Long adminUserId, Long targetUserId, UserRole role) {
+        if (adminUserId.equals(targetUserId) && role == UserRole.USER) {
+            throw new ApiException(HttpStatus.CONFLICT, "cannot remove your own admin role");
+        }
+        User user = getById(targetUserId);
+        userMapper.updateRole(targetUserId, role);
+        user.setRole(role);
         return user;
     }
 
