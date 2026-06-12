@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssafy.arena.mapper.UserMapper">
+    <insert id="insert" parameterType="com.ssafy.arena.domain.User" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO users (login_id, nickname, password_hash, provider, provider_id, role)
+        VALUES (#{loginId}, #{nickname}, #{passwordHash}, #{provider}, #{providerId}, #{role})
+    </insert>
+
+    <select id="findById" resultType="com.ssafy.arena.domain.User">
+        SELECT id, login_id, nickname, password_hash, provider, provider_id, role, created_at, updated_at
+        FROM users
+        WHERE id = #{id}
+    </select>
+
+    <select id="findByLoginId" resultType="com.ssafy.arena.domain.User">
+        SELECT id, login_id, nickname, password_hash, provider, provider_id, role, created_at, updated_at
+        FROM users
+        WHERE login_id = #{loginId}
+    </select>
+
+    <select id="findByProvider" resultType="com.ssafy.arena.domain.User">
+        SELECT id, login_id, nickname, password_hash, provider, provider_id, role, created_at, updated_at
+        FROM users
+        WHERE provider = #{provider}
+          AND provider_id = #{providerId}
+    </select>
+
+    <select id="findByNickname" resultType="com.ssafy.arena.domain.User">
+        SELECT id, login_id, nickname, password_hash, provider, provider_id, role, created_at, updated_at
+        FROM users
+        WHERE nickname = #{nickname}
+    </select>
+
+    <select id="findAll" resultType="com.ssafy.arena.domain.User">
+        SELECT id, login_id, nickname, password_hash, provider, provider_id, role, created_at, updated_at
+        FROM users
+        ORDER BY id ASC
+    </select>
+
+    <update id="updateRole">
+        UPDATE users
+        SET role = #{role}
+        WHERE id = #{id}
+    </update>
+</mapper>
