@@ -1,93 +1,137 @@
-# Java_Seoul_16_Jaeyoung_Minyong
+# ARENA - AI Debate Community
 
+SSAFY 15기 서울 16반 관통 프로젝트 제출 저장소입니다. ARENA는 사용자가 선택하기 어려운 주제를 입력하면 두 AI 페르소나가 서로 다른 관점으로 토론하고, 토론 결과를 게시글로 공유해 다른 사용자의 투표와 의견을 받을 수 있는 서비스입니다.
 
+## 프로젝트 개요
 
-## Getting started
+- 프로젝트명: ARENA
+- 팀: Java_Seoul_16_Jaeyoung_Minyong
+- 주제: AI 기반 선택 토론 커뮤니티
+- 핵심 기능: 카카오 OAuth 로그인, JWT 인증, AI 토론 턴 생성, 토론 요약, 게시글 공유, 투표/댓글, 관리자 권한 관리
+- 제출 범위: Spring Boot REST API, Spring Security + JWT, Spring AI 연동 설계 및 문서
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+## 기술 스택
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+| 영역 | 기술 |
+| --- | --- |
+| Backend | Java 17, Spring Boot 3, Spring Security, Spring AI |
+| Auth | Kakao OAuth 2.0, JWT |
+| Persistence | MySQL 8, MyBatis |
+| Infra | Docker Compose |
+| Optional Frontend | Vue 3, Vite, Pinia, Axios |
+| Docs | Markdown, ERD/API/요구사항 문서 |
 
-## Add your files
+## 문서
 
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/topics/git/add_files/#add-files-to-a-git-repository) or push an existing Git repository with the following command:
+- [요구사항 정의서](docs/requirements.md)
+- [인증/인가 및 권한 설계](docs/auth-design.md)
+- [Spring AI 기능 설계](docs/ai-design.md)
+- [API 명세](docs/api.md)
+- [프로젝트 구조 및 제출 체크리스트](docs/project-structure.md)
 
+## 주요 기능
+
+### 사용자 기능
+
+- 카카오 OAuth 로그인
+- JWT 발급 및 인증
+- 내 토론 목록 조회
+- 토론 생성 및 AI 발화 요청
+- 토론 중단 후 AI 요약 생성
+- 요약 결과 게시글 공유
+- 게시글 투표 및 댓글 작성
+
+### 관리자 기능
+
+- 전체 사용자 조회
+- 사용자 권한 변경
+- 게시글 공개 여부 관리
+- 사용자/콘텐츠 관리 기능 확장 기반 제공
+
+### AI 기능
+
+- Spring AI `ChatClient` 기반 토론 발화 생성
+- 냉정파/열정파 페르소나를 번갈아 발화
+- 토론 종료 시 핵심 주장, 하이라이트, 판단 기준, 남은 쟁점, 공유용 요약 생성
+
+## 실행 환경 변수
+
+실행 전 `.env` 또는 실행 환경에 다음 값을 설정합니다. 실제 키 값은 저장소에 커밋하지 않습니다.
+
+```bash
+JWT_SECRET=change-this-to-a-long-random-secret-key-32chars
+JWT_EXPIRATION_SECONDS=86400
+
+OPENAI_API_KEY=sk-...
+OPENAI_MODEL=gpt-4o-mini
+
+KAKAO_REST_API_KEY=...
+KAKAO_CLIENT_SECRET=...
+KAKAO_REDIRECT_URI=http://localhost:5173/auth/kakao/callback
 ```
-cd existing_repo
-git remote add origin https://lab.ssafy.com/s15/a16/pjt_springai/java_seoul_16_jaeyoung_minyong.git
-git branch -M master
-git push -uf origin master
+
+## 실행 방법
+
+Docker Compose를 사용하는 경우:
+
+```bash
+docker compose up -d --build
 ```
 
-## Integrate with your tools
+로컬 Spring Boot 실행 기준:
 
-- [ ] [Set up project integrations](https://lab.ssafy.com/s15/a16/pjt_springai/java_seoul_16_jaeyoung_minyong/-/settings/integrations)
+```bash
+./gradlew bootRun
+```
 
-## Collaborate with your team
+테스트:
 
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Set auto-merge](https://docs.gitlab.com/user/project/merge_requests/auto_merge/)
+```bash
+./gradlew test
+```
 
-## Test and Deploy
+## Kakao OAuth 로컬 설정
 
-Use the built-in continuous integration in GitLab.
+Kakao Developers 콘솔에서 다음 설정이 필요합니다.
 
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
+- 카카오 로그인 사용 설정: ON
+- REST API 키의 카카오 로그인 리다이렉트 URI:
+  - `http://localhost:5173/auth/kakao/callback`
+- 웹 도메인:
+  - `http://localhost:5173`
+- 클라이언트 시크릿을 ON으로 둔 경우 백엔드 `KAKAO_CLIENT_SECRET`에 동일 값 설정
 
-***
+## API 요약
 
-# Editing this README
+| Method | Path | 설명 | 인증 |
+| --- | --- | --- | --- |
+| POST | `/api/auth/kakao` | 카카오 인가 코드로 JWT 발급 | Public |
+| POST | `/api/auth/login` | 로컬 로그인 | Public |
+| POST | `/api/auth/signup` | 로컬 회원가입 | Public |
+| GET | `/api/debates` | 내 토론 목록 조회 | USER |
+| POST | `/api/debates` | 토론 생성 | USER |
+| POST | `/api/debates/{id}/turns` | AI 다음 발화 생성 | USER |
+| POST | `/api/debates/{id}/stop` | 토론 종료 및 요약 생성 | USER |
+| POST | `/api/debates/{id}/share` | 토론 요약 게시글 공유 | USER |
+| GET | `/api/posts` | 공개 게시글 목록 | Public |
+| POST | `/api/posts/{id}/votes` | 게시글 투표 | USER |
+| POST | `/api/posts/{id}/comments` | 댓글 작성 | USER |
+| GET | `/api/admin/users` | 사용자 목록 관리 | ADMIN |
 
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
+상세 내용은 [API 명세](docs/api.md)를 참고합니다.
 
-## Suggestions for a good README
+## 브랜치 전략
 
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
+- `master`: 제출 및 최종 안정 버전
+- `dev`: 문서/기능 통합 작업 브랜치
+- 기능 작업 브랜치는 필요 시 `feat/*`, `fix/*`, `docs/*` 형식 사용
 
-## Name
-Choose a self-explaining name for your project.
+## 제출 체크리스트
 
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
-
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
-
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
-
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
-
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
-
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
-
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
-
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
-
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
-
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
-
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
-
-## License
-For open source projects, say how it is licensed.
-
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+- [x] 요구사항 정의서
+- [x] 인증/인가 설계 문서
+- [x] 사용자 권한 설계
+- [x] Spring AI 기능 설계
+- [x] README 정리
+- [ ] 최종 소스코드 반영
+- [ ] 실행 결과 캡처 또는 테스트 로그 정리
