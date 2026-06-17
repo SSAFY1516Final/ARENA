@@ -19,12 +19,16 @@
       <select v-model="filters.sort" class="select" @change="search">
         <option value="latest">최신순</option>
         <option value="comments">댓글순</option>
-        <option value="vote">투표순</option>
+        <option value="votes">투표순</option>
       </select>
       <button class="button button--ghost" type="button" @click="search">검색</button>
     </section>
 
-    <section v-if="postStore.hasPosts" class="post-grid">
+    <section v-if="postStore.loading" class="loading-state">
+      공유된 토론을 불러오는 중입니다.
+    </section>
+
+    <section v-else-if="postStore.hasPosts" class="post-grid">
       <RouterLink
         v-for="post in postStore.posts"
         :key="post.postId"
@@ -39,6 +43,10 @@
         </div>
         <h2>{{ post.title }}</h2>
         <p>{{ post.body }}</p>
+        <div class="post-card__meta">
+          <span>{{ post.voteOptionA }} {{ post.voteA }}</span>
+          <span>{{ post.voteOptionB }} {{ post.voteB }}</span>
+        </div>
       </RouterLink>
     </section>
 

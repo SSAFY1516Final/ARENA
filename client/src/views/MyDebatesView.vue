@@ -9,7 +9,11 @@
       <RouterLink class="button" to="/new">새 토론</RouterLink>
     </section>
 
-    <section v-if="debateStore.myDebates.length" class="my-debate-grid" aria-label="내 토론 목록">
+    <section v-if="debateStore.loading" class="loading-state">
+      내 토론을 불러오는 중입니다.
+    </section>
+
+    <section v-else-if="debateStore.myDebates.length" class="my-debate-grid" aria-label="내 토론 목록">
       <RouterLink
         v-for="debate in debateStore.myDebates"
         :key="debate.debateId"
@@ -24,12 +28,14 @@
         </div>
         <h2>{{ debate.topic }}</h2>
         <p>{{ debate.shareBody || debate.summaryCard }}</p>
+        <span class="card-link-label">이어가기</span>
       </RouterLink>
     </section>
 
     <section v-else class="empty-state">
       <h2>아직 만든 토론이 없습니다</h2>
       <p>새 토론을 만들면 이곳에서 이어서 진행할 수 있습니다.</p>
+      <RouterLink class="button" to="/new">첫 토론 만들기</RouterLink>
     </section>
   </main>
 </template>

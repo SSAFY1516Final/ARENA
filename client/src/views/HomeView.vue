@@ -31,7 +31,10 @@
         </div>
 
         <div class="start-panel__topic">
-          <label class="field-label" for="topic">토론 주제</label>
+          <div class="field-header">
+            <label class="field-label" for="topic">토론 주제</label>
+            <span>{{ topic.length }}/120</span>
+          </div>
           <input
             id="topic"
             v-model="topic"
@@ -42,6 +45,21 @@
           />
         </div>
       </form>
+
+      <div class="hero-metrics" aria-label="ARENA 주요 흐름">
+        <div>
+          <strong>01</strong>
+          <span>주제 입력</span>
+        </div>
+        <div>
+          <strong>02</strong>
+          <span>AI 토론</span>
+        </div>
+        <div>
+          <strong>03</strong>
+          <span>공유와 투표</span>
+        </div>
+      </div>
     </section>
 
     <aside class="preview-card">
@@ -57,6 +75,9 @@
         :key="message.messageId"
         :message="message"
       />
+      <div class="preview-card__footer">
+        <span>토론 종료 후 요약 카드와 투표 게시글로 이어집니다.</span>
+      </div>
     </aside>
   </main>
 </template>

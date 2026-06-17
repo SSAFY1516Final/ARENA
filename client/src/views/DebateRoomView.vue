@@ -2,17 +2,35 @@
   <main class="page">
     <section class="topic-header">
       <div>
+        <span class="eyebrow">Debate Room</span>
         <h1>{{ debateStore.currentDebate.topic }}</h1>
         <div class="tag-row">
           <span class="tag tag--teal">{{ modeLabel }}</span>
-          <span class="tag tag--blue">{{ debateStore.currentDebate.status }}</span>
+          <span class="tag tag--blue">{{ statusLabel }}</span>
         </div>
       </div>
     </section>
 
     <section class="debate-layout">
       <div class="chat-panel">
-        <div class="message-list">
+        <header class="chat-panel__header">
+          <div>
+            <strong>AI 페르소나 토론</strong>
+            <span>{{ chatMeta }}</span>
+          </div>
+          <span v-if="debateStore.currentDebate.peakReached" class="tag tag--amber">핵심 쟁점 도달</span>
+        </header>
+
+        <div v-if="debateStore.loading && !debateStore.messages.length" class="loading-state">
+          토론을 불러오는 중입니다.
+        </div>
+
+        <div v-else-if="!debateStore.messages.length" class="empty-state empty-state--compact">
+          <h2>아직 발화가 없습니다</h2>
+          <p>냉정파와 열정파가 차례로 의견을 내며 흐름을 만듭니다.</p>
+        </div>
+
+        <div v-else class="message-list">
           <section v-for="group in messageGroups" :key="group.roundNo" class="round-group">
             <div v-if="group.roundNo > 1" class="round-divider">
               <span>Round {{ group.roundNo }}</span>
@@ -76,6 +94,16 @@ const canShareDebate = computed(() => debateStore.currentDebate.status !== 'ACTI
 const modeLabel = computed(() =>
   debateStore.currentDebate.mode === 'PRACTICAL' ? '실용 판정' : '예능 배틀',
 )
+const statusLabel = computed(() => {
+  if (debateStore.currentDebate.status === 'ACTIVE') return '진행 중'
+  if (debateStore.currentDebate.status === 'STOPPED') return '요약 완료'
+  if (debateStore.currentDebate.status === 'SHARED') return '공유됨'
+  return debateStore.currentDebate.status
+})
+const chatMeta = computed(() => {
+  const count = debateStore.messages.length
+  return count ? `${count}개 발화` : '첫 발화를 기다리는 중'
+})
 
 onMounted(() => {
   debateStore.fetchDebate(route.params.debateId)

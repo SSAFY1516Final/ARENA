@@ -76,6 +76,12 @@
       </form>
     </aside>
   </main>
+
+  <main v-else class="page">
+    <section class="loading-state">
+      게시글을 불러오는 중입니다.
+    </section>
+  </main>
 </template>
 
 <script setup>
