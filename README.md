@@ -14,11 +14,11 @@ SSAFY 15기 서울 16반 관통 프로젝트 제출 저장소입니다. ARENA는
 
 | 영역 | 기술 |
 | --- | --- |
-| Backend | Java 17, Spring Boot 3, Spring Security, Spring AI |
+| Server | Java 17, Spring Boot 3, Spring Security, Spring AI |
 | Auth | Kakao OAuth 2.0, JWT |
 | Persistence | MySQL 8, MyBatis |
 | Infra | Docker Compose |
-| Optional Frontend | Vue 3, Vite, Pinia, Axios |
+| Client | Vue 3, Vite, Pinia, Axios |
 | Docs | Markdown, ERD/API/요구사항 문서 |
 
 ## 문서
@@ -81,13 +81,38 @@ docker compose up -d --build
 로컬 Spring Boot 실행 기준:
 
 ```bash
+cd server
 ./gradlew bootRun
 ```
 
 테스트:
 
 ```bash
+cd server
 ./gradlew test
+
+cd ../client
+npm ci
+npm test -- --run
+```
+
+프론트 개발 서버:
+
+```bash
+cd client
+npm ci
+npm run dev
+```
+
+## 프로젝트 구조
+
+```text
+.
+├── client/              # Vue 3 + Vite 프론트엔드
+├── server/              # Spring Boot 백엔드
+├── docs/                # 요구사항, 인증/인가, AI, API 문서
+├── docker-compose.yml   # MySQL + Spring Boot 실행
+└── README.md
 ```
 
 ## Kakao OAuth 로컬 설정

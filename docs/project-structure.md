@@ -5,28 +5,35 @@
 ```text
 .
 ├── README.md
+├── client
+│   ├── package.json
+│   └── src
+├── server
+│   ├── build.gradle.kts
+│   ├── gradlew
+│   ├── gradle
+│   └── src
+│       └── main
+│           ├── java
+│           │   └── com/ssafy/arena
+│           │       ├── ai
+│           │       ├── config
+│           │       ├── controller
+│           │       ├── domain
+│           │       ├── dto
+│           │       ├── mapper
+│           │       ├── security
+│           │       └── service
+│           └── resources
+│               ├── application.yml
+│               ├── db/schema.sql
+│               └── mapper
 ├── docs
 │   ├── requirements.md
 │   ├── auth-design.md
 │   ├── ai-design.md
 │   ├── api.md
 │   └── project-structure.md
-├── src
-│   └── main
-│       ├── java
-│       │   └── com/ssafy/arena
-│       │       ├── ai
-│       │       ├── config
-│       │       ├── controller
-│       │       ├── domain
-│       │       ├── dto
-│       │       ├── mapper
-│       │       ├── security
-│       │       └── service
-│       └── resources
-│           ├── application.yml
-│           ├── db/schema.sql
-│           └── mapper
 └── docker-compose.yml
 ```
 
@@ -34,6 +41,8 @@
 
 | 계층 | 역할 |
 | --- | --- |
+| `server` | Spring Boot 백엔드 애플리케이션 |
+| `client` | Vue 3 프론트엔드 애플리케이션 |
 | Controller | REST API 엔드포인트, 요청 검증, 인증 사용자 주입 |
 | Service | 비즈니스 로직, 트랜잭션, 권한 검증 |
 | Repository/Mapper | MyBatis 기반 DB 접근 |
