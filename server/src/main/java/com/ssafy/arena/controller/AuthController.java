@@ -1,10 +1,7 @@
 package com.ssafy.arena.controller;
 
-import com.ssafy.arena.domain.User;
 import com.ssafy.arena.dto.user.*;
-import com.ssafy.arena.security.JwtTokenProvider;
-import com.ssafy.arena.service.KakaoOAuthClient;
-import com.ssafy.arena.service.UserService;
+import com.ssafy.arena.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -18,27 +15,22 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
 public class AuthController {
-    private final UserService userService;
-    private final KakaoOAuthClient kakaoOAuthClient;
-    private final JwtTokenProvider jwtTokenProvider;
+    private final AuthService authService;
 
     @PostMapping("/signup")
     @ResponseStatus(HttpStatus.CREATED)
     public UserResponse signup(@Valid @RequestBody SignupRequest request) {
-        return UserResponse.from(userService.signup(request));
+        return UserResponse.from(authService.signup(request));
     }
 
     @PostMapping("/login")
     public TokenResponse login(@Valid @RequestBody LoginRequest request) {
-        User user = userService.authenticate(request);
-        return TokenResponse.bearer(jwtTokenProvider.createToken(user.getId(), user.getLoginId(), user.getRole()));
+        return authService.login(request);
     }
 
     @PostMapping("/kakao")
     public TokenResponse kakaoLogin(@Valid @RequestBody KakaoLoginRequest request) {
-        KakaoUserProfile profile = kakaoOAuthClient.fetchProfile(request.code(), request.redirectUri());
-        User user = userService.findOrCreateKakaoUser(profile);
-        return TokenResponse.bearer(jwtTokenProvider.createToken(user.getId(), user.getLoginId(), user.getRole()));
+        return authService.kakaoLogin(request);
     }
 
     @PostMapping("/logout")

@@ -44,7 +44,7 @@
 | `server` | Spring Boot 백엔드 애플리케이션 |
 | `client` | Vue 3 프론트엔드 애플리케이션 |
 | Controller | REST API 엔드포인트, 요청 검증, 인증 사용자 주입 |
-| Service | 비즈니스 로직, 트랜잭션, 권한 검증 |
+| Service | 비즈니스 로직, 트랜잭션, 권한 검증. 인증 흐름은 `AuthService`, 사용자 관리는 `UserService`로 분리 |
 | Repository/Mapper | MyBatis 기반 DB 접근 |
 | Security | JWT 발급/검증, SecurityFilterChain, Role 기반 인가 |
 | AI | Spring AI ChatClient 호출, 프롬프트 관리, 응답 파싱 |

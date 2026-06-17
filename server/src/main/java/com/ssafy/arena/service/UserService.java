@@ -65,7 +65,7 @@ public class UserService implements UserDetailsService {
         return kakaoUser;
     }
 
-    public User authenticate(LoginRequest request) {
+    public User authenticateLocal(LoginRequest request) {
         User user = userMapper.findByLoginId(request.loginId());
         if (user == null || !passwordEncoder.matches(request.password(), user.getPasswordHash())) {
             throw new ApiException(HttpStatus.UNAUTHORIZED, "invalid login credentials");

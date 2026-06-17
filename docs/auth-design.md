@@ -21,6 +21,17 @@ sequenceDiagram
     V->>B: Authorization: Bearer JWT
 ```
 
+## 인증 책임 분리
+
+| 구성 요소 | 책임 |
+| --- | --- |
+| `AuthController` | `/api/auth/**` 요청 검증과 응답 변환 |
+| `AuthService` | 회원가입, 로컬 로그인, Kakao 로그인, JWT 발급 흐름 조합 |
+| `UserService` | 사용자 생성/조회, 로컬 비밀번호 검증, Kakao 사용자 조회 또는 생성, 권한 변경 |
+| `KakaoOAuthClient` | Kakao authorization code 교환과 프로필 조회 |
+| `JwtTokenProvider` | 서비스 JWT 생성과 claim 파싱 |
+| `JwtAuthenticationFilter` | `Authorization: Bearer` 토큰 검증 후 SecurityContext 설정 |
+
 ## JWT 설계
 
 JWT payload에는 다음 정보를 포함한다.
