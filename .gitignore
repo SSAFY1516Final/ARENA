@@ -26,9 +26,9 @@ __pycache__/
 .env
 .env.local
 
-### Frontend ###
-frontend/node_modules/
-frontend/dist/
-frontend/.env
-frontend/.env.local
-frontend/coverage/
+### Client ###
+client/node_modules/
+client/dist/
+client/.env
+client/.env.local
+client/coverage/

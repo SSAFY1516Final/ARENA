@@ -11,7 +11,7 @@ services:
       - "${MYSQL_PORT:-3306}:3306"
     volumes:
       - arena-mysql-data:/var/lib/mysql
-      - ./src/main/resources/db/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+      - ./server/src/main/resources/db/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
     healthcheck:
       test: ["CMD-SHELL", "mysqladmin ping -h localhost -uroot -p$${MYSQL_ROOT_PASSWORD} --silent"]
       interval: 10s
@@ -19,7 +19,7 @@ services:
       retries: 10
 
   app:
-    build: .
+    build: ./server
     container_name: arena-app
     restart: unless-stopped
     depends_on:
