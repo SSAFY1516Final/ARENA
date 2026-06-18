@@ -133,6 +133,7 @@ Kakao Developers 콘솔에서 다음 설정이 필요합니다.
 | POST | `/api/auth/kakao` | 카카오 인가 코드로 JWT 발급 | Public |
 | POST | `/api/auth/login` | 로컬 로그인 | Public |
 | POST | `/api/auth/signup` | 로컬 회원가입 | Public |
+| POST | `/api/ai/topic-candidates` | 조건 기반 AI 주제 후보 생성 | USER |
 | GET | `/api/debates` | 내 토론 목록 조회 | USER |
 | POST | `/api/debates` | 토론 생성 | USER |
 | POST | `/api/debates/{id}/turns` | AI 다음 발화 생성 | USER |
