@@ -10,6 +10,20 @@ ARENA의 AI 기능은 사용자의 선택 고민을 토론 가능한 구조로 �
 - Spring 연동: Spring AI `ChatClient`
 - 모델: 환경 변수 `OPENAI_MODEL`로 지정, 기본값 `gpt-4o-mini`
 
+## AI 파이프라인 책임 분리
+
+현재 1단계 파이프라인은 기존 API를 유지하면서 내부 책임만 분리한다.
+
+| 구성 요소 | 책임 |
+| --- | --- |
+| `AiClient` | `DebateService`가 의존하는 AI 기능 인터페이스 |
+| `AiPipelineService` | 발화/요약 생성 흐름 조합, 발화자 선택, provider 호출과 파싱 연결 |
+| `SpringAiClient` | Spring AI `ChatClient`를 통한 실제 provider 호출 |
+| `AiPromptFactory` | 발화 생성/요약 생성 system/user prompt 구성 |
+| `AiResponseParser` | AI JSON 응답을 DTO로 파싱하고 실패 시 `502 Bad Gateway` 변환 |
+
+향후 주제 후보 생성, 주제 검증, 참신도 정렬, 턴 후보 선택 기능은 `AiPipelineService` 밖에 별도 use case로 추가한다. 이때 기존 토론 발화/요약 API 계약은 유지한다.
+
 ## AI 발화 생성
 
 ### 입력
