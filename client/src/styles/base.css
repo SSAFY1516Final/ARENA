@@ -335,74 +335,6 @@ p {
   width: 100%;
 }
 
-.candidate-controls {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
-  gap: 10px;
-  align-items: start;
-}
-
-.candidate-controls .input {
-  margin-bottom: 0;
-}
-
-.topic-candidate-button {
-  min-width: 126px;
-  white-space: nowrap;
-}
-
-.candidate-panel {
-  display: grid;
-  gap: 10px;
-}
-
-.topic-candidate-card {
-  width: 100%;
-  display: grid;
-  gap: 6px;
-  border: 1px solid var(--line);
-  border-radius: var(--radius-card);
-  background: var(--surface-raised);
-  padding: 14px 16px;
-  color: var(--ink);
-  text-align: left;
-  cursor: pointer;
-  transition:
-    border-color 0.16s ease,
-    background 0.16s ease,
-    transform 0.16s ease;
-}
-
-.topic-candidate-card:hover,
-.topic-candidate-card.selected {
-  border-color: rgba(49, 130, 246, 0.34);
-  background: var(--blue-soft);
-  transform: translateY(-1px);
-}
-
-.topic-candidate-card strong,
-.topic-candidate-card span,
-.topic-candidate-card small {
-  display: block;
-}
-
-.topic-candidate-card strong {
-  font-size: 15px;
-  font-weight: 850;
-}
-
-.topic-candidate-card span {
-  color: var(--muted-strong);
-  font-size: 13px;
-  font-weight: 700;
-}
-
-.topic-candidate-card small {
-  color: var(--blue);
-  font-size: 12px;
-  font-weight: 850;
-}
-
 .field-label {
   display: block;
   margin-bottom: 8px;
@@ -1641,9 +1573,6 @@ p {
     align-items: stretch;
   }
 
-  .candidate-controls {
-    grid-template-columns: 1fr;
-  }
 }
 
 @media (max-width: 720px) {

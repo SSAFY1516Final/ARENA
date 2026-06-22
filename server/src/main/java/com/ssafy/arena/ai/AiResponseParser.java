@@ -6,10 +6,6 @@ import com.ssafy.arena.common.ApiException;
 import com.ssafy.arena.domain.Speaker;
 import com.ssafy.arena.dto.ai.AiNextTurnResponse;
 import com.ssafy.arena.dto.ai.AiSummaryResponse;
-import com.ssafy.arena.dto.ai.TopicCandidateItem;
-import com.ssafy.arena.dto.ai.TopicCandidateResponse;
-import java.util.ArrayList;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
@@ -47,25 +43,4 @@ public class AiResponseParser {
         }
     }
 
-    public TopicCandidateResponse parseTopicCandidates(String content) {
-        try {
-            var root = objectMapper.readTree(content);
-            var itemsNode = root.path("items");
-            List<TopicCandidateItem> items = new ArrayList<>();
-            if (itemsNode.isArray()) {
-                for (var itemNode : itemsNode) {
-                    items.add(new TopicCandidateItem(
-                            itemNode.path("title").asText(),
-                            itemNode.path("reason").asText(),
-                            itemNode.path("noveltyScore").asInt(0),
-                            itemNode.path("fitScore").asInt(0),
-                            itemNode.path("funScore").asInt(0)
-                    ));
-                }
-            }
-            return new TopicCandidateResponse(items);
-        } catch (RuntimeException | com.fasterxml.jackson.core.JsonProcessingException ex) {
-            throw new ApiException(HttpStatus.BAD_GATEWAY, "Spring AI topic candidate generation failed");
-        }
-    }
 }

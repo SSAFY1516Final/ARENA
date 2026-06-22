@@ -8,7 +8,6 @@ import com.ssafy.arena.common.ApiException;
 import com.ssafy.arena.domain.Speaker;
 import com.ssafy.arena.dto.ai.AiNextTurnResponse;
 import com.ssafy.arena.dto.ai.AiSummaryResponse;
-import com.ssafy.arena.dto.ai.TopicCandidateResponse;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 
@@ -53,28 +52,5 @@ class AiResponseParserTest {
                 .isInstanceOf(ApiException.class)
                 .extracting("status")
                 .isEqualTo(HttpStatus.BAD_GATEWAY);
-    }
-
-    @Test
-    void parsesTopicCandidateJson() {
-        TopicCandidateResponse response = parser.parseTopicCandidates("""
-                {
-                  "items": [
-                    {
-                      "title": "오후 집중력을 기준으로 제육 vs 돈까스",
-                      "reason": "조건과 선택 갈등이 명확합니다.",
-                      "noveltyScore": 88,
-                      "fitScore": 94,
-                      "funScore": 72
-                    }
-                  ]
-                }
-                """);
-
-        assertThat(response.items()).hasSize(1);
-        assertThat(response.items().get(0).title()).isEqualTo("오후 집중력을 기준으로 제육 vs 돈까스");
-        assertThat(response.items().get(0).noveltyScore()).isEqualTo(88);
-        assertThat(response.items().get(0).fitScore()).isEqualTo(94);
-        assertThat(response.items().get(0).funScore()).isEqualTo(72);
     }
 }

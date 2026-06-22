@@ -10,9 +10,6 @@ export const debateApi = {
   create(payload) {
     return api.post('/api/debates', payload)
   },
-  topicCandidates(payload) {
-    return api.post('/api/ai/topic-candidates', payload)
-  },
   nextTurn(debateId) {
     return api.post(`/api/debates/${debateId}/turns`)
   },

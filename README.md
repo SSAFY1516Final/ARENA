@@ -36,7 +36,6 @@ SSAFY 15기 서울 16반 관통 프로젝트 제출 저장소입니다. ARENA는
 - 카카오 OAuth 로그인
 - JWT 발급 및 인증
 - 내 토론 목록 조회
-- 조건 기반 AI 주제 후보 생성 및 후보 선택
 - 토론 생성 및 AI 발화 요청
 - 토론 중단 후 AI 요약 생성
 - 요약 결과 게시글 공유
@@ -132,7 +131,6 @@ Kakao Developers 콘솔에서 다음 설정이 필요합니다.
 | Method | Path | 설명 | 인증 |
 | --- | --- | --- | --- |
 | POST | `/api/auth/kakao` | 카카오 인가 코드로 JWT 발급 | Public |
-| POST | `/api/ai/topic-candidates` | 조건 기반 AI 주제 후보 생성 | USER |
 | GET | `/api/debates` | 내 토론 목록 조회 | USER |
 | POST | `/api/debates` | 토론 생성 | USER |
 | POST | `/api/debates/{id}/turns` | AI 다음 발화 생성 | USER |
