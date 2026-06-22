@@ -1,0 +1,37 @@
+@startuml
+left to right direction
+skinparam packageStyle rectangle
+skinparam actorStyle awesome
+
+actor "사용자" as User
+
+rectangle "ARENA(아레나)" {
+  usecase "회원 관리" as UC_Auth
+  usecase "AI 토론 생성" as UC_CreateDebate
+  usecase "AI 토론 진행" as UC_RunDebate
+  usecase "토론 결과 요약" as UC_Summarize
+  usecase "토론 결과 공유" as UC_Share
+  usecase "공유된 토론 조회" as UC_ViewPosts
+  usecase "게시글 검색/필터" as UC_SearchFilter
+  usecase "게시글 투표" as UC_Vote
+  usecase "댓글 작성" as UC_Comment
+  usecase "내 콘텐츠 관리" as UC_ManageOwn
+}
+
+User --> UC_Auth
+User --> UC_CreateDebate
+User --> UC_RunDebate
+User --> UC_Summarize
+User --> UC_Share
+User --> UC_ViewPosts
+User --> UC_SearchFilter
+User --> UC_Vote
+User --> UC_Comment
+User --> UC_ManageOwn
+
+UC_Share ..> UC_Summarize : <<include>>
+UC_SearchFilter ..> UC_ViewPosts : <<extend>>
+UC_Vote ..> UC_ViewPosts : <<extend>>
+UC_Comment ..> UC_ViewPosts : <<extend>>
+UC_ManageOwn ..> UC_ViewPosts : <<extend>>
+@enduml

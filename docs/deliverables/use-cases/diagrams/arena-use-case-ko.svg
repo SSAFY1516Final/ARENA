@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="760" viewBox="0 0 1200 760">
+  <style>
+    .title{font:700 28px sans-serif;fill:#111827}.sub{font:15px sans-serif;fill:#64748b}.actor{font:700 16px sans-serif;fill:#111827}.box{fill:#fff;stroke:#0f766e;stroke-width:2}.uc{fill:#f8fafc;stroke:#2563eb;stroke-width:2}.admin{fill:#fef3c7;stroke:#d97706;stroke-width:2}.ext{fill:#ecfeff;stroke:#0891b2;stroke-width:2}.txt{font:700 15px sans-serif;fill:#111827;text-anchor:middle;dominant-baseline:middle}.line{stroke:#64748b;stroke-width:2;fill:none}.dash{stroke-dasharray:6 5}
+  </style>
+  <text class="title" x="48" y="52">ARENA(아레나) 유스케이스 다이어그램</text>
+  <text class="sub" x="48" y="82">현재 기준: Kakao OAuth + JWT, Vue 3, Spring AI 베이스 환경</text>
+
+  <rect class="box" x="240" y="120" width="720" height="560" rx="18"/>
+  <text class="actor" x="600" y="155" text-anchor="middle">ARENA System</text>
+
+  <text class="actor" x="90" y="250" text-anchor="middle">비회원</text>
+  <circle cx="90" cy="190" r="18" fill="none" stroke="#111827" stroke-width="3"/><line class="line" x1="90" y1="208" x2="90" y2="270"/><line class="line" x1="60" y1="230" x2="120" y2="230"/><line class="line" x1="90" y1="270" x2="65" y2="320"/><line class="line" x1="90" y1="270" x2="115" y2="320"/>
+  <text class="actor" x="90" y="530" text-anchor="middle">회원</text>
+  <circle cx="90" cy="470" r="18" fill="none" stroke="#111827" stroke-width="3"/><line class="line" x1="90" y1="488" x2="90" y2="550"/><line class="line" x1="60" y1="510" x2="120" y2="510"/><line class="line" x1="90" y1="550" x2="65" y2="600"/><line class="line" x1="90" y1="550" x2="115" y2="600"/>
+  <text class="actor" x="1090" y="265" text-anchor="middle">Kakao OAuth</text>
+  <text class="actor" x="1090" y="455" text-anchor="middle">Spring AI</text>
+  <text class="actor" x="1090" y="610" text-anchor="middle">관리자</text>
+
+  <rect class="ext" x="300" y="190" width="160" height="50" rx="25"/><text class="txt" x="380" y="215">카카오 로그인</text>
+  <rect class="uc" x="520" y="190" width="160" height="50" rx="25"/><text class="txt" x="600" y="215">공개 게시글 조회</text>
+  <rect class="uc" x="740" y="190" width="160" height="50" rx="25"/><text class="txt" x="820" y="215">검색/필터</text>
+
+  <rect class="uc" x="300" y="310" width="160" height="50" rx="25"/><text class="txt" x="380" y="335">토론 생성</text>
+  <rect class="uc" x="520" y="310" width="160" height="50" rx="25"/><text class="txt" x="600" y="335">AI 토론 진행</text>
+  <rect class="uc" x="740" y="310" width="160" height="50" rx="25"/><text class="txt" x="820" y="335">토론 중단/요약</text>
+
+  <rect class="uc" x="300" y="430" width="160" height="50" rx="25"/><text class="txt" x="380" y="455">토론 결과 공유</text>
+  <rect class="uc" x="520" y="430" width="160" height="50" rx="25"/><text class="txt" x="600" y="455">게시글 투표</text>
+  <rect class="uc" x="740" y="430" width="160" height="50" rx="25"/><text class="txt" x="820" y="455">댓글 작성/삭제</text>
+
+  <rect class="admin" x="410" y="560" width="180" height="50" rx="25"/><text class="txt" x="500" y="585">사용자 권한 관리</text>
+  <rect class="admin" x="640" y="560" width="180" height="50" rx="25"/><text class="txt" x="730" y="585">게시글 공개 관리</text>
+
+  <path class="line" d="M130 230 L300 215"/><path class="line" d="M130 245 L520 215"/><path class="line" d="M130 505 L300 335"/><path class="line" d="M130 515 L520 335"/><path class="line" d="M130 525 L740 335"/><path class="line" d="M130 535 L300 455"/><path class="line" d="M130 545 L520 455"/><path class="line" d="M130 555 L740 455"/>
+  <path class="line" d="M460 215 L1040 250"/><path class="line" d="M680 335 L1040 440"/><path class="line" d="M900 335 L1040 450"/>
+  <path class="line" d="M1035 600 L820 585"/><path class="line" d="M1035 600 L590 585"/>
+  <path class="line dash" d="M380 455 L820 360"/><text class="sub" x="520" y="390">include</text>
+</svg>
