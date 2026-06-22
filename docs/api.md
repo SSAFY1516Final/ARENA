@@ -30,14 +30,6 @@ Response:
 }
 ```
 
-### POST `/api/auth/login`
-
-로컬 계정 로그인용 API다. 데모나 Kakao 장애 시 대체 로그인으로 사용할 수 있다.
-
-### POST `/api/auth/signup`
-
-로컬 계정 생성용 API다.
-
 ## AI
 
 ### POST `/api/ai/topic-candidates`

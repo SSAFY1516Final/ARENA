@@ -3,8 +3,6 @@ package com.ssafy.arena.service;
 import com.ssafy.arena.domain.User;
 import com.ssafy.arena.dto.user.KakaoLoginRequest;
 import com.ssafy.arena.dto.user.KakaoUserProfile;
-import com.ssafy.arena.dto.user.LoginRequest;
-import com.ssafy.arena.dto.user.SignupRequest;
 import com.ssafy.arena.dto.user.TokenResponse;
 import com.ssafy.arena.security.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
@@ -18,16 +16,6 @@ public class AuthService {
     private final UserService userService;
     private final KakaoOAuthClient kakaoOAuthClient;
     private final JwtTokenProvider jwtTokenProvider;
-
-    @Transactional
-    public User signup(SignupRequest request) {
-        return userService.signup(request);
-    }
-
-    public TokenResponse login(LoginRequest request) {
-        User user = userService.authenticateLocal(request);
-        return createTokenResponse(user);
-    }
 
     @Transactional
     public TokenResponse kakaoLogin(KakaoLoginRequest request) {

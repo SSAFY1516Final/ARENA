@@ -65,7 +65,7 @@
 
 - [ ] Spring Boot 서버 실행
 - [ ] MySQL 연결
-- [ ] 회원가입/로그인 또는 Kakao OAuth 로그인
+- [ ] Kakao OAuth 로그인
 - [ ] JWT 발급 및 인증 API 호출
 - [ ] USER 권한 API 접근
 - [ ] ADMIN 권한 API 접근 제한 확인
