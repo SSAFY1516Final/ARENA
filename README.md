@@ -2,13 +2,30 @@
 
 SSAFY 15기 서울 16반 관통 프로젝트 제출 저장소입니다. ARENA는 사용자가 선택하기 어려운 주제를 입력하면 두 AI 페르소나가 서로 다른 관점으로 토론하고, 토론 결과를 게시글로 공유해 다른 사용자의 투표와 의견을 받을 수 있는 서비스입니다.
 
+## 제출 요약
+
+| 항목 | 위치 | 상태 |
+| --- | --- | --- |
+| Spring Boot 백엔드 | `server/` | Spring Security, JWT, Kakao OAuth, MyBatis, Spring AI 베이스 환경 반영 |
+| Vue 프론트엔드 | `client/` | Kakao 로그인, 토론, 게시글, 관리자 화면 흐름 반영 |
+| 요구사항 정의서 | `docs/deliverables/requirements/arena-requirements.md` | 현재 서비스 방향 기준 보정 완료 |
+| 유즈케이스 다이어그램 | `docs/deliverables/use-cases/arena-use-cases.md` | Actor, 주요 기능, Mermaid 원본 포함 |
+| ERD | `docs/deliverables/erd/arena-erd.md` | Kakao OAuth 사용자 모델 및 JWT 인증 흐름 기준 보정 |
+| WBS | `docs/deliverables/wbs/arena-wbs.xlsx` | 카카오 로그인, 관리자 기능, Spring AI 베이스 기준 보정 |
+| 간트차트 | `docs/deliverables/gantt/arena-gantt.xlsx` | 현재 개발 흐름 기준 보정 |
+| 화면설계서 | `docs/deliverables/screen-definition/figma-screen-definition.md` | Vue 화면 구조와 사용자 흐름 기준 보정 |
+| API 설계서 | `docs/deliverables/api/arena-rest-api.md` | 현재 REST API 기준 보정 |
+
+전체 산출물 색인은 [docs/deliverables/README.md](docs/deliverables/README.md)를 참고합니다.
+
 ## 프로젝트 개요
 
 - 프로젝트명: ARENA
 - 팀: Java_Seoul_16_Jaeyoung_Minyong
 - 주제: AI 기반 선택 토론 커뮤니티
-- 핵심 기능: 카카오 OAuth 로그인, JWT 인증, AI 토론 턴 생성, 토론 요약, 게시글 공유, 투표/댓글, 관리자 권한 관리
-- 제출 범위: Spring Boot REST API, Spring Security + JWT, Spring AI 연동 설계 및 문서
+- 인증 방식: Kakao OAuth 로그인 후 자체 JWT 발급
+- 핵심 기능: AI 토론 생성, 토론 요약, 게시글 공유, 투표/댓글, 관리자 권한 관리
+- 제출 범위: Spring Boot REST API, Vue 3 프론트엔드, Spring Security + JWT, MyBatis, Spring AI 베이스 환경, 제출 산출물
 
 ## 기술 스택
 
@@ -19,28 +36,19 @@ SSAFY 15기 서울 16반 관통 프로젝트 제출 저장소입니다. ARENA는
 | Persistence | MySQL 8, MyBatis |
 | Infra | Docker Compose |
 | Client | Vue 3, Vite, Pinia, Axios |
-| Docs | Markdown, ERD/API/요구사항 문서 |
-
-## 문서
-
-- [요구사항 정의서](docs/requirements.md)
-- [인증/인가 및 권한 설계](docs/auth-design.md)
-- [Spring AI 기능 설계](docs/ai-design.md)
-- [API 명세](docs/api.md)
-- [프로젝트 구조 및 제출 체크리스트](docs/project-structure.md)
-- [산출물 모음](docs/deliverables/README.md)
+| Docs | Markdown, Mermaid, Excel, PNG |
 
 ## 주요 기능
 
 ### 사용자 기능
 
 - 카카오 OAuth 로그인
-- JWT 발급 및 인증
+- JWT 기반 API 인증
 - 내 토론 목록 조회
 - 토론 생성 및 AI 발화 요청
 - 토론 중단 후 AI 요약 생성
 - 요약 결과 게시글 공유
-- 게시글 투표 및 댓글 작성
+- 공개 게시글 조회, 투표, 댓글 작성
 
 ### 관리자 기능
 
@@ -51,9 +59,9 @@ SSAFY 15기 서울 16반 관통 프로젝트 제출 저장소입니다. ARENA는
 
 ### AI 기능
 
-- Spring AI `ChatClient` 기반 토론 발화 생성
-- 냉정파/열정파 페르소나를 번갈아 발화
-- 토론 종료 시 핵심 주장, 하이라이트, 판단 기준, 남은 쟁점, 공유용 요약 생성
+- Spring AI 연동을 위한 최소 베이스 환경 구성
+- 토론 발화 생성 및 요약 생성을 담당하는 AI 클라이언트 추상화
+- 선택형 주제 후보 생성 등 고도화 파이프라인은 `ai-experiment-choice-pipeline` 브랜치에 별도 보존
 
 ## 실행 환경 변수
 
@@ -79,11 +87,19 @@ Docker Compose를 사용하는 경우:
 docker compose up -d --build
 ```
 
-로컬 Spring Boot 실행 기준:
+백엔드만 로컬로 실행하는 경우:
 
 ```bash
 cd server
 ./gradlew bootRun
+```
+
+프론트 개발 서버:
+
+```bash
+cd client
+npm ci
+npm run dev
 ```
 
 테스트:
@@ -97,22 +113,18 @@ npm ci
 npm test -- --run
 ```
 
-프론트 개발 서버:
-
-```bash
-cd client
-npm ci
-npm run dev
-```
-
 ## 프로젝트 구조
 
 ```text
 .
-├── client/              # Vue 3 + Vite 프론트엔드
-├── server/              # Spring Boot 백엔드
-├── docs/                # 요구사항, 인증/인가, AI, API 문서
-├── docker-compose.yml   # MySQL + Spring Boot 실행
+├── client/                 # Vue 3 + Vite 프론트엔드
+├── server/                 # Spring Boot 백엔드
+├── docs/                   # 설계 문서 및 제출 산출물
+│   ├── auth-design.md      # 인증/인가 설계
+│   ├── ai-design.md        # Spring AI 설계
+│   ├── api.md              # API 명세
+│   └── deliverables/       # 요구사항, ERD, WBS, 간트차트, 화면설계서
+├── docker-compose.yml      # MySQL + Spring Boot 실행
 └── README.md
 ```
 
@@ -132,6 +144,7 @@ Kakao Developers 콘솔에서 다음 설정이 필요합니다.
 | Method | Path | 설명 | 인증 |
 | --- | --- | --- | --- |
 | POST | `/api/auth/kakao` | 카카오 인가 코드로 JWT 발급 | Public |
+| POST | `/api/auth/logout` | 클라이언트 토큰 폐기 흐름 | USER |
 | GET | `/api/debates` | 내 토론 목록 조회 | USER |
 | POST | `/api/debates` | 토론 생성 | USER |
 | POST | `/api/debates/{id}/turns` | AI 다음 발화 생성 | USER |
@@ -142,20 +155,26 @@ Kakao Developers 콘솔에서 다음 설정이 필요합니다.
 | POST | `/api/posts/{id}/comments` | 댓글 작성 | USER |
 | GET | `/api/admin/users` | 사용자 목록 관리 | ADMIN |
 
-상세 내용은 [API 명세](docs/api.md)를 참고합니다.
+상세 내용은 [docs/deliverables/api/arena-rest-api.md](docs/deliverables/api/arena-rest-api.md)를 참고합니다.
+
+## 제출 체크리스트
+
+- [x] 요구사항 정의서
+- [x] 유즈케이스 문서 및 다이어그램
+- [x] ERD
+- [x] WBS
+- [x] 간트차트
+- [x] 화면설계서
+- [x] 인증/인가 설계 문서
+- [x] 사용자 권한 설계
+- [x] Spring AI 베이스 설계
+- [x] API 설계서
+- [x] README 정리
+- [ ] 최종 실행 캡처 또는 테스트 로그 정리
 
 ## 브랜치 전략
 
 - `master`: 제출 및 최종 안정 버전
 - `dev`: 문서/기능 통합 작업 브랜치
+- `ai-experiment-choice-pipeline`: 고도화 AI 파이프라인 실험 브랜치
 - 기능 작업 브랜치는 필요 시 `feat/*`, `fix/*`, `docs/*` 형식 사용
-
-## 제출 체크리스트
-
-- [x] 요구사항 정의서
-- [x] 인증/인가 설계 문서
-- [x] 사용자 권한 설계
-- [x] Spring AI 기능 설계
-- [x] README 정리
-- [ ] 최종 소스코드 반영
-- [ ] 실행 결과 캡처 또는 테스트 로그 정리
