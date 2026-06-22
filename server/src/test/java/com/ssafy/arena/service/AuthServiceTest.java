@@ -8,8 +8,6 @@ import com.ssafy.arena.domain.User;
 import com.ssafy.arena.domain.UserRole;
 import com.ssafy.arena.dto.user.KakaoLoginRequest;
 import com.ssafy.arena.dto.user.KakaoUserProfile;
-import com.ssafy.arena.dto.user.LoginRequest;
-import com.ssafy.arena.dto.user.SignupRequest;
 import com.ssafy.arena.dto.user.TokenResponse;
 import com.ssafy.arena.security.JwtTokenProvider;
 import org.junit.jupiter.api.Test;
@@ -31,39 +29,6 @@ class AuthServiceTest {
 
     @InjectMocks
     private AuthService authService;
-
-    @Test
-    void signupDelegatesUserCreation() {
-        SignupRequest request = new SignupRequest("user01", "일반사용자", "password123");
-        User user = User.builder()
-                .id(1L)
-                .loginId("user01")
-                .nickname("일반사용자")
-                .role(UserRole.USER)
-                .build();
-        when(userService.signup(request)).thenReturn(user);
-
-        User created = authService.signup(request);
-
-        assertThat(created).isSameAs(user);
-    }
-
-    @Test
-    void localLoginReturnsBearerToken() {
-        LoginRequest request = new LoginRequest("user01", "password123");
-        User user = User.builder()
-                .id(1L)
-                .loginId("user01")
-                .role(UserRole.USER)
-                .build();
-        when(userService.authenticateLocal(request)).thenReturn(user);
-        when(jwtTokenProvider.createToken(1L, "user01", UserRole.USER)).thenReturn("jwt-token");
-
-        TokenResponse response = authService.login(request);
-
-        assertThat(response.tokenType()).isEqualTo("Bearer");
-        assertThat(response.accessToken()).isEqualTo("jwt-token");
-    }
 
     @Test
     void kakaoLoginReturnsBearerTokenForProviderUser() {

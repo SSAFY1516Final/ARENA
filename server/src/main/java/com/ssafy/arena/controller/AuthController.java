@@ -1,6 +1,7 @@
 package com.ssafy.arena.controller;
 
-import com.ssafy.arena.dto.user.*;
+import com.ssafy.arena.dto.user.KakaoLoginRequest;
+import com.ssafy.arena.dto.user.TokenResponse;
 import com.ssafy.arena.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -16,17 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class AuthController {
     private final AuthService authService;
-
-    @PostMapping("/signup")
-    @ResponseStatus(HttpStatus.CREATED)
-    public UserResponse signup(@Valid @RequestBody SignupRequest request) {
-        return UserResponse.from(authService.signup(request));
-    }
-
-    @PostMapping("/login")
-    public TokenResponse login(@Valid @RequestBody LoginRequest request) {
-        return authService.login(request);
-    }
 
     @PostMapping("/kakao")
     public TokenResponse kakaoLogin(@Valid @RequestBody KakaoLoginRequest request) {
