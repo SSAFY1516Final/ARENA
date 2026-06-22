@@ -8,7 +8,7 @@
     <nav class="nav-links" aria-label="주요 메뉴">
       <RouterLink to="/posts">게시판</RouterLink>
       <RouterLink to="/debates">내 토론</RouterLink>
-      <RouterLink class="nav-create-link" to="/new">새 토론 만들기</RouterLink>
+      <RouterLink class="nav-create-link" to="/new">새 토론</RouterLink>
     </nav>
 
     <div class="nav-user">

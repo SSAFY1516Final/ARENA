@@ -4,9 +4,9 @@
       <div>
         <span class="eyebrow">Community Board</span>
         <h1>공유된 토론</h1>
-        <p class="page-copy">공유자가 남긴 본문과 토론 주제를 보고 의견을 남길 게시글을 탐색합니다.</p>
+        <p class="page-copy">토론 결과가 커뮤니티로 이어집니다. 공유된 판단 기준과 투표 흐름을 확인하세요.</p>
       </div>
-      <RouterLink class="button" to="/new">새 토론 만들기</RouterLink>
+      <RouterLink class="button" to="/new">새 토론</RouterLink>
     </section>
 
     <section class="toolbar" aria-label="게시글 검색과 필터">

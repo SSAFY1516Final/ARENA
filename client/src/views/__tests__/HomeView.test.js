@@ -19,7 +19,7 @@ describe('HomeView', () => {
     })
   })
 
-  it('shows a sample debate without wireframe explanation copy', async () => {
+  it('shows a debate workspace instead of a sample hero page', async () => {
     const router = createRouter({
       history: createWebHistory(),
       routes: [
@@ -34,10 +34,14 @@ describe('HomeView', () => {
       },
     })
 
-    expect(wrapper.text()).toContain('샘플 토론')
-    expect(wrapper.text()).not.toContain('토론 미리보기')
-    expect(wrapper.text()).not.toContain('입력한 주제로 생성될 대화 예시')
-    expect(wrapper.text()).not.toContain('예시')
+    expect(wrapper.find('.workspace-layout').exists()).toBe(true)
+    expect(wrapper.find('.workspace-setup').exists()).toBe(true)
+    expect(wrapper.find('.workspace-main').exists()).toBe(true)
+    expect(wrapper.text()).toContain('무엇을 비교할까요?')
+    expect(wrapper.text()).toContain('최근 공유된 토론')
+    expect(wrapper.text()).toContain('투표가 진행 중')
+    expect(wrapper.text()).not.toContain('샘플 토론')
+    expect(wrapper.text()).not.toContain('고민을 꺼내면')
   })
 
   it('places compact mode choices above the long topic field and keeps the start action on the top right', () => {
@@ -55,16 +59,16 @@ describe('HomeView', () => {
       },
     })
 
-    const panel = wrapper.get('.start-panel')
-    const topbar = panel.get('.start-panel__topbar')
+    const panel = wrapper.get('.workspace-setup')
+    const topbar = panel.get('.workspace-setup__modes')
 
-    expect(wrapper.find('a[href="/posts"]').exists()).toBe(false)
+    expect(wrapper.find('a[href="/posts"]').exists()).toBe(true)
     expect(topbar.get('.mode-grid.mode-grid--compact').exists()).toBe(true)
-    expect(topbar.get('button[type="submit"]').text()).toContain('토론 시작')
+    expect(panel.get('button[type="submit"]').text()).toContain('토론 시작')
     expect(panel.get('input#topic').classes()).toContain('input--topic')
 
-    const topbarText = topbar.text()
-    expect(topbarText.indexOf('실용 판정')).toBeLessThan(topbarText.indexOf('토론 시작'))
+    const panelText = panel.text()
+    expect(panelText.indexOf('실용 판정')).toBeLessThan(panelText.indexOf('토론 시작'))
     expect(panel.text().indexOf('실용 판정')).toBeLessThan(panel.text().indexOf('토론 주제'))
   })
 
@@ -83,7 +87,7 @@ describe('HomeView', () => {
       },
     })
 
-    await wrapper.get('form.start-panel').trigger('submit')
+    await wrapper.get('form.workspace-setup').trigger('submit')
     await flushPromises()
 
     expect(debateApi.create).toHaveBeenCalledWith({

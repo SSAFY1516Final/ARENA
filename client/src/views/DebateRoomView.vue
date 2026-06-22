@@ -11,7 +11,7 @@
       </div>
     </section>
 
-    <section class="debate-layout">
+    <section class="debate-room-layout">
       <div class="chat-panel">
         <header class="chat-panel__header">
           <div>
@@ -42,36 +42,62 @@
             />
           </section>
         </div>
-        <div class="chat-actions">
+        <p v-if="debateStore.currentDebate.shareBody" class="shared-body-preview">
+          {{ debateStore.currentDebate.shareBody }}
+        </p>
+      </div>
+
+      <aside class="debate-status-rail">
+        <div>
+          <span class="section-label">토론 진행</span>
+          <h2>토론 컨트롤</h2>
+        </div>
+
+        <div class="status-metric-grid">
+          <div class="status-metric">
+            <span>발화</span>
+            <strong>{{ debateStore.messages.length }}개</strong>
+          </div>
+          <div class="status-metric">
+            <span>상태</span>
+            <strong>{{ statusLabel }}</strong>
+          </div>
+        </div>
+
+        <div class="status-note">
+          <span>모드</span>
+          <strong>{{ modeLabel }}</strong>
+          <p>{{ debateStore.currentDebate.peakReached ? '핵심 쟁점에 도달했습니다.' : '다음 발화를 생성해 흐름을 이어가세요.' }}</p>
+        </div>
+
+        <div class="rail-actions">
           <button
             v-if="canGenerateTurn"
-            class="button button--ghost"
+            class="button button--full"
             type="button"
             :disabled="debateStore.turnLoading"
             @click="nextTurn"
           >
-            토론 진행
-          </button>
-          <button v-if="canShareDebate" class="button button--ghost share-toggle" type="button" @click="toggleShareForm">
-            공유하기
+            다음 발화
           </button>
           <button
             v-if="canGenerateTurn"
-            class="button finish-button"
+            class="button button--ghost button--full finish-button"
             type="button"
             :disabled="debateStore.stopLoading"
             @click="finishDebate"
           >
             종료하기
           </button>
+          <button v-if="canShareDebate" class="button button--full share-toggle" type="button" @click="toggleShareForm">
+            공유하기
+          </button>
         </div>
+
         <form v-if="shareFormOpen" class="share-form share-form--room" @submit.prevent="shareDebate">
           <button class="button button--full" type="submit">게시글 공유</button>
         </form>
-        <p v-if="debateStore.currentDebate.shareBody" class="shared-body-preview">
-          {{ debateStore.currentDebate.shareBody }}
-        </p>
-      </div>
+      </aside>
     </section>
   </main>
 </template>

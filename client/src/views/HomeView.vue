@@ -1,15 +1,22 @@
 <template>
-  <main class="page page--hero">
-    <section class="hero-copy">
-      <span class="eyebrow">AI 논쟁 커뮤니티</span>
-      <h1>선택 고민을 두 AI가 대신 논쟁합니다</h1>
-      <p>
-        실용적인 결정은 기준 중심으로, 상상 배틀은 더 재미있게. 주제만 입력하면
-        냉정파와 열정파가 번갈아 토론합니다.
-      </p>
+  <main class="page workspace-page">
+    <section class="workspace-header">
+      <div>
+        <span class="eyebrow">Debate Workspace</span>
+        <h1>무엇을 비교할까요?</h1>
+        <p class="page-copy">주제와 모드를 정하면 AI 토론방에서 바로 발화를 이어갈 수 있습니다.</p>
+      </div>
+    </section>
 
-      <form class="start-panel" @submit.prevent="startDebate">
-        <div class="start-panel__topbar">
+    <section class="workspace-layout">
+      <form class="workspace-setup" @submit.prevent="startDebate">
+        <div class="workspace-setup__section">
+          <span class="section-label">토론 설정</span>
+          <h2>새 토론 만들기</h2>
+          <p>실제 선택은 기준 중심으로, 예능 배틀은 더 과감한 관점으로 진행합니다.</p>
+        </div>
+
+        <div class="workspace-setup__modes">
           <div class="mode-grid mode-grid--compact">
             <ModeCard
               mode="PRACTICAL"
@@ -26,11 +33,9 @@
               @select="mode = $event"
             />
           </div>
-
-          <button class="button start-panel__submit" type="submit">토론 시작</button>
         </div>
 
-        <div class="start-panel__topic">
+        <div class="workspace-setup__topic">
           <div class="field-header">
             <label class="field-label" for="topic">토론 주제</label>
             <span>{{ topic.length }}/120</span>
@@ -45,41 +50,42 @@
           />
         </div>
 
+        <button class="button button--full workspace-setup__submit" type="submit">토론 시작</button>
       </form>
 
-      <div class="hero-metrics" aria-label="ARENA 주요 흐름">
-        <div>
-          <strong>01</strong>
-          <span>주제 입력</span>
-        </div>
-        <div>
-          <strong>02</strong>
-          <span>AI 토론</span>
-        </div>
-        <div>
-          <strong>03</strong>
-          <span>공유와 투표</span>
-        </div>
-      </div>
-    </section>
+      <section class="workspace-main">
+        <article class="workspace-preview">
+          <div class="workspace-preview__header">
+            <div>
+              <span class="section-label">AI 토론 미리보기</span>
+              <h2>{{ topic || '토론 주제를 입력하세요' }}</h2>
+            </div>
+            <span class="tag tag--blue">Round 2</span>
+          </div>
+          <DebateMessage
+            v-for="message in sampleMessages"
+            :key="message.messageId"
+            :message="message"
+          />
+          <div class="workspace-preview__footer">
+            <span>토론을 생성하면 이 화면에서 다음 발화, 종료, 요약 공유까지 이어집니다.</span>
+          </div>
+        </article>
 
-    <aside class="preview-card">
-      <div class="preview-card__header">
-        <span class="eyebrow">샘플 토론</span>
-      </div>
-      <div class="tag-row">
-        <span class="tag tag--teal">실용 판정</span>
-      </div>
-      <h2>오늘 점심 제육 vs 돈까스</h2>
-      <DebateMessage
-        v-for="message in sampleMessages"
-        :key="message.messageId"
-        :message="message"
-      />
-      <div class="preview-card__footer">
-        <span>토론 종료 후 요약 카드와 투표 게시글로 이어집니다.</span>
-      </div>
-    </aside>
+        <div class="workspace-signal-grid">
+          <RouterLink class="workspace-signal-card" to="/posts">
+            <span class="section-label">최근 공유된 토론</span>
+            <strong>퇴근 후 운동 vs 휴식</strong>
+            <p>댓글 8 · 투표 24</p>
+          </RouterLink>
+          <RouterLink class="workspace-signal-card" to="/posts">
+            <span class="section-label">투표가 진행 중</span>
+            <strong>제육 58% / 돈까스 42%</strong>
+            <p>토론 결과를 공유하면 게시판 투표로 이어집니다.</p>
+          </RouterLink>
+        </div>
+      </section>
+    </section>
   </main>
 </template>
 

@@ -45,6 +45,9 @@ describe('PostListView', () => {
     })
     await flushPromises()
 
+    expect(wrapper.text()).toContain('공유된 토론')
+    expect(wrapper.text()).toContain('토론 결과가 커뮤니티로 이어집니다')
+    expect(wrapper.text()).toContain('댓글 2')
     expect(wrapper.text()).toContain('점심을 고르는 기준이 매번 달라져서 공유합니다.')
     expect(wrapper.text()).not.toContain('사용자 투표')
     expect(wrapper.text()).not.toContain('상세에서 투표하기')

@@ -37,6 +37,6 @@ describe('AppNav', () => {
     expect(wrapper.find('.profile-avatar').text()).toBe('k')
     expect(wrapper.find('.profile-chip').text()).toContain('kakao_12345')
     expect(wrapper.find('.profile-chip').classes()).not.toContain('router-link-active')
-    expect(wrapper.get('a.nav-create-link[href="/new"]').text()).toContain('새 토론 만들기')
+    expect(wrapper.get('a.nav-create-link[href="/new"]').text()).toContain('새 토론')
   })
 })

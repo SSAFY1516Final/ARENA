@@ -89,7 +89,7 @@ describe('DebateRoomView', () => {
     expect(wrapper.text()).not.toContain('게시판 공유 후 사용자 투표 비율이 표시됩니다.')
   })
 
-  it('keeps actions in the chat footer without a separate side box', async () => {
+  it('shows a compact debate status rail with primary controls', async () => {
     const router = createRouter({
       history: createWebHistory(),
       routes: [
@@ -108,15 +108,13 @@ describe('DebateRoomView', () => {
     })
     await flushPromises()
 
-    expect(wrapper.find('.side-panel').exists()).toBe(false)
-    expect(wrapper.text()).not.toContain('할 수 있는 일')
+    expect(wrapper.find('.debate-room-layout').exists()).toBe(true)
+    expect(wrapper.find('.debate-status-rail').exists()).toBe(true)
+    expect(wrapper.text()).toContain('토론 컨트롤')
+    expect(wrapper.text()).toContain('발화')
+    expect(wrapper.text()).toContain('다음 발화')
+    expect(wrapper.text()).toContain('종료')
     expect(wrapper.text()).not.toContain('게시판 보기')
-    expect(wrapper.get('.chat-actions').text()).toContain('토론 진행')
-    expect(wrapper.get('.chat-actions').text()).toContain('종료하기')
-    expect(wrapper.get('.chat-actions').text()).not.toContain('공유하기')
-    expect(wrapper.text()).not.toContain('토론 상태')
-    expect(wrapper.text()).not.toContain('정점 감지')
-    expect(wrapper.text()).not.toContain('라운드 1')
   })
 
   it('returns to my debates when finishing an active debate', async () => {
@@ -173,7 +171,7 @@ describe('DebateRoomView', () => {
     })
 
     expect(wrapper.text()).toContain('공유하기')
-    expect(wrapper.text()).not.toContain('토론 진행')
+    expect(wrapper.text()).toContain('토론 컨트롤')
     expect(wrapper.text()).not.toContain('종료하기')
 
     await flushPromises()

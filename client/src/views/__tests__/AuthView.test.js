@@ -21,7 +21,9 @@ describe('AuthView', () => {
       },
     })
 
+    expect(wrapper.text()).toContain('AI 토론을 바로 시작하세요')
     expect(wrapper.text()).toContain('카카오톡으로 시작하기')
+    expect(wrapper.text()).toContain('실제 토론 흐름')
     expect(wrapper.text()).not.toContain('회원가입')
     expect(wrapper.find('input[type="password"]').exists()).toBe(false)
     expect(wrapper.find('.kakao-login-button').attributes('href')).toContain('kauth.kakao.com/oauth/authorize')

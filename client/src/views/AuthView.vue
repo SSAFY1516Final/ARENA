@@ -11,10 +11,10 @@
 
       <section class="auth-intro">
         <span class="eyebrow">AI Debate Workspace</span>
-        <h1>고민을 꺼내면<br />논쟁이 시작됩니다</h1>
+        <h1>AI 토론을 바로 시작하세요</h1>
         <p>
-          두 AI 페르소나가 선택지를 밀고 당기고, 사람들은 게시판에서 투표합니다.
-          ARENA는 결정과 재미 사이를 빠르게 정리하는 토론 공간입니다.
+          주제를 입력하면 냉정파와 열정파가 번갈아 논쟁하고, 결과는 게시판에서
+          투표로 이어집니다.
         </p>
 
         <a class="kakao-login-button" :href="kakaoAuthorizeUrl">
@@ -29,7 +29,7 @@
       <section class="auth-product" aria-label="ARENA 시작 화면">
         <article class="auth-product__board">
           <div class="auth-product__top">
-            <span class="tag tag--teal">실용 판정</span>
+            <span class="tag tag--teal">실제 토론 흐름</span>
             <strong>오늘 점심 제육 vs 돈까스</strong>
           </div>
           <div class="auth-product__message">
