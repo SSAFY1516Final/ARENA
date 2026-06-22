@@ -38,6 +38,8 @@ export const useDebateStore = defineStore('debate', () => {
   const stopLoading = ref(false)
   const myDebates = ref([])
   const loading = ref(false)
+  const topicCandidates = ref([])
+  const topicCandidateLoading = ref(false)
 
   const isStopped = computed(() => currentDebate.value?.status === 'STOPPED')
   const isShared = computed(() => currentDebate.value?.status === 'SHARED')
@@ -49,6 +51,17 @@ export const useDebateStore = defineStore('debate', () => {
     summary.value = null
     myDebates.value = [currentDebate.value, ...myDebates.value]
     return currentDebate.value
+  }
+
+  async function fetchTopicCandidates(payload) {
+    topicCandidateLoading.value = true
+    try {
+      const { data } = await debateApi.topicCandidates(payload)
+      topicCandidates.value = data.items || []
+      return topicCandidates.value
+    } finally {
+      topicCandidateLoading.value = false
+    }
   }
 
   async function fetchMyDebates() {
@@ -139,12 +152,15 @@ export const useDebateStore = defineStore('debate', () => {
     messages,
     summary,
     myDebates,
+    topicCandidates,
     turnLoading,
     stopLoading,
     loading,
+    topicCandidateLoading,
     isStopped,
     isShared,
     createDebate,
+    fetchTopicCandidates,
     fetchMyDebates,
     fetchDebate,
     generateNextTurn,

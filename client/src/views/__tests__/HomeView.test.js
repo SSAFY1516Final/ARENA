@@ -1,10 +1,38 @@
-import { describe, expect, it } from 'vitest'
-import { mount } from '@vue/test-utils'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { flushPromises, mount } from '@vue/test-utils'
 import { createPinia } from 'pinia'
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '@/views/HomeView.vue'
+import { debateApi } from '@/api/debateApi'
+
+vi.mock('@/api/debateApi', () => ({
+  debateApi: {
+    create: vi.fn(),
+    topicCandidates: vi.fn(),
+  },
+}))
 
 describe('HomeView', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+    debateApi.create.mockResolvedValue({
+      data: { debateId: 11, topic: '오후 집중력을 기준으로 제육 vs 돈까스', mode: 'PRACTICAL', status: 'ACTIVE' },
+    })
+    debateApi.topicCandidates.mockResolvedValue({
+      data: {
+        items: [
+          {
+            title: '오후 집중력을 기준으로 제육 vs 돈까스',
+            reason: '조건과 선택 갈등이 명확합니다.',
+            noveltyScore: 88,
+            fitScore: 94,
+            funScore: 72,
+          },
+        ],
+      },
+    })
+  })
+
   it('shows a sample debate without wireframe explanation copy', async () => {
     const router = createRouter({
       history: createWebHistory(),
@@ -52,5 +80,37 @@ describe('HomeView', () => {
     const topbarText = topbar.text()
     expect(topbarText.indexOf('실용 판정')).toBeLessThan(topbarText.indexOf('토론 시작'))
     expect(panel.text().indexOf('실용 판정')).toBeLessThan(panel.text().indexOf('토론 주제'))
+  })
+
+  it('shows AI topic candidates and starts with the selected candidate', async () => {
+    const router = createRouter({
+      history: createWebHistory(),
+      routes: [
+        { path: '/', component: HomeView },
+        { path: '/debates/:debateId', component: { template: '<div />' } },
+      ],
+    })
+
+    const wrapper = mount(HomeView, {
+      global: {
+        plugins: [createPinia(), router],
+      },
+    })
+
+    await wrapper.get('button.topic-candidate-button').trigger('click')
+    await flushPromises()
+
+    expect(debateApi.topicCandidates).toHaveBeenCalled()
+    expect(wrapper.text()).toContain('오후 집중력을 기준으로 제육 vs 돈까스')
+
+    await wrapper.get('button.topic-candidate-card').trigger('click')
+    await wrapper.get('form.start-panel').trigger('submit')
+    await flushPromises()
+
+    expect(debateApi.create).toHaveBeenCalledWith({
+      topic: '오후 집중력을 기준으로 제육 vs 돈까스',
+      mode: 'PRACTICAL',
+    })
+    expect(router.currentRoute.value.path).toBe('/debates/11')
   })
 })
