@@ -3,7 +3,6 @@ package com.ssafy.arena.ai;
 import com.ssafy.arena.domain.Speaker;
 import com.ssafy.arena.dto.ai.AiNextTurnRequest;
 import com.ssafy.arena.dto.ai.AiSummaryRequest;
-import com.ssafy.arena.dto.ai.TopicCandidateRequest;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -42,24 +41,4 @@ public class AiPromptFactory {
                 """.formatted(request.topic(), request.mode(), request.messages());
     }
 
-    public String topicCandidateSystemPrompt() {
-        return """
-                ARENA의 토론 주제 후보를 생성한다.
-                반드시 JSON만 반환한다.
-                keys: items(array).
-                각 item keys: title, reason, noveltyScore, fitScore, funScore.
-                후보는 10개를 목표로 하고, 점수는 0부터 100 사이 정수로 작성한다.
-                """;
-    }
-
-    public String topicCandidateUserPrompt(TopicCandidateRequest request) {
-        return """
-                사용자가 입력한 큰 주제: %s
-                모드: %s
-                조건: %s
-                세부조건: %s
-
-                조건을 반영하면서도 사용자가 고르고 싶어지는 참신한 세부 토론 주제를 만들어라.
-                """.formatted(request.topic(), request.mode(), request.conditions(), request.detailConditions());
-    }
 }

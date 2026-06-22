@@ -30,39 +30,6 @@ Response:
 }
 ```
 
-## AI
-
-### POST `/api/ai/topic-candidates`
-
-큰 주제와 조건을 바탕으로 토론 후보 주제 목록을 생성한다. 인증이 필요하다.
-
-Request:
-
-```json
-{
-  "topic": "점심 메뉴",
-  "mode": "PRACTICAL",
-  "conditions": ["1만원 이하", "오후 집중력"],
-  "detailConditions": "회사 근처에서 빠르게 먹어야 함"
-}
-```
-
-Response:
-
-```json
-{
-  "items": [
-    {
-      "title": "오후 집중력을 기준으로 제육 vs 돈까스",
-      "reason": "조건과 선택 갈등이 명확합니다.",
-      "noveltyScore": 88,
-      "fitScore": 94,
-      "funScore": 72
-    }
-  ]
-}
-```
-
 ## Debate
 
 ### GET `/api/debates`

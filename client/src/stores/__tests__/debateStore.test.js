@@ -8,7 +8,6 @@ vi.mock('@/api/debateApi', () => ({
     list: vi.fn(),
     detail: vi.fn(),
     create: vi.fn(),
-    topicCandidates: vi.fn(),
     nextTurn: vi.fn(),
     stop: vi.fn(),
     share: vi.fn(),
@@ -71,39 +70,5 @@ describe('debateStore', () => {
     expect(store.myDebates).toHaveLength(1)
     expect(store.currentDebate.topic).toContain('오타니')
     expect(store.messages[0].messageId).toBe(9)
-  })
-
-  it('loads AI topic candidates from backend data', async () => {
-    const store = useDebateStore()
-    debateApi.topicCandidates.mockResolvedValue({
-      data: {
-        items: [
-          {
-            title: '오후 집중력을 기준으로 제육 vs 돈까스',
-            reason: '조건과 선택 갈등이 명확합니다.',
-            noveltyScore: 88,
-            fitScore: 94,
-            funScore: 72,
-          },
-        ],
-      },
-    })
-
-    const candidates = await store.fetchTopicCandidates({
-      topic: '점심 메뉴',
-      mode: 'PRACTICAL',
-      conditions: ['1만원 이하'],
-      detailConditions: '회사 근처',
-    })
-
-    expect(debateApi.topicCandidates).toHaveBeenCalledWith({
-      topic: '점심 메뉴',
-      mode: 'PRACTICAL',
-      conditions: ['1만원 이하'],
-      detailConditions: '회사 근처',
-    })
-    expect(candidates).toHaveLength(1)
-    expect(candidates[0].title).toContain('제육')
-    expect(store.topicCandidates[0].fitScore).toBe(94)
   })
 })

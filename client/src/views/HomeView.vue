@@ -45,43 +45,6 @@
           />
         </div>
 
-        <div class="candidate-controls">
-          <input
-            v-model="conditionText"
-            class="input"
-            placeholder="조건: 1만원 이하, 오후 집중력"
-          />
-          <input
-            v-model="detailConditions"
-            class="input"
-            placeholder="세부조건: 회사 근처에서 빠르게 먹어야 함"
-          />
-          <button
-            class="button button--ghost topic-candidate-button"
-            type="button"
-            :disabled="debateStore.topicCandidateLoading"
-            @click="loadTopicCandidates"
-          >
-            후보 만들기
-          </button>
-        </div>
-
-        <section v-if="debateStore.topicCandidates.length" class="candidate-panel" aria-label="AI 주제 후보">
-          <button
-            v-for="candidate in debateStore.topicCandidates"
-            :key="candidate.title"
-            class="topic-candidate-card"
-            :class="{ selected: selectedCandidateTitle === candidate.title }"
-            type="button"
-            @click="selectCandidate(candidate)"
-          >
-            <strong>{{ candidate.title }}</strong>
-            <span>{{ candidate.reason }}</span>
-            <small>
-              참신 {{ candidate.noveltyScore }} · 적합 {{ candidate.fitScore }} · 재미 {{ candidate.funScore }}
-            </small>
-          </button>
-        </section>
       </form>
 
       <div class="hero-metrics" aria-label="ARENA 주요 흐름">
@@ -121,7 +84,7 @@
 </template>
 
 <script setup>
-import { computed, ref } from 'vue'
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import ModeCard from '@/components/common/ModeCard.vue'
 import DebateMessage from '@/components/debate/DebateMessage.vue'
@@ -132,31 +95,6 @@ const router = useRouter()
 const debateStore = useDebateStore()
 const topic = ref('오늘 점심 제육 vs 돈까스')
 const mode = ref('PRACTICAL')
-const conditionText = ref('')
-const detailConditions = ref('')
-const selectedCandidateTitle = ref('')
-
-const conditions = computed(() =>
-  conditionText.value
-    .split(',')
-    .map((condition) => condition.trim())
-    .filter(Boolean),
-)
-
-async function loadTopicCandidates() {
-  selectedCandidateTitle.value = ''
-  await debateStore.fetchTopicCandidates({
-    topic: topic.value,
-    mode: mode.value,
-    conditions: conditions.value,
-    detailConditions: detailConditions.value,
-  })
-}
-
-function selectCandidate(candidate) {
-  selectedCandidateTitle.value = candidate.title
-  topic.value = candidate.title
-}
 
 async function startDebate() {
   const debate = await debateStore.createDebate({

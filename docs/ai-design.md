@@ -10,9 +10,9 @@ ARENA의 AI 기능은 사용자의 선택 고민을 토론 가능한 구조로 �
 - Spring 연동: Spring AI `ChatClient`
 - 모델: 환경 변수 `OPENAI_MODEL`로 지정, 기본값 `gpt-4o-mini`
 
-## AI 파이프라인 책임 분리
+## Spring AI 베이스 책임 분리
 
-현재 1단계 파이프라인은 기존 API를 유지하면서 내부 책임만 분리한다.
+현재 베이스 브랜치는 팀원이 서로 다른 AI 파이프라인을 실험할 수 있도록 Spring AI 호출 환경과 최소 계약만 유지한다. 주제 후보 생성, 검증, 로컬 린트, fallback 같은 품질 파이프라인은 베이스에 고정하지 않고 별도 실험 브랜치에서 비교한다.
 
 | 구성 요소 | 책임 |
 | --- | --- |
@@ -22,29 +22,7 @@ ARENA의 AI 기능은 사용자의 선택 고민을 토론 가능한 구조로 �
 | `AiPromptFactory` | 발화 생성/요약 생성 system/user prompt 구성 |
 | `AiResponseParser` | AI JSON 응답을 DTO로 파싱하고 실패 시 `502 Bad Gateway` 변환 |
 
-향후 주제 후보 생성, 주제 검증, 참신도 정렬, 턴 후보 선택 기능은 `AiPipelineService` 밖에 별도 use case로 추가한다. 이때 기존 토론 발화/요약 API 계약은 유지한다.
-
-## AI 주제 후보 생성
-
-토론 생성 전 사용자의 큰 주제와 조건을 받아 세부 토론 후보를 만든다. 이 기능은 기존 토론 생성 API를 대체하지 않고, 사용자가 더 좋은 주제를 고를 수 있게 돕는 사전 단계다.
-
-```mermaid
-flowchart TD
-    A["사용자 입력: 주제 / 조건 / 세부조건"] --> B["TopicCandidateGenerator"]
-    B --> C["TopicCandidateValidator"]
-    C --> D["TopicCandidateRanker"]
-    D --> E["후보 목록 반환"]
-    E --> F["사용자가 후보 선택 후 기존 토론 생성 API 호출"]
-```
-
-| 구성 요소 | 책임 |
-| --- | --- |
-| `TopicSuggestionUseCase` | 주제 후보 생성, 검증, 정렬 흐름 조합 |
-| `TopicCandidateGenerator` | Spring AI를 호출해 후보 목록 생성 |
-| `TopicCandidateValidator` | 제목 공백, 조건 적합도 등 1차 필터링 |
-| `TopicCandidateRanker` | 참신도, 적합도, 재미 점수 기반 정렬 |
-
-현재 백엔드는 `POST /api/ai/topic-candidates`만 제공한다. 후보 선택 UI는 프론트 2차 작업에서 연결한다.
+선택형 주제 후보 파이프라인은 `ai-experiment-choice-pipeline` 브랜치에 보존한다. 다른 팀원은 동일 베이스에서 새 브랜치를 만들어 다른 파이프라인 구조를 구현하고 비교할 수 있다.
 
 ## AI 발화 생성
 
