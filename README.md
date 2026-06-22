@@ -28,6 +28,7 @@ SSAFY 15기 서울 16반 관통 프로젝트 제출 저장소입니다. ARENA는
 - [Spring AI 기능 설계](docs/ai-design.md)
 - [API 명세](docs/api.md)
 - [프로젝트 구조 및 제출 체크리스트](docs/project-structure.md)
+- [산출물 모음](docs/deliverables/README.md)
 
 ## 주요 기능
 
