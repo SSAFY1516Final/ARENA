@@ -11,48 +11,51 @@
 
       <section class="auth-gate">
         <section class="auth-intro">
-          <span class="eyebrow">AI Debate Workspace</span>
-          <h1>AI 토론을 바로 시작하세요</h1>
+          <span class="eyebrow">AI Debate Community</span>
+          <h1>AI가 논쟁하고, 사람들은 투표합니다</h1>
           <p>
-            주제를 입력하면 냉정파와 열정파가 번갈아 논쟁하고, 결과는 게시판에서
-            투표로 이어집니다.
+            ARENA는 선택하기 어려운 주제를 AI 페르소나 토론으로 풀어내고,
+            요약된 결과를 게시판에서 함께 판단하는 서비스입니다.
           </p>
 
-          <div class="auth-feature-grid" aria-label="ARENA 주요 기능">
-            <span>토론 생성</span>
-            <span>요약 공유</span>
-            <span>투표 참여</span>
-          </div>
-        </section>
-
-        <aside class="auth-login-card">
-          <span class="section-label">Login</span>
-          <h2>계속하려면 로그인</h2>
-          <p>카카오 계정으로 인증하고 ARENA 워크스페이스를 사용합니다.</p>
-
-          <a class="kakao-login-button" :href="kakaoAuthorizeUrl">
+          <a class="kakao-login-button auth-hero-login" :href="kakaoAuthorizeUrl">
             <span class="kakao-login-button__mark">K</span>
             <span>카카오톡으로 시작하기</span>
           </a>
           <p v-if="!kakaoRestApiKey" class="auth-config-warning">
             카카오 REST API 키를 설정하면 실제 로그인이 가능합니다.
           </p>
+        </section>
 
-          <dl class="auth-runtime-list" aria-label="로컬 실행 상태">
-            <div>
-              <dt>API 서버</dt>
-              <dd>연결 준비</dd>
-            </div>
-            <div>
-              <dt>인증 방식</dt>
-              <dd>JWT 인증 사용</dd>
-            </div>
-            <div>
-              <dt>OAuth</dt>
-              <dd>카카오 전용</dd>
-            </div>
-          </dl>
-        </aside>
+        <section class="auth-feature-panel" aria-label="ARENA 핵심 기능">
+          <div class="auth-feature-card">
+            <span>01</span>
+            <strong>주제 입력</strong>
+            <p>선택지, 조건, 고민 상황을 짧게 입력해 토론을 시작합니다.</p>
+          </div>
+          <div class="auth-feature-card">
+            <span>02</span>
+            <strong>AI 페르소나 토론</strong>
+            <p>냉정파와 열정파가 번갈아 말하며 판단 기준을 드러냅니다.</p>
+          </div>
+          <div class="auth-feature-card">
+            <span>03</span>
+            <strong>요약 카드 생성</strong>
+            <p>토론 종료 후 핵심 주장과 남은 쟁점을 공유용으로 정리합니다.</p>
+          </div>
+          <div class="auth-feature-card">
+            <span>04</span>
+            <strong>게시판 공유</strong>
+            <p>다른 사용자의 투표와 댓글로 최종 판단을 넓힙니다.</p>
+          </div>
+        </section>
+      </section>
+
+      <section class="auth-flow" aria-label="ARENA 서비스 흐름">
+        <div>1. 주제 작성</div>
+        <div>2. AI 토론</div>
+        <div>3. 요약 공유</div>
+        <div>4. 커뮤니티 반응</div>
       </section>
     </section>
   </main>

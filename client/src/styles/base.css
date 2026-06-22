@@ -899,9 +899,9 @@ p {
 }
 
 .auth-gate {
-  min-height: 520px;
+  min-height: 430px;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 360px;
+  grid-template-columns: minmax(0, 0.95fr) minmax(420px, 1.05fr);
   gap: 34px;
   align-items: center;
 }
@@ -915,7 +915,7 @@ p {
 }
 
 .auth-intro h1 {
-  max-width: 520px;
+  max-width: 620px;
   margin-bottom: 18px;
   font-size: 52px;
   line-height: 1.08;
@@ -923,57 +923,50 @@ p {
 }
 
 .auth-intro p {
-  max-width: 520px;
+  max-width: 560px;
   margin: 0;
   color: var(--muted);
   font-size: 17px;
 }
 
-.auth-intro .kakao-login-button {
+.auth-hero-login {
   max-width: 320px;
   margin: 28px 0 0;
 }
 
-.auth-feature-grid {
+.auth-feature-panel {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 10px;
-  width: min(520px, 100%);
-  margin-top: 28px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
 }
 
-.auth-feature-grid span {
-  min-height: 58px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+.auth-feature-card {
+  min-height: 150px;
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  padding: 18px;
   border: 1px solid rgba(229, 232, 235, 0.76);
-  border-radius: var(--radius-card);
-  background: var(--surface-soft);
-  color: var(--muted-strong);
-  font-size: 13px;
-  font-weight: 850;
-}
-
-.auth-login-card {
-  display: grid;
-  gap: 16px;
-  padding: 26px;
-  border: 1px solid rgba(229, 232, 235, 0.8);
   border-radius: var(--radius-card);
   background: var(--surface);
   box-shadow: var(--shadow-soft);
 }
 
-.auth-login-card h2 {
-  font-size: 25px;
-  line-height: 1.25;
+.auth-feature-card span {
+  color: var(--blue);
+  font-size: 12px;
   font-weight: 850;
 }
 
-.auth-login-card > p {
+.auth-feature-card strong {
+  color: var(--ink);
+  font-size: 18px;
+  font-weight: 850;
+}
+
+.auth-feature-card p {
   color: var(--muted);
-  font-size: 14px;
+  font-size: 13px;
 }
 
 .kakao-login-button {
@@ -996,10 +989,6 @@ p {
     background 0.16s ease,
     box-shadow 0.16s ease,
     transform 0.16s ease;
-}
-
-.auth-login-card .kakao-login-button {
-  margin-top: 4px;
 }
 
 .kakao-login-button__mark {
@@ -1029,37 +1018,28 @@ p {
   color: #9b3328;
   font-size: 13px;
   font-weight: 750;
+  margin-top: 12px;
 }
 
-.auth-runtime-list {
+.auth-flow {
   display: grid;
-  gap: 0;
-  margin: 4px 0 0;
-  border-top: 1px solid var(--line);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  position: relative;
+  z-index: 1;
 }
 
-.auth-runtime-list div {
+.auth-flow div {
+  min-height: 54px;
   display: flex;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 12px 0;
-  border-bottom: 1px solid var(--line);
-}
-
-.auth-runtime-list dt,
-.auth-runtime-list dd {
-  margin: 0;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(229, 232, 235, 0.72);
+  border-radius: var(--radius-card);
+  background: var(--surface-soft);
+  color: var(--muted-strong);
   font-size: 13px;
-  font-weight: 800;
-}
-
-.auth-runtime-list dt {
-  color: var(--muted);
-}
-
-.auth-runtime-list dd {
-  color: var(--ink);
-  text-align: right;
+  font-weight: 850;
 }
 
 .auth-mini-card {
@@ -1757,8 +1737,8 @@ p {
     align-items: start;
   }
 
-  .auth-login-card {
-    max-width: 520px;
+  .auth-feature-panel {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .list-header,
@@ -1839,19 +1819,9 @@ p {
     gap: 22px;
   }
 
-  .auth-feature-grid {
+  .auth-feature-panel,
+  .auth-flow {
     grid-template-columns: 1fr;
-  }
-
-  .auth-login-card {
-    max-width: none;
-    padding: 20px;
-  }
-
-  .auth-runtime-list div {
-    align-items: flex-start;
-    flex-direction: column;
-    gap: 4px;
   }
 
   .vote-section-header {
