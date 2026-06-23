@@ -19,7 +19,7 @@ describe('HomeView', () => {
     })
   })
 
-  it('shows a debate workspace instead of a sample hero page', async () => {
+  it('shows a clean topic workspace instead of a mode-based setup', async () => {
     const router = createRouter({
       history: createWebHistory(),
       routes: [
@@ -38,13 +38,25 @@ describe('HomeView', () => {
     expect(wrapper.find('.workspace-setup').exists()).toBe(true)
     expect(wrapper.find('.workspace-main').exists()).toBe(true)
     expect(wrapper.text()).toContain('무엇을 비교할까요?')
-    expect(wrapper.text()).toContain('최근 공유된 토론')
-    expect(wrapper.text()).toContain('투표가 진행 중')
+    expect(wrapper.text()).toContain('상황/조건')
+    expect(wrapper.text()).toContain('세부 조건')
+    expect(wrapper.text()).toContain('추천 주제')
+    expect(wrapper.text()).toContain('하나를 골라 시작하세요')
+    expect(wrapper.find('.pipeline-stage-list').exists()).toBe(false)
+    expect(wrapper.find('.selected-candidate-panel').exists()).toBe(false)
+    expect(wrapper.find('.pipeline-summary').exists()).toBe(false)
+    expect(wrapper.find('.candidate-score-row').exists()).toBe(false)
+    expect(wrapper.text()).not.toContain('실용 판정')
+    expect(wrapper.text()).not.toContain('예능 배틀')
+    expect(wrapper.text()).not.toContain('참신도')
+    expect(wrapper.text()).not.toContain('적합도')
+    expect(wrapper.text()).not.toContain('토론성')
+    expect(wrapper.text()).not.toContain('실제 구현')
     expect(wrapper.text()).not.toContain('샘플 토론')
     expect(wrapper.text()).not.toContain('고민을 꺼내면')
   })
 
-  it('places compact mode choices above the long topic field and keeps the start action on the top right', () => {
+  it('places topic, condition, and detail inputs before candidate selection', () => {
     const router = createRouter({
       history: createWebHistory(),
       routes: [
@@ -60,19 +72,19 @@ describe('HomeView', () => {
     })
 
     const panel = wrapper.get('.workspace-setup')
-    const topbar = panel.get('.workspace-setup__modes')
 
-    expect(wrapper.find('a[href="/posts"]').exists()).toBe(true)
-    expect(topbar.get('.mode-grid.mode-grid--compact').exists()).toBe(true)
+    expect(wrapper.find('.pipeline-candidate-grid').exists()).toBe(true)
     expect(panel.get('button[type="submit"]').text()).toContain('토론 시작')
     expect(panel.get('input#topic').classes()).toContain('input--topic')
+    expect(panel.get('input#condition').exists()).toBe(true)
+    expect(panel.get('textarea#details').exists()).toBe(true)
 
     const panelText = panel.text()
-    expect(panelText.indexOf('실용 판정')).toBeLessThan(panelText.indexOf('토론 시작'))
-    expect(panel.text().indexOf('실용 판정')).toBeLessThan(panel.text().indexOf('토론 주제'))
+    expect(panelText.indexOf('토론 주제')).toBeLessThan(panelText.indexOf('토론 시작'))
+    expect(panelText.indexOf('상황/조건')).toBeLessThan(panelText.indexOf('토론 시작'))
   })
 
-  it('starts a debate from the entered topic', async () => {
+  it('starts a debate from the selected pipeline candidate', async () => {
     const router = createRouter({
       history: createWebHistory(),
       routes: [
@@ -87,13 +99,17 @@ describe('HomeView', () => {
       },
     })
 
+    const candidateButtons = wrapper.findAll('.pipeline-candidate-card')
+    expect(candidateButtons.length).toBeGreaterThanOrEqual(3)
+    await candidateButtons[1].trigger('click')
     await wrapper.get('form.workspace-setup').trigger('submit')
     await flushPromises()
 
     expect(debateApi.create).toHaveBeenCalledWith({
-      topic: '오늘 점심 제육 vs 돈까스',
+      topic: expect.stringContaining('제육'),
       mode: 'PRACTICAL',
     })
+    expect(debateApi.create.mock.calls[0][0].topic).not.toBe('오늘 점심 제육 vs 돈까스')
     expect(router.currentRoute.value.path).toBe('/debates/11')
   })
 })

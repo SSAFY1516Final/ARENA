@@ -39,6 +39,13 @@
         ORDER BY id ASC
     </select>
 
+    <update id="updateNickname">
+        UPDATE users
+        SET nickname = #{nickname},
+            updated_at = CURRENT_TIMESTAMP
+        WHERE id = #{id}
+    </update>
+
     <update id="updateRole">
         UPDATE users
         SET role = #{role}

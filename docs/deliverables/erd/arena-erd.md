@@ -159,13 +159,13 @@ Spring AI를 통해 OpenAI API 호출을 담당한다. 현재 `dev` 기준은 �
 
 | 컬럼 | 값 | 설명 |
 | --- | --- | --- |
-| debate_sessions.mode | PRACTICAL | 실용 판정 모드 |
-| debate_sessions.mode | ENTERTAINMENT | 예능 배틀 모드 |
+| debate_sessions.mode | PRACTICAL | 현재 프론트 기본 전송값. 서버/DB 호환을 위한 내부 모드 |
+| debate_sessions.mode | ENTERTAINMENT | 기존 데이터와 확장 가능성을 위한 내부 모드 |
 | debate_sessions.status | ACTIVE | 진행 중 |
 | debate_sessions.status | STOPPED | 중단 및 요약 완료 |
 | debate_sessions.status | SHARED | 게시판 공유 완료 |
-| debate_messages.speaker | COOL_HEADED | 냉정파 |
-| debate_messages.speaker | PASSIONATE | 열정파 |
+| debate_messages.speaker | COOL_HEADED | 주제의 앞쪽 선택지 진영 |
+| debate_messages.speaker | PASSIONATE | 주제의 뒤쪽 선택지 진영 |
 | debate_messages.speaker | SYSTEM | 시스템 메시지 |
 | post_votes.choice | A | 게시글 투표 선택지 A |
 | post_votes.choice | B | 게시글 투표 선택지 B |

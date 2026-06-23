@@ -48,6 +48,7 @@
 | Repository/Mapper | MyBatis 기반 DB 접근 |
 | Security | JWT 발급/검증, SecurityFilterChain, Role 기반 인가 |
 | AI | Spring AI ChatClient 호출, 프롬프트 관리, 응답 파싱 |
+| Docs | 제출 산출물, 인증/AI/API 설계, 요구사항, 화면정의서 관리 |
 
 ## 제출 체크리스트
 
@@ -71,6 +72,8 @@
 - [ ] ADMIN 권한 API 접근 제한 확인
 - [ ] Spring AI 발화 생성
 - [ ] 토론 요약 생성
+- [ ] 닉네임 조회/수정 확인
+- [ ] `/new` 선택형 후보 목업 화면 확인
 
 ### 데모 확인
 
@@ -78,4 +81,5 @@
 - [ ] `.env` 설정
 - [ ] Docker Compose 실행
 - [ ] 브라우저 CORS 확인
+- [ ] `http://localhost:15173/new` 또는 개발 서버 포트에서 후보 선택형 토론 생성 화면 확인
 - [ ] API 테스트 로그 또는 화면 캡처 준비

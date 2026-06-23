@@ -1,16 +1,3 @@
-export const personas = {
-  COOL_HEADED: {
-    label: '냉정파',
-    shortLabel: '냉',
-    tone: '비용, 리스크, 효율, 실행 가능성 중심',
-  },
-  PASSIONATE: {
-    label: '열정파',
-    shortLabel: '열',
-    tone: '재미, 감정, 즉시 만족, 몰입감 중심',
-  },
-}
-
 export const sampleDebate = {
   debateId: 10,
   topic: '오늘 점심 제육 vs 돈까스',
@@ -18,6 +5,39 @@ export const sampleDebate = {
   status: 'ACTIVE',
   peakReached: false,
 }
+
+export const mockMyDebates = [
+  {
+    debateId: 'mock-101',
+    topic: '점심시간 15분 남았을 때, 제육 vs 돈까스 주문을 누가 양보할지 갈린다',
+    mode: 'PRACTICAL',
+    status: 'ACTIVE',
+    summaryCard: '점심시간이 얼마 남지 않은 상황에서 결정 속도와 선택권이 부딪힙니다.',
+    shareBody: '',
+    updatedAt: '2026-06-22T14:10:00',
+    isMock: true,
+  },
+  {
+    debateId: 'mock-102',
+    topic: '여행 단톡방에서 아이폰 사진 공유 때문에 누가 다시 올릴지 싸운다',
+    mode: 'PRACTICAL',
+    status: 'STOPPED',
+    summaryCard: '원본 공유 편의와 단톡방 정리 부담이 충돌한 토론입니다.',
+    shareBody: '사진을 다시 올리는 수고와 원본 품질을 지키려는 요구가 충돌했습니다.',
+    updatedAt: '2026-06-22T13:35:00',
+    isMock: true,
+  },
+  {
+    debateId: 'mock-103',
+    topic: '산길에서 오타니 10명이 북극곰을 유인할지 흩어질지 갈린다',
+    mode: 'PRACTICAL',
+    status: 'SHARED',
+    summaryCard: '지형, 거리, 역할 분담을 두고 공방이 벌어진 토론입니다.',
+    shareBody: '유인 전략과 분산 전략 중 어느 쪽이 현실적인지 의견이 갈렸습니다.',
+    updatedAt: '2026-06-22T12:20:00',
+    isMock: true,
+  },
+]
 
 export const sampleMessages = [
   {
@@ -50,8 +70,8 @@ export const nextTurnSamples = [
 ]
 
 export const sampleSummary = {
-  coreArguments: '냉정파는 안정성과 오후 일정 리스크를, 열정파는 즉시 만족감과 점심 보상을 강조했습니다.',
-  highlight: '열정파가 제육의 매콤함을 하루를 버티게 하는 보상이라고 표현한 장면',
+  coreArguments: '돈까스는 안정성과 오후 일정 리스크를, 제육은 즉시 만족감과 점심 보상을 강조했습니다.',
+  highlight: '제육 쪽이 매콤함을 하루를 버티게 하는 보상이라고 표현한 장면',
   decisionCriteria: '선택 기준: 오후 일정이 중요하면 돈까스, 지금의 만족이 중요하면 제육',
   remainingIssue: '매운맛이 오후 집중력에 미치는 영향',
   summaryText: '선택 기준은 안정성과 만족감의 차이입니다. 돈까스는 예측 가능성을, 제육은 즉시 만족을 최적화합니다.',

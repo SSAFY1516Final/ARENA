@@ -2,9 +2,7 @@
   <main v-if="post" class="page detail-layout">
     <article class="article-card">
       <div class="tag-row">
-        <span class="tag" :class="post.mode === 'PRACTICAL' ? 'tag--teal' : 'tag--amber'">
-          {{ post.mode === 'PRACTICAL' ? '실용 판정' : '예능 배틀' }}
-        </span>
+        <span class="tag tag--teal">토론</span>
         <span class="tag tag--blue">SHARED</span>
       </div>
       <h1>{{ post.title }}</h1>
@@ -13,9 +11,11 @@
       <section class="log-box">
         <h2>전체 토론 로그</h2>
         <DebateMessage
-          v-for="message in post.messages"
+          v-for="(message, index) in post.messages"
           :key="message.messageId"
           :message="message"
+          :side-labels="postSideLabels"
+          :display-index="index + 1"
         />
       </section>
 
@@ -104,6 +104,10 @@ const selectedVoteLabel = computed(() => {
   if (!post.value?.userVoteChoice) return ''
   return post.value.userVoteChoice === 'A' ? post.value.voteOptionA : post.value.voteOptionB
 })
+const postSideLabels = computed(() => ({
+  COOL_HEADED: post.value?.voteOptionA || 'A 진영',
+  PASSIONATE: post.value?.voteOptionB || 'B 진영',
+}))
 const visibleComments = computed(() => {
   if (!post.value) return []
   const localComments = commentStore.comments.filter((comment) => comment.postId === post.value.postId)

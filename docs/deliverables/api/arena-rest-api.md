@@ -82,7 +82,69 @@ Status:
 | 성공 | 204 No Content |
 | 미인증 | 401 Unauthorized |
 
-## 3. 토론 API
+## 3. 사용자 API
+
+### GET /api/users/me
+
+현재 로그인한 사용자의 프로필을 조회한다.
+
+Response:
+
+```json
+{
+  "userId": 7,
+  "loginId": "kakao_123456789",
+  "nickname": "아레나유저"
+}
+```
+
+Status:
+
+| 상황 | 코드 |
+| --- | --- |
+| 성공 | 200 OK |
+| 미인증 | 401 Unauthorized |
+
+### PATCH /api/users/me/nickname
+
+현재 로그인한 사용자의 닉네임을 수정한다.
+
+Request:
+
+```json
+{
+  "nickname": "아레나유저"
+}
+```
+
+Validation:
+
+| 항목 | 조건 |
+| --- | --- |
+| 길이 | 2자 이상 20자 이하 |
+| 허용 문자 | 한글, 영문, 숫자, 밑줄 |
+| 중복 | 다른 사용자가 사용 중인 닉네임 불가 |
+
+Response:
+
+```json
+{
+  "userId": 7,
+  "loginId": "kakao_123456789",
+  "nickname": "아레나유저"
+}
+```
+
+Status:
+
+| 상황 | 코드 |
+| --- | --- |
+| 성공 | 200 OK |
+| 미인증 | 401 Unauthorized |
+| 형식 오류 | 400 Bad Request |
+| 닉네임 중복 | 409 Conflict |
+
+## 4. 토론 API
 
 ### GET /api/debates
 
@@ -112,11 +174,13 @@ Response:
 
 로그인 사용자의 토론 세션을 생성한다.
 
+현재 프론트 `/new` 화면은 주제, 상황/조건, 세부 조건을 입력받고 검증 통과 후보를 선택하는 목업 흐름을 제공한다. 실제 서버 요청에는 선택된 후보 제목을 `topic`으로 전달한다. `mode`는 기존 DB/API 호환을 위해 유지한다.
+
 Request:
 
 ```json
 {
-  "topic": "오늘 점심 제육 vs 돈까스",
+  "topic": "점심시간 15분 남았을 때, 오늘 점심 제육 vs 돈까스 주문을 누가 양보할지 갈린다",
   "mode": "PRACTICAL"
 }
 ```
@@ -126,7 +190,7 @@ Response:
 ```json
 {
   "debateId": 10,
-  "topic": "오늘 점심 제육 vs 돈까스",
+  "topic": "점심시간 15분 남았을 때, 오늘 점심 제육 vs 돈까스 주문을 누가 양보할지 갈린다",
   "mode": "PRACTICAL",
   "status": "ACTIVE"
 }
@@ -178,8 +242,8 @@ Response:
   "debateId": 10,
   "status": "STOPPED",
   "summary": {
-    "coreArguments": "냉정파는 안정성, 열정파는 만족감을 주장했습니다.",
-    "highlight": "열정파가 제육의 즉시 만족감을 강하게 주장한 장면",
+    "coreArguments": "돈까스는 안정성, 제육은 만족감을 주장했습니다.",
+    "highlight": "제육 쪽이 즉시 만족감을 강하게 주장한 장면",
     "decisionCriteria": "오후 집중력이 중요하면 돈까스, 현재 만족이 중요하면 제육",
     "remainingIssue": "매운맛과 식후 집중력",
     "summaryText": "두 선택지는 안정성과 만족감의 차이로 정리됩니다."
@@ -214,7 +278,7 @@ Response:
 }
 ```
 
-## 4. 게시글 API
+## 5. 게시글 API
 
 ### GET /api/posts?page=1&size=10&keyword=제육&mode=PRACTICAL&sort=latest
 
@@ -273,7 +337,7 @@ Status:
 | 작성자 아님 | 403 Forbidden |
 | 게시글 없음 | 404 Not Found |
 
-## 5. 투표 API
+## 6. 투표 API
 
 ### POST /api/posts/{postId}/votes
 
@@ -301,7 +365,7 @@ Response:
 }
 ```
 
-## 6. 댓글 API
+## 7. 댓글 API
 
 ### POST /api/posts/{postId}/comments
 
@@ -329,7 +393,7 @@ Response:
 
 작성자 본인의 댓글을 소프트 삭제한다.
 
-## 7. 관리자 API
+## 8. 관리자 API
 
 ### GET /api/admin/users
 
@@ -359,8 +423,10 @@ Request:
 }
 ```
 
-## 8. AI 생성 정책
+## 9. AI 생성 정책
 
 AI 발화와 요약은 Spring Boot 내부의 Spring AI `ChatClient`가 OpenAI API를 호출해 생성한다. 브라우저가 직접 호출하는 별도 AI API는 제공하지 않는다. 토론 턴 생성과 토론 중단 API 안에서 서버가 내부적으로 Spring AI를 호출하고, 생성 결과만 서비스 데이터로 저장한다.
 
 현재 `dev` 기준 Spring AI는 공통 호출 환경과 최소 계약만 유지한다. 선택형 주제 후보 생성 등 고도화 파이프라인은 `ai-experiment-choice-pipeline` 브랜치에 보존되어 있으며, 팀원별 실험 브랜치에서 비교 후 채택한다.
+
+현재 `/new` 화면의 후보 생성, 검증/정렬, 후보 선택 단계는 데모용 프론트 목업이다. 실제 선택형 후보 생성 API를 본 브랜치에 확정하지 않은 이유는 팀원별 AI 파이프라인 실험 결과를 비교한 뒤 서버 계약을 고정하기 위해서다.

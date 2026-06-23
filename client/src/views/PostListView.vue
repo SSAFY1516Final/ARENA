@@ -13,8 +13,7 @@
       <input v-model="filters.keyword" class="input" placeholder="검색어를 입력하세요" @keyup.enter="search" />
       <select v-model="filters.mode" class="select" @change="search">
         <option value="ALL">전체</option>
-        <option value="PRACTICAL">실용 판정</option>
-        <option value="ENTERTAINMENT">예능 배틀</option>
+        <option value="PRACTICAL">토론</option>
       </select>
       <select v-model="filters.sort" class="select" @change="search">
         <option value="latest">최신순</option>
@@ -37,7 +36,7 @@
       >
         <div class="tag-row">
           <span class="tag" :class="post.mode === 'PRACTICAL' ? 'tag--teal' : 'tag--amber'">
-            {{ post.mode === 'PRACTICAL' ? '실용 판정' : '예능 배틀' }}
+            토론
           </span>
           <span class="tag">댓글 {{ post.commentCount }}</span>
         </div>

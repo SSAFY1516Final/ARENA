@@ -21,7 +21,7 @@ describe('MyDebatesView', () => {
     })
   })
 
-  it('shows my debate topics as cards and provides a new debate button', async () => {
+  it('shows my debate topics as cards and provides a debate creation button', async () => {
     const router = createRouter({
       history: createWebHistory(),
       routes: [
@@ -50,6 +50,33 @@ describe('MyDebatesView', () => {
     expect(wrapper.text()).not.toContain('공유하기')
 
     const newDebateLink = wrapper.get('a[href="/new"]')
-    expect(newDebateLink.text()).toContain('새 토론')
+    expect(newDebateLink.text()).toContain('토론 만들기')
+  })
+
+  it('shows demo debate cards when the user has no debates yet', async () => {
+    debateApi.list.mockResolvedValue({ data: [] })
+    const router = createRouter({
+      history: createWebHistory(),
+      routes: [
+        { path: '/debates', component: MyDebatesView },
+        { path: '/new', component: { template: '<div>토론 만들기</div>' } },
+      ],
+    })
+    await router.push('/debates')
+    await router.isReady()
+
+    const wrapper = mount(MyDebatesView, {
+      global: {
+        plugins: [createPinia(), router],
+      },
+    })
+    await flushPromises()
+
+    expect(wrapper.find('.empty-state').exists()).toBe(false)
+    expect(wrapper.findAll('.my-debate-card')).toHaveLength(3)
+    expect(wrapper.text()).toContain('여행 단톡방에서 아이폰 사진 공유')
+    expect(wrapper.text()).toContain('토론 시작하기')
+    expect(wrapper.text()).not.toContain('예시')
+    expect(wrapper.text()).not.toContain('목업')
   })
 })

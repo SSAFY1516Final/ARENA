@@ -86,6 +86,24 @@ public class UserService implements UserDetailsService {
     }
 
     @Transactional
+    public User updateNickname(Long userId, String nickname) {
+        User user = getById(userId);
+        String nextNickname = nickname.trim();
+        if (user.getNickname().equals(nextNickname)) {
+            return user;
+        }
+
+        User nicknameOwner = userMapper.findByNickname(nextNickname);
+        if (nicknameOwner != null && !nicknameOwner.getId().equals(userId)) {
+            throw new ApiException(HttpStatus.CONFLICT, "nickname already exists");
+        }
+
+        userMapper.updateNickname(userId, nextNickname);
+        user.setNickname(nextNickname);
+        return user;
+    }
+
+    @Transactional
     public User updateRole(Long adminUserId, Long targetUserId, UserRole role) {
         if (adminUserId.equals(targetUserId) && role == UserRole.USER) {
             throw new ApiException(HttpStatus.CONFLICT, "cannot remove your own admin role");

@@ -7,7 +7,7 @@ SSAFY 15기 서울 16반 관통 프로젝트 제출 저장소입니다. ARENA는
 | 항목 | 위치 | 상태 |
 | --- | --- | --- |
 | Spring Boot 백엔드 | `server/` | Spring Security, JWT, Kakao OAuth, MyBatis, Spring AI 베이스 환경 반영 |
-| Vue 프론트엔드 | `client/` | Kakao 로그인, 토론, 게시글, 관리자 화면 흐름 반영 |
+| Vue 프론트엔드 | `client/` | Kakao 로그인, 닉네임 수정, 선택형 토론 생성 목업, 게시글 화면 흐름 반영 |
 | 요구사항 정의서 | `docs/deliverables/requirements/arena-requirements.md` | 현재 서비스 방향 기준 보정 완료 |
 | 유즈케이스 다이어그램 | `docs/deliverables/use-cases/arena-use-cases.md` | Actor, 주요 기능, Mermaid 원본 포함 |
 | ERD | `docs/deliverables/erd/arena-erd.md` | Kakao OAuth 사용자 모델 및 JWT 인증 흐름 기준 보정 |
@@ -15,6 +15,7 @@ SSAFY 15기 서울 16반 관통 프로젝트 제출 저장소입니다. ARENA는
 | 간트차트 | `docs/deliverables/gantt/arena-gantt.xlsx` | 현재 개발 흐름 기준 보정 |
 | 화면설계서 | `docs/deliverables/screen-definition/figma-screen-definition.md` | Vue 화면 구조와 사용자 흐름 기준 보정 |
 | API 설계서 | `docs/deliverables/api/arena-rest-api.md` | 현재 REST API 기준 보정 |
+| 최종 검증 기록 | `docs/deliverables/test-report.md` | 테스트/빌드/브라우저 확인 결과 정리 |
 
 전체 산출물 색인은 [docs/deliverables/README.md](docs/deliverables/README.md)를 참고합니다.
 
@@ -24,7 +25,7 @@ SSAFY 15기 서울 16반 관통 프로젝트 제출 저장소입니다. ARENA는
 - 팀: Java_Seoul_16_Jaeyoung_Minyong
 - 주제: AI 기반 선택 토론 커뮤니티
 - 인증 방식: Kakao OAuth 로그인 후 자체 JWT 발급
-- 핵심 기능: AI 토론 생성, 토론 요약, 게시글 공유, 투표/댓글, 관리자 권한 관리
+- 핵심 기능: 선택형 후보 기반 토론 생성, AI 토론 진행/요약, 게시글 공유, 투표/댓글, 관리자 권한 관리
 - 제출 범위: Spring Boot REST API, Vue 3 프론트엔드, Spring Security + JWT, MyBatis, Spring AI 베이스 환경, 제출 산출물
 
 ## 기술 스택
@@ -44,8 +45,10 @@ SSAFY 15기 서울 16반 관통 프로젝트 제출 저장소입니다. ARENA는
 
 - 카카오 OAuth 로그인
 - JWT 기반 API 인증
+- 내 닉네임 조회 및 수정
 - 내 토론 목록 조회
-- 토론 생성 및 AI 발화 요청
+- 주제/상황/세부조건 기반 후보 선택형 토론 생성
+- AI 발화 요청
 - 토론 중단 후 AI 요약 생성
 - 요약 결과 게시글 공유
 - 공개 게시글 조회, 투표, 댓글 작성
@@ -61,7 +64,8 @@ SSAFY 15기 서울 16반 관통 프로젝트 제출 저장소입니다. ARENA는
 
 - Spring AI 연동을 위한 최소 베이스 환경 구성
 - 토론 발화 생성 및 요약 생성을 담당하는 AI 클라이언트 추상화
-- 선택형 주제 후보 생성 등 고도화 파이프라인은 `ai-experiment-choice-pipeline` 브랜치에 별도 보존
+- `/new` 화면은 선택형 후보 파이프라인을 목업으로 노출
+- 실제 선택형 주제 후보 생성 등 고도화 파이프라인은 `ai-experiment-choice-pipeline` 브랜치에 별도 보존
 
 ## 실행 환경 변수
 
@@ -73,12 +77,17 @@ JWT_EXPIRATION_SECONDS=86400
 
 OPENAI_API_KEY=sk-...
 OPENAI_MODEL=gpt-4o-mini
-CORS_ALLOWED_ORIGINS=http://localhost:5173,http://127.0.0.1:5173
+CORS_ALLOWED_ORIGINS=http://localhost:5173,http://127.0.0.1:5173,http://localhost:15173
 
 KAKAO_REST_API_KEY=...
 KAKAO_CLIENT_SECRET=...
 KAKAO_REDIRECT_URI=http://localhost:5173/auth/kakao/callback
 ```
+
+프론트 개발 서버를 `15173` 포트로 실행하는 경우 Kakao Developers에도 다음 값을 함께 등록합니다.
+
+- Redirect URI: `http://localhost:15173/auth/kakao/callback`
+- Web domain: `http://localhost:15173`
 
 ## 실행 방법
 
@@ -146,6 +155,8 @@ Kakao Developers 콘솔에서 다음 설정이 필요합니다.
 | --- | --- | --- | --- |
 | POST | `/api/auth/kakao` | 카카오 인가 코드로 JWT 발급 | Public |
 | POST | `/api/auth/logout` | 클라이언트 토큰 폐기 흐름 | USER |
+| GET | `/api/users/me` | 내 프로필 조회 | USER |
+| PATCH | `/api/users/me/nickname` | 내 닉네임 수정 | USER |
 | GET | `/api/debates` | 내 토론 목록 조회 | USER |
 | POST | `/api/debates` | 토론 생성 | USER |
 | POST | `/api/debates/{id}/turns` | AI 다음 발화 생성 | USER |
@@ -171,7 +182,9 @@ Kakao Developers 콘솔에서 다음 설정이 필요합니다.
 - [x] Spring AI 베이스 설계
 - [x] API 설계서
 - [x] README 정리
-- [ ] 최종 실행 캡처 또는 테스트 로그 정리
+- [x] 선택형 토론 생성 화면 목업 반영
+- [x] 닉네임 수정 기능 문서 반영
+- [x] 최종 실행 캡처 또는 테스트 로그 정리
 
 ## 브랜치 전략
 
