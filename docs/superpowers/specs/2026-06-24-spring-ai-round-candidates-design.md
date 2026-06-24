@@ -18,13 +18,14 @@ In scope:
 - Add a backend API consumed by the existing `/new` page.
 - Keep the selected candidate flowing into the existing `POST /api/debates` request.
 - Preserve `originalTopic` as the user's input and use the selected candidate's `coreQuestion` as the debate `topic`.
+- Persist each candidate generation run, rendered prompts, raw provider responses, parsed stage outputs, final response, and failures for later analysis.
 
 Out of scope:
 
 - The `debate-single-round-fast-generator.txt` 10-turn batch generation flow.
-- New persistence for topic frames or round candidate metadata.
 - Replacing the existing `/api/debates/{debateId}/turns` one-turn-at-a-time flow.
 - Importing the prompt-lab experiment controllers, log UI, prompt editing API, or legacy generation modes.
+- Storing provider API keys, authorization headers, or other secrets in prompt logs.
 
 ## Architecture
 
@@ -36,6 +37,7 @@ HomeView
   -> debateApi.generateRoundCandidates()
   -> POST /api/ai/round-candidates
   -> AiRoundCandidateService
+  -> AiRoundCandidateRunMapper + AiPromptCallLogMapper
   -> SpringAiClient
   -> PromptTemplateLoader + AiResponseParser
 ```
@@ -100,6 +102,60 @@ Response:
 
 The endpoint remains authenticated because it spends provider quota.
 
+## Database Persistence
+
+Add two tables so product data can be preserved without coupling prompt logs to active debate sessions.
+
+`ai_round_candidate_runs` stores one row per candidate generation request:
+
+```sql
+CREATE TABLE ai_round_candidate_runs (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    user_id BIGINT NOT NULL,
+    original_topic VARCHAR(255) NOT NULL,
+    mode VARCHAR(30) NOT NULL,
+    candidate_count INT NOT NULL,
+    status VARCHAR(30) NOT NULL,
+    topic_frame_json LONGTEXT NULL,
+    final_response_json LONGTEXT NULL,
+    error_message TEXT NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    completed_at DATETIME NULL,
+    CONSTRAINT fk_ai_round_candidate_runs_user FOREIGN KEY (user_id) REFERENCES users(id),
+    INDEX idx_ai_round_candidate_runs_user_created (user_id, created_at),
+    INDEX idx_ai_round_candidate_runs_status_created (status, created_at)
+);
+```
+
+`ai_prompt_call_logs` stores one row per LLM prompt call in the run:
+
+```sql
+CREATE TABLE ai_prompt_call_logs (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    run_id BIGINT NOT NULL,
+    stage VARCHAR(40) NOT NULL,
+    prompt_name VARCHAR(120) NOT NULL,
+    model VARCHAR(120) NULL,
+    rendered_prompt LONGTEXT NOT NULL,
+    raw_response LONGTEXT NULL,
+    parsed_response_json LONGTEXT NULL,
+    status VARCHAR(30) NOT NULL,
+    error_message TEXT NULL,
+    latency_ms BIGINT NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_ai_prompt_call_logs_run FOREIGN KEY (run_id) REFERENCES ai_round_candidate_runs(id),
+    INDEX idx_ai_prompt_call_logs_run_stage (run_id, stage)
+);
+```
+
+Status values:
+
+- Run status: `STARTED`, `SUCCEEDED`, `FAILED`.
+- Prompt call status: `SUCCEEDED`, `FAILED`.
+- Stage values: `TOPIC_FRAME`, `CANDIDATE_GENERATION`, `CANDIDATE_VALIDATION`.
+
+The service must not store API keys, bearer tokens, request headers, or environment values. The rendered prompt may contain the user's topic and AI-generated intermediate content; this is intentional product data for analysis.
+
 ## Backend Components
 
 Create `server/src/main/resources/prompts/` and store the three active prompt files as UTF-8 resources. The prompt files should be copied from the downloaded package without semantic edits, except placeholder usage must match the renderer.
@@ -127,14 +183,23 @@ Extend `AiResponseParser`:
 
 Add `AiRoundCandidateService`:
 
-1. Render and call `topic-frame-generator.txt`.
-2. Parse `TopicFrameResponse`.
-3. If `isDebatable=false`, throw `422 Unprocessable Entity`.
-4. Render and call `topic-round-candidates-generator.txt`.
-5. Render and call `topic-round-candidates-validator.txt`.
-6. Return exactly five candidates, or fail with `502 Bad Gateway` when the AI response is malformed.
+1. Create an `ai_round_candidate_runs` row with `STARTED`.
+2. Render and call `topic-frame-generator.txt`, then store rendered prompt, raw response, parsed response, status, and latency as `TOPIC_FRAME`.
+3. Parse `TopicFrameResponse`.
+4. If `isDebatable=false`, update the run to `FAILED` with the topic frame JSON and throw `422 Unprocessable Entity`.
+5. Render and call `topic-round-candidates-generator.txt`, then store rendered prompt, raw response, parsed response, status, and latency as `CANDIDATE_GENERATION`.
+6. Render and call `topic-round-candidates-validator.txt`, then store rendered prompt, raw response, parsed response, status, and latency as `CANDIDATE_VALIDATION`.
+7. Update the run to `SUCCEEDED` with `topic_frame_json` and `final_response_json`.
+8. Return exactly five candidates, or update the run to `FAILED` and fail with `502 Bad Gateway` when the AI response is malformed.
 
-The service should not persist prompt outputs in this first version.
+Add persistence classes:
+
+- `AiRoundCandidateRun`
+- `AiPromptCallLog`
+- `AiRoundCandidateRunMapper`
+- `AiPromptCallLogMapper`
+
+Prompt logs should be written in `try/finally`-style boundaries so provider errors and parser errors are still stored.
 
 ## Frontend Flow
 
@@ -163,6 +228,8 @@ Backend:
 - `422 Unprocessable Entity`: topic frame says the input is not debatable.
 - `502 Bad Gateway`: provider failure, malformed JSON, missing required candidate fields, or fewer than five valid candidates.
 
+All backend failure paths update the run to `FAILED`. If a provider call was attempted, its prompt log row stores the rendered prompt, raw response when available, status, error message, and latency.
+
 Frontend:
 
 - Show the existing Axios `userMessage` when present.
@@ -177,6 +244,7 @@ Backend tests:
 - `PromptTemplateLoaderTest` verifies placeholder replacement and missing placeholder failure.
 - `AiResponseParserTest` parses fenced and unfenced candidate JSON.
 - `AiRoundCandidateServiceTest` verifies the three-prompt flow, non-debatable `422`, and malformed JSON `502`.
+- `AiRoundCandidateServiceTest` verifies successful runs and failed runs are persisted with prompt call logs.
 - `AiControllerTest` verifies authenticated request mapping and response shape.
 
 Frontend tests:
@@ -186,6 +254,6 @@ Frontend tests:
 
 ## Migration Notes
 
-No database migration is required. Existing rows keep using `original_topic` and `topic`.
+Add the two AI logging tables above to `server/src/main/resources/db/schema.sql`. Existing debate rows keep using `original_topic` and `topic`; candidate run logs are independent and do not require a `debate_session_id`.
 
 The downloaded package's `POST /api/debate/round-turns` and 10-turn batch generation are intentionally outside this spec. They require a separate follow-up spec after candidate generation is stable in the product.
