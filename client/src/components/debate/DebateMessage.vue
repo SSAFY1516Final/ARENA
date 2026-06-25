@@ -1,11 +1,10 @@
 <template>
   <article class="debate-message" :class="{ hot: message.speaker === 'PASSIONATE' }">
-    <div class="bubble" :class="{ hot: message.speaker === 'PASSIONATE' }">
-      <div class="bubble__meta">
-        <strong>{{ sideLabel }}</strong>
-        <span>의견 {{ displayIndex }}</span>
+    <div class="debate-message__body">
+      <strong class="debate-message__name">{{ sideLabel }}</strong>
+      <div class="bubble" :class="{ hot: message.speaker === 'PASSIONATE' }">
+        <p>{{ message.content }}</p>
       </div>
-      <p>{{ message.content }}</p>
     </div>
   </article>
 </template>

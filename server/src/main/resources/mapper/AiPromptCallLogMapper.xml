@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssafy.arena.mapper.AiPromptCallLogMapper">
+    <insert id="insert" parameterType="com.ssafy.arena.domain.AiPromptCallLog" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO ai_prompt_call_logs (
+            run_id, stage, prompt_name, model, rendered_prompt,
+            raw_response, parsed_response_json, status, error_message, latency_ms
+        )
+        VALUES (
+            #{runId}, #{stage}, #{promptName}, #{model}, #{renderedPrompt},
+            #{rawResponse}, #{parsedResponseJson}, #{status}, #{errorMessage}, #{latencyMs}
+        )
+    </insert>
+</mapper>

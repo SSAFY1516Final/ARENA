@@ -80,4 +80,17 @@ describe('authStore', () => {
     expect(user.nickname).toBe('아레나유저')
     expect(store.user.nickname).toBe('아레나유저')
   })
+
+  it('clears a stale token when the profile API rejects it as invalid', async () => {
+    localStorage.setItem('arena_access_token', createJwt({ userId: 7, sub: 'kakao_12345', role: 'USER' }))
+    const store = useAuthStore()
+    userApi.me.mockRejectedValue({ response: { status: 403 } })
+
+    const user = await store.fetchMe()
+
+    expect(user).toBeNull()
+    expect(store.accessToken).toBeNull()
+    expect(store.user).toBeNull()
+    expect(localStorage.getItem('arena_access_token')).toBeNull()
+  })
 })

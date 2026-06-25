@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssafy.arena.mapper.AiRoundCandidateRunMapper">
+    <insert id="insert" parameterType="com.ssafy.arena.domain.AiRoundCandidateRun" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO ai_round_candidate_runs (
+            user_id, original_topic, mode, candidate_count, status,
+            topic_frame_json, final_response_json, error_message
+        )
+        VALUES (
+            #{userId}, #{originalTopic}, #{mode}, #{candidateCount}, #{status},
+            #{topicFrameJson}, #{finalResponseJson}, #{errorMessage}
+        )
+    </insert>
+
+    <select id="findById" resultType="com.ssafy.arena.domain.AiRoundCandidateRun">
+        SELECT id, user_id, original_topic, mode, candidate_count, status,
+               topic_frame_json, final_response_json, error_message, created_at, completed_at
+        FROM ai_round_candidate_runs
+        WHERE id = #{id}
+    </select>
+
+    <update id="markSucceeded">
+        UPDATE ai_round_candidate_runs
+        SET status = 'SUCCEEDED',
+            topic_frame_json = #{topicFrameJson},
+            final_response_json = #{finalResponseJson},
+            error_message = NULL,
+            completed_at = CURRENT_TIMESTAMP
+        WHERE id = #{id}
+    </update>
+
+    <update id="markFailed">
+        UPDATE ai_round_candidate_runs
+        SET status = 'FAILED',
+            topic_frame_json = #{topicFrameJson},
+            error_message = #{errorMessage},
+            completed_at = CURRENT_TIMESTAMP
+        WHERE id = #{id}
+    </update>
+</mapper>

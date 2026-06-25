@@ -4,6 +4,7 @@ import { authApi } from '@/api/authApi'
 import { userApi } from '@/api/userApi'
 
 const TOKEN_STORAGE_KEY = 'arena_access_token'
+const AUTH_FAILURE_STATUSES = new Set([401, 403])
 
 function decodeJwtPayload(token) {
   const payload = token.split('.')[1]
@@ -51,15 +52,24 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  async function logout() {
+  function clearSession() {
     localStorage.removeItem(TOKEN_STORAGE_KEY)
     accessToken.value = null
     user.value = null
   }
 
+  async function logout() {
+    clearSession()
+  }
+
   async function fetchMe() {
     if (!user.value && accessToken.value) {
-      setSession({ accessToken: accessToken.value })
+      try {
+        setSession({ accessToken: accessToken.value })
+      } catch {
+        clearSession()
+        return null
+      }
     }
     if (accessToken.value) {
       try {
@@ -68,7 +78,11 @@ export const useAuthStore = defineStore('auth', () => {
           ...user.value,
           ...data,
         }
-      } catch {
+      } catch (error) {
+        if (AUTH_FAILURE_STATUSES.has(error.response?.status)) {
+          clearSession()
+          return null
+        }
         // Keep the decoded token fallback so route guards do not log users out on transient API errors.
       }
     }

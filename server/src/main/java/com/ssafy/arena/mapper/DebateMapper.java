@@ -15,6 +15,12 @@ public interface DebateMapper {
 
     void updateSessionStatus(@Param("id") Long id, @Param("status") DebateStatus status);
 
+    void updateSelection(
+            @Param("id") Long id,
+            @Param("selectedSide") Speaker selectedSide,
+            @Param("selectedRoundNo") Integer selectedRoundNo
+    );
+
     void updatePeakReached(@Param("id") Long id, @Param("peakReached") boolean peakReached);
 
     void insertMessage(DebateMessage message);
@@ -26,4 +32,16 @@ public interface DebateMapper {
     void insertSummary(DebateSummary summary);
 
     DebateSummary findSummary(@Param("debateSessionId") Long debateSessionId);
+
+    void deletePostVotesByDebateId(@Param("debateSessionId") Long debateSessionId);
+
+    void deleteCommentsByDebateId(@Param("debateSessionId") Long debateSessionId);
+
+    void deletePostByDebateId(@Param("debateSessionId") Long debateSessionId);
+
+    void deleteSummaryByDebateId(@Param("debateSessionId") Long debateSessionId);
+
+    void deleteMessagesByDebateId(@Param("debateSessionId") Long debateSessionId);
+
+    void deleteSessionById(@Param("id") Long id);
 }

@@ -4,6 +4,7 @@ import { createPinia } from 'pinia'
 import { createRouter, createWebHistory } from 'vue-router'
 import AppNav from '@/components/common/AppNav.vue'
 import { useAuthStore } from '@/stores/authStore'
+import { userApi } from '@/api/userApi'
 
 vi.mock('@/api/userApi', () => ({
   userApi: {
@@ -76,6 +77,47 @@ describe('AppNav', () => {
 
     expect(wrapper.get('#nickname-editor').exists()).toBe(true)
     expect(wrapper.get('input#nickname-input').element.value).toBe('kakao_12345')
+  })
+
+  it('saves a changed nickname and closes the editor', async () => {
+    const router = createRouter({
+      history: createWebHistory(),
+      routes: [
+        { path: '/auth', component: { template: '<div />' } },
+        { path: '/new', component: { template: '<div />' } },
+        { path: '/debates', component: { template: '<div />' } },
+        { path: '/posts', component: { template: '<div />' } },
+      ],
+    })
+    const pinia = createPinia()
+    const auth = useAuthStore(pinia)
+    auth.setSession({
+      tokenType: 'Bearer',
+      accessToken: createJwt({ userId: 7, sub: 'kakao_12345', role: 'USER' }),
+    })
+    userApi.updateNickname.mockResolvedValue({
+      data: {
+        userId: 7,
+        loginId: 'kakao_12345',
+        nickname: '새닉네임',
+      },
+    })
+
+    const wrapper = mount(AppNav, {
+      global: {
+        plugins: [pinia, router],
+      },
+    })
+
+    await wrapper.get('.profile-chip').trigger('click')
+    await wrapper.get('input#nickname-input').setValue('새닉네임')
+    await wrapper.get('#nickname-editor').trigger('submit')
+    await flushPromises()
+
+    expect(userApi.updateNickname).toHaveBeenCalledWith({ nickname: '새닉네임' })
+    expect(auth.user.nickname).toBe('새닉네임')
+    expect(wrapper.find('#nickname-editor').exists()).toBe(false)
+    expect(wrapper.get('.profile-chip').text()).toContain('새닉네임')
   })
 
   it('logs out and returns to the auth page from the profile area', async () => {

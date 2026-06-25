@@ -1,45 +1,55 @@
 <template>
-  <main class="page">
-    <section class="topic-header">
-      <div>
-        <h1>{{ debateStore.currentDebate.topic }}</h1>
-        <div class="tag-row">
-          <span class="tag tag--teal">{{ sideLabels.COOL_HEADED }}</span>
-          <span class="tag tag--blue">{{ sideLabels.PASSIONATE }}</span>
-        </div>
+  <main class="page debate-room-page">
+    <section class="topic-header debate-topic-card">
+      <div class="debate-topic-copy">
+        <h1 class="debate-room-title">{{ roomTopic }}</h1>
+        <p v-if="roomDetailTopic" class="debate-room-detail-topic">{{ roomDetailTopic }}</p>
+        <p v-if="originalTopic" class="debate-room-original-topic">{{ originalTopic }}</p>
       </div>
     </section>
 
     <section class="debate-room-layout">
-      <div class="chat-panel">
-        <header class="chat-panel__header">
-          <div>
-            <strong>{{ sideLabels.COOL_HEADED }} vs {{ sideLabels.PASSIONATE }}</strong>
-            <span>{{ chatMeta }}</span>
-          </div>
+      <div class="chat-panel debate-chat-card">
+        <header v-if="chatMeta" class="chat-panel__header">
+          <span>{{ chatMeta }}</span>
         </header>
 
         <div v-if="debateStore.loading && !visibleMessages.length" class="loading-state">
           토론을 불러오는 중입니다.
         </div>
 
-        <div v-else class="message-list">
+        <div v-else class="message-list debate-message-stream">
+          <div v-if="showInitialGenerationLoading" class="debate-room-start-loading" role="status" aria-live="polite">
+            <strong>토론 대결을 준비중입니다</strong>
+            <span>AI가 첫 발화를 준비하고 있어요. 1분 정도 소요될 수 있습니다. 화면을 떠나도 서버에서 계속 저장됩니다.</span>
+            <div class="new-generation-loading__progress" aria-hidden="true">
+              <span></span>
+            </div>
+          </div>
           <DebateMessage
+            v-if="!showInitialGenerationLoading"
             v-for="(message, index) in visibleMessages"
             :key="message.messageId"
             :message="message"
             :side-labels="sideLabels"
             :display-index="index + 1"
           />
-          <div v-if="autoRunning || debateStore.turnLoading" class="typing-indicator" aria-live="polite">
-            <span></span>
-            <span></span>
-            <span></span>
-          </div>
-          <div v-if="!visibleMessages.length && !autoRunning" class="empty-state empty-state--compact">
-            <h2>토론을 준비하고 있습니다</h2>
-            <p>{{ sideLabels.COOL_HEADED }}와 {{ sideLabels.PASSIONATE }} 입장이 차례로 올라옵니다.</p>
-          </div>
+          <article
+            v-if="!showInitialGenerationLoading && displayTypingSpeaker"
+            class="typing-row typing-message"
+            :class="{ hot: displayTypingSpeaker === 'PASSIONATE' }"
+            aria-live="polite"
+          >
+            <div class="debate-message__body">
+              <strong class="debate-message__name">{{ sideLabels[displayTypingSpeaker] }}</strong>
+              <div class="bubble typing-indicator" :class="{ hot: displayTypingSpeaker === 'PASSIONATE' }">
+                <span class="typing-dot"></span>
+                <span class="typing-dot"></span>
+                <span class="typing-dot"></span>
+                <span class="typing-label">입력중</span>
+              </div>
+            </div>
+          </article>
         </div>
 
         <div class="chat-actions">
@@ -51,84 +61,59 @@
           >
             토론 진행 중
           </button>
-          <button
-            v-if="canContinueDebate"
-            class="button button--ghost"
-            type="button"
-            :disabled="debateStore.turnLoading || autoRunning"
-            @click="continueRound"
-          >
-            이 주제로 더 듣기
-          </button>
-          <button
-            v-if="canStopDebate"
-            class="button finish-button"
-            type="button"
-            :disabled="debateStore.stopLoading || autoRunning"
-            @click="openDecisionStep"
-          >
-            판단하기
-          </button>
         </div>
 
-        <section v-if="showDecisionPanel" class="debate-flow-panel">
+        <section
+          v-if="showDecisionPanel"
+          class="debate-flow-panel"
+          :class="{
+            'debate-flow-panel--choice': flowStep === 'pick',
+            'debate-flow-panel--chosen': flowStep === 'pick' && selectedSide,
+          }"
+        >
           <div v-if="flowStep === 'pick'" class="flow-step">
             <div>
-              <span class="section-label">내 선택</span>
-              <h2>어느 쪽이 더 설득됐나요?</h2>
+              <h2>어느 쪽 의견에 더 마음이 가나요?</h2>
             </div>
             <div class="debate-choice-grid">
               <button
                 type="button"
                 class="debate-choice"
-                :class="{ selected: selectedSide === 'COOL_HEADED' }"
+                :class="{
+                  selected: selectedSide === 'COOL_HEADED',
+                  'is-dimmed': selectedSide && selectedSide !== 'COOL_HEADED',
+                }"
+                :disabled="isChoosingSide"
                 @click="pickSide('COOL_HEADED')"
               >
                 <strong>{{ sideLabels.COOL_HEADED }}</strong>
-                <span>이쪽 주장이 더 설득력 있었습니다.</span>
               </button>
               <button
                 type="button"
                 class="debate-choice debate-choice--hot"
-                :class="{ selected: selectedSide === 'PASSIONATE' }"
+                :class="{
+                  selected: selectedSide === 'PASSIONATE',
+                  'is-dimmed': selectedSide && selectedSide !== 'PASSIONATE',
+                }"
+                :disabled="isChoosingSide"
                 @click="pickSide('PASSIONATE')"
               >
                 <strong>{{ sideLabels.PASSIONATE }}</strong>
-                <span>이쪽 주장이 더 설득력 있었습니다.</span>
-              </button>
-            </div>
-          </div>
-
-          <div v-else-if="flowStep === 'next'" class="flow-step">
-            <div>
-              <span class="section-label">다음 진행</span>
-              <h2>{{ selectedSideLabel }} 쪽으로 선택했습니다</h2>
-              <p>다른 세부주제를 골라 이어가거나, 여기서 토론을 마무리할 수 있습니다.</p>
-            </div>
-            <div class="flow-actions">
-              <button class="button button--ghost" type="button" @click="goNewDebate">다른 세부주제 보기</button>
-              <button class="button" type="button" :disabled="debateStore.stopLoading" @click="finishDebate">
-                토론 마무리
               </button>
             </div>
           </div>
 
           <div v-else class="flow-step">
-            <div>
-              <span class="section-label">마무리</span>
-              <h2>요약이 준비됐습니다</h2>
-              <p>{{ summaryText }}</p>
-            </div>
-            <div class="flow-actions">
-              <button class="button button--ghost" type="button" @click="goMyDebates">내 토론에 저장</button>
-              <button class="button share-toggle" type="button" @click="toggleShareForm">게시판에 공유</button>
+            <div class="flow-actions debate-result-actions">
+              <button class="debate-action-button debate-action-button--secondary" type="button" @click="goMoreDebates">
+                토론 더 진행하기
+              </button>
+              <button class="debate-action-button debate-action-button--primary share-toggle" type="button" @click="shareDebate">
+                게시글 등록
+              </button>
             </div>
           </div>
         </section>
-
-        <form v-if="shareFormOpen" class="share-form share-form--room" @submit.prevent="shareDebate">
-          <button class="button button--full" type="submit">게시글 공유하기</button>
-        </form>
 
         <p v-if="debateStore.currentDebate.shareBody" class="shared-body-preview">
           {{ debateStore.currentDebate.shareBody }}
@@ -143,64 +128,133 @@ import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import DebateMessage from '@/components/debate/DebateMessage.vue'
 import { useDebateStore } from '@/stores/debateStore'
-import { debateSideLabels } from '@/utils/debateSides'
+import { debateSideLabels, displaySideLabel } from '@/utils/debateSides'
 
 const route = useRoute()
 const router = useRouter()
 const debateStore = useDebateStore()
-const shareFormOpen = ref(false)
 const visibleMessages = ref([])
 const autoRunning = ref(false)
-const targetTurnCount = ref(6)
+const initialGenerationPending = ref(false)
+const typingSpeaker = ref('')
+const targetTurnCount = ref(10)
 const selectedSide = ref('')
+const isChoosingSide = ref(false)
 const flowStep = ref('chat')
+const turnGenerationError = ref('')
 let revealTimer = null
+let unmounted = false
+const MESSAGE_TYPING_DELAY_MS = 2000
+const GENERATION_POLL_INTERVAL_MS = 2000
+const CHOICE_TRANSITION_DELAY_MS = 250
 
-const sideLabels = computed(() => debateSideLabels(debateStore.currentDebate.topic))
+const openedFromRecentDebates = computed(() => route.query.from === 'recent')
+const originalTopic = computed(() => {
+  const storedTopic = debateStore.currentDebate.originalTopic || ''
+  const selectedTopic = debateStore.currentDebate.topic || ''
+  if (storedTopic && storedTopic !== selectedTopic) return storedTopic
+  return inferredOriginalTopic.value || storedTopic
+})
+const inferredOriginalTopic = computed(() => {
+  const topic = debateStore.currentDebate.topic || ''
+  if (!topic.includes(',')) return ''
+  return topic.split(',')[0].trim()
+})
+const sideLabelSource = computed(() => originalTopic.value || debateStore.currentDebate.topic)
+const sideLabels = computed(() => {
+  if (debateStore.currentDebate.sideALabel && debateStore.currentDebate.sideBLabel) {
+    return {
+      COOL_HEADED: displaySideLabel(debateStore.currentDebate.sideALabel),
+      PASSIONATE: displaySideLabel(debateStore.currentDebate.sideBLabel),
+    }
+  }
+  return debateSideLabels(sideLabelSource.value)
+})
+const roomTopic = computed(() => (
+  debateStore.currentDebate.roundTitle ||
+  debateStore.currentDebate.topic ||
+  '토론 주제를 불러오는 중입니다'
+))
+const roomDetailTopic = computed(() => {
+  const topic = debateStore.currentDebate.topic || ''
+  if (!debateStore.currentDebate.roundTitle || !topic || topic === debateStore.currentDebate.roundTitle) {
+    return ''
+  }
+  return topic
+})
 const selectedSideLabel = computed(() => (selectedSide.value ? sideLabels.value[selectedSide.value] : '선택한 진영'))
 const summaryText = computed(
   () => debateStore.summary?.summaryText || `${selectedSideLabel.value} 쪽을 선택했습니다. 토론 내용을 게시판에 공유할 수 있습니다.`,
 )
 const chatMeta = computed(() => {
+  if (turnGenerationError.value) return turnGenerationError.value
   if (debateStore.currentDebate.status !== 'ACTIVE') return '토론 종료'
-  if (flowStep.value !== 'chat') return '선택 대기'
+  if (flowStep.value !== 'chat') return ''
   if (autoRunning.value || debateStore.turnLoading) return '의견 생성 중'
-  return `${visibleMessages.value.length}개 의견`
+  return ''
 })
-const canContinueDebate = computed(
-  () =>
-    flowStep.value === 'chat' &&
-    debateStore.currentDebate.status === 'ACTIVE' &&
-    !autoRunning.value &&
-    visibleMessages.value.length >= targetTurnCount.value,
-)
-const canStopDebate = computed(
-  () =>
-    flowStep.value === 'chat' &&
-    debateStore.currentDebate.status === 'ACTIVE' &&
-    !autoRunning.value &&
-    visibleMessages.value.length > 0,
-)
 const showDecisionPanel = computed(() => flowStep.value !== 'chat')
+const showInitialGenerationLoading = computed(() => (
+  flowStep.value === 'chat' &&
+  debateStore.currentDebate.status === 'ACTIVE' &&
+  !turnGenerationError.value &&
+  initialGenerationPending.value &&
+  !visibleMessages.value.length
+))
+const displayTypingSpeaker = computed(() => {
+  if (typingSpeaker.value) return typingSpeaker.value
+  if (showInitialGenerationLoading.value) return ''
+  if (
+    flowStep.value === 'chat' &&
+    debateStore.currentDebate.status === 'ACTIVE' &&
+    !autoRunning.value &&
+    !debateStore.turnLoading &&
+    !openedFromRecentDebates.value &&
+    !visibleMessages.value.length
+  ) {
+    return 'COOL_HEADED'
+  }
+  return ''
+})
+const currentRoundNo = computed(() => {
+  const currentDebateId = Number(debateStore.currentDebate.debateId)
+  const currentRound = debateStore.rounds.find((round) => Number(round.debateId) === currentDebateId)
+  return currentRound?.roundNo || null
+})
+const debateMessages = computed(() => {
+  if (!currentRoundNo.value) {
+    return debateStore.messages
+  }
+  return debateStore.messages.filter((message) => Number(message.roundNo) === Number(currentRoundNo.value))
+})
 
 onMounted(async () => {
   await debateStore.fetchDebate(route.params.debateId)
   visibleMessages.value = []
+  turnGenerationError.value = ''
 
-  if (debateStore.currentDebate.status !== 'ACTIVE') {
-    visibleMessages.value = [...debateStore.messages]
+  if (openedFromRecentDebates.value) {
+    visibleMessages.value = debateMessages.value.slice(0, targetTurnCount.value)
     flowStep.value = 'summary'
     return
   }
 
-  await revealStoredMessages()
-
-  if (debateStore.messages.length < targetTurnCount.value) {
-    runAutoDebate()
+  if (debateStore.currentDebate.status !== 'ACTIVE') {
+    visibleMessages.value = [...debateMessages.value]
+    flowStep.value = 'summary'
+    return
   }
+
+  if (debateMessages.value.length < targetTurnCount.value) {
+    await runAutoDebate()
+    return
+  }
+  await revealStoredMessages()
+  openDecisionStepIfReady()
 })
 
 onBeforeUnmount(() => {
+  unmounted = true
   if (revealTimer) {
     clearTimeout(revealTimer)
   }
@@ -212,20 +266,43 @@ function wait(ms) {
   })
 }
 
-async function revealNextMessage(delay = 520) {
-  if (visibleMessages.value.length >= debateStore.messages.length) return
-  if (delay > 0) await wait(delay)
+async function revealNextMessage(delay = MESSAGE_TYPING_DELAY_MS, showTyping = true) {
+  if (visibleMessages.value.length >= targetTurnCount.value) return
+  if (visibleMessages.value.length >= debateMessages.value.length) return
 
-  const nextMessage = debateStore.messages[visibleMessages.value.length]
+  const nextMessage = debateMessages.value[visibleMessages.value.length]
   if (nextMessage) {
+    if (showTyping) {
+      typingSpeaker.value = nextMessage.speaker
+      if (delay > 0) await wait(delay)
+      typingSpeaker.value = ''
+    }
     visibleMessages.value = [...visibleMessages.value, nextMessage]
+    openDecisionStepIfReady()
   }
 }
 
 async function revealStoredMessages() {
-  while (visibleMessages.value.length < debateStore.messages.length) {
-    await revealNextMessage(520)
+  while (
+    visibleMessages.value.length < debateMessages.value.length &&
+    visibleMessages.value.length < targetTurnCount.value
+  ) {
+    await revealNextMessage(MESSAGE_TYPING_DELAY_MS)
   }
+}
+
+async function waitForInitialGenerationToComplete() {
+  while (!unmounted && debateMessages.value.length < targetTurnCount.value) {
+    await wait(GENERATION_POLL_INTERVAL_MS)
+    if (unmounted) return false
+    try {
+      await debateStore.fetchDebate(route.params.debateId)
+    } catch {
+      turnGenerationError.value = 'AI response generation failed. Please try again.'
+      return false
+    }
+  }
+  return debateMessages.value.length >= targetTurnCount.value
 }
 
 async function runAutoDebate() {
@@ -235,56 +312,92 @@ async function runAutoDebate() {
 
   autoRunning.value = true
   try {
-    while (
-      debateStore.currentDebate.status === 'ACTIVE' &&
-      debateStore.messages.length < targetTurnCount.value
-    ) {
-      await wait(780)
-      const beforeCount = debateStore.messages.length
+    if (debateMessages.value.length < targetTurnCount.value) {
+      initialGenerationPending.value = true
       try {
-        await debateStore.generateNextTurn(route.params.debateId)
-      } catch {
-        break
+        const generation = await debateStore.generateInitialTurns(route.params.debateId)
+        if (generation.status !== 'COMPLETE' || debateMessages.value.length < targetTurnCount.value) {
+          const completed = await waitForInitialGenerationToComplete()
+          if (!completed) return
+        }
+      } catch (error) {
+        turnGenerationError.value = 'AI response generation failed. Please try again.'
+        return
+      } finally {
+        initialGenerationPending.value = false
       }
-      if (debateStore.messages.length <= beforeCount) break
-      await revealNextMessage(160)
     }
+    await revealStoredMessages()
   } finally {
+    initialGenerationPending.value = false
+    typingSpeaker.value = ''
     autoRunning.value = false
+    openDecisionStepIfReady()
   }
 }
 
-async function continueRound() {
-  selectedSide.value = ''
-  targetTurnCount.value += 2
-  flowStep.value = 'chat'
-  await runAutoDebate()
+function openDecisionStepIfReady() {
+  if (
+    flowStep.value === 'chat' &&
+    debateStore.currentDebate.status === 'ACTIVE' &&
+    !autoRunning.value &&
+    visibleMessages.value.length >= targetTurnCount.value
+  ) {
+    flowStep.value = 'pick'
+  }
 }
 
-function openDecisionStep() {
-  flowStep.value = 'pick'
-}
-
-function pickSide(side) {
+async function pickSide(side) {
+  if (isChoosingSide.value) return
+  isChoosingSide.value = true
   selectedSide.value = side
-  flowStep.value = 'next'
+  turnGenerationError.value = ''
+  window.localStorage.setItem(`arena.debate.choice.${route.params.debateId}`, side)
+  const selectedRoundNo = currentRoundNo.value || visibleMessages.value.find((message) => message.roundNo)?.roundNo || 1
+  let navigatingToResult = false
+  const stopAttempt = debateStore.stopDebate(route.params.debateId, {
+    selectedSide: side,
+    selectedRoundNo,
+  }).catch(() => {
+    if (!navigatingToResult) {
+      selectedSide.value = ''
+      turnGenerationError.value = '결과를 저장하지 못했습니다. 잠시 후 다시 선택해주세요.'
+    }
+    return null
+  })
+
+  try {
+    await wait(CHOICE_TRANSITION_DELAY_MS)
+    if (turnGenerationError.value) return
+
+    navigatingToResult = true
+    await router.push({
+      path: `/debates/${route.params.debateId}/result`,
+      query: { choice: side },
+    })
+    void stopAttempt
+  } catch {
+    selectedSide.value = ''
+    turnGenerationError.value = '결과를 저장하지 못했습니다. 잠시 후 다시 선택해주세요.'
+  } finally {
+    isChoosingSide.value = false
+  }
 }
 
-async function finishDebate() {
-  await debateStore.stopDebate(route.params.debateId)
-  flowStep.value = 'summary'
-}
+function goMoreDebates() {
+  const query = {
+    topic: originalTopic.value || debateStore.currentDebate.originalTopic || debateStore.currentDebate.topic,
+  }
+  if (debateStore.currentDebate.candidateRunId) {
+    query.candidateRunId = String(debateStore.currentDebate.candidateRunId)
+  } else {
+    query.candidates = '1'
+  }
 
-function goNewDebate() {
-  router.push('/new')
-}
-
-function goMyDebates() {
-  router.push('/debates')
-}
-
-function toggleShareForm() {
-  shareFormOpen.value = !shareFormOpen.value
+  router.push({
+    path: '/new',
+    query,
+  })
 }
 
 async function shareDebate() {
@@ -294,7 +407,6 @@ async function shareDebate() {
     voteOptionB: sideLabels.value.PASSIONATE,
     isPublic: true,
   })
-  shareFormOpen.value = false
   router.push(`/posts/${post.postId}`)
 }
 </script>

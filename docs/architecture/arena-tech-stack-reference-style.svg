@@ -1,0 +1,144 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1120" viewBox="0 0 1600 1120" role="img" aria-labelledby="title desc">
+  <title id="title">ARENA Technology Stack</title>
+  <desc id="desc">Reference-image style technology stack diagram for ARENA.</desc>
+  <defs>
+    <style>
+      .bg{fill:#fff}
+      .title{font:900 38px Arial,'Noto Sans KR',sans-serif;fill:#0b0b0b}
+      .subtitle{font:700 16px Arial,'Noto Sans KR',sans-serif;fill:#4b5563}
+      .box{fill:#fff;stroke:#111827;stroke-width:3}
+      .thin{fill:#fff;stroke:#111827;stroke-width:2.5}
+      .soft{fill:#f8fafc;stroke:#cbd5e1;stroke-width:2}
+      .label{font:900 25px Arial,'Noto Sans KR',sans-serif;fill:#0b0b0b}
+      .mid{font:850 19px Arial,'Noto Sans KR',sans-serif;fill:#111827}
+      .small{font:750 14px Arial,'Noto Sans KR',sans-serif;fill:#374151}
+      .tiny{font:700 12px Arial,'Noto Sans KR',sans-serif;fill:#64748b}
+      .flow{font:850 16px Arial,'Noto Sans KR',sans-serif;fill:#111827}
+      .blue{fill:#3182f6}.green{fill:#00a887}.amber{fill:#f59f00}.red{fill:#ff6b6b}.purple{fill:#7c3aed}.dark{fill:#111827}.cyan{fill:#0891b2}
+      .line{stroke:#111827;stroke-width:3;fill:none;marker-end:url(#arrow)}
+      .double{stroke:#111827;stroke-width:3;fill:none;marker-start:url(#arrow-start);marker-end:url(#arrow)}
+      .dash{stroke:#64748b;stroke-width:2.7;fill:none;stroke-dasharray:8 7;marker-end:url(#arrow-gray)}
+    </style>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="4" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,8 L11,4 z" fill="#111827"/>
+    </marker>
+    <marker id="arrow-start" markerWidth="12" markerHeight="12" refX="1" refY="4" orient="auto" markerUnits="strokeWidth">
+      <path d="M11,0 L11,8 L0,4 z" fill="#111827"/>
+    </marker>
+    <marker id="arrow-gray" markerWidth="12" markerHeight="12" refX="10" refY="4" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,8 L11,4 z" fill="#64748b"/>
+    </marker>
+  </defs>
+
+  <rect class="bg" width="1600" height="1120"/>
+  <text class="title" x="64" y="62">ARENA Technology Stack</text>
+  <text class="subtitle" x="64" y="94">현재 구현 기준 기술 스택 · Vue 3 + Spring Boot + MySQL + Spring AI/GMS</text>
+
+  <!-- User -->
+  <circle cx="1330" cy="120" r="28" class="dark"/>
+  <path d="M1284 195 C1292 150 1368 150 1376 195 Z" class="dark"/>
+  <text class="label" x="1440" y="118" text-anchor="middle">USER</text>
+  <text class="label" x="1440" y="150" text-anchor="middle">REQUEST</text>
+  <path class="line" d="M1330 230 L1330 315 L1130 315"/>
+  <text class="flow" x="1160" y="300">Browser</text>
+
+  <!-- Main stack box -->
+  <rect class="box" x="230" y="270" width="900" height="520" rx="48"/>
+  <text class="label" x="680" y="322" text-anchor="middle">ARENA Application Stack</text>
+  <text class="tiny" x="680" y="348" text-anchor="middle">Docker Compose Runtime</text>
+
+  <!-- Frontend stack -->
+  <rect class="thin" x="280" y="390" width="260" height="300" rx="30"/>
+  <text class="label blue" x="410" y="435" text-anchor="middle">Frontend</text>
+  <circle cx="410" cy="500" r="50" fill="#eaf3ff" stroke="#3182f6" stroke-width="5"/>
+  <text class="mid blue" x="410" y="508" text-anchor="middle">Vue 3</text>
+  <text class="small" x="410" y="578" text-anchor="middle">Vite 6</text>
+  <text class="small" x="410" y="604" text-anchor="middle">Pinia 3</text>
+  <text class="small" x="410" y="630" text-anchor="middle">Vue Router 4</text>
+  <text class="small" x="410" y="656" text-anchor="middle">Axios · Naive UI</text>
+
+  <!-- Backend stack -->
+  <rect class="thin" x="610" y="375" width="300" height="330" rx="30"/>
+  <text class="label green" x="760" y="420" text-anchor="middle">Backend</text>
+  <circle cx="690" cy="482" r="32" fill="#e9fbf7" stroke="#00a887" stroke-width="4"/>
+  <text class="mid" x="762" y="488">Java 17</text>
+  <circle cx="690" cy="542" r="32" fill="#e9fbf7" stroke="#00a887" stroke-width="4"/>
+  <text class="mid" x="762" y="548">Spring Boot 3.5</text>
+  <circle cx="690" cy="602" r="32" fill="#fff1f1" stroke="#ff6b6b" stroke-width="4"/>
+  <text class="mid" x="762" y="608">Spring Security</text>
+  <circle cx="690" cy="662" r="32" fill="#eaf3ff" stroke="#3182f6" stroke-width="4"/>
+  <text class="mid" x="762" y="668">MyBatis 3.0.5</text>
+
+  <!-- AI stack inside app -->
+  <rect class="thin" x="945" y="405" width="150" height="260" rx="26"/>
+  <text class="label amber" x="1020" y="450" text-anchor="middle">AI</text>
+  <circle cx="1020" cy="510" r="42" fill="#fff7e6" stroke="#f59f00" stroke-width="5"/>
+  <text class="mid amber" x="1020" y="504" text-anchor="middle">Spring</text>
+  <text class="mid amber" x="1020" y="528" text-anchor="middle">AI</text>
+  <text class="small" x="1020" y="585" text-anchor="middle">Prompt</text>
+  <text class="small" x="1020" y="610" text-anchor="middle">Parser</text>
+  <text class="small" x="1020" y="635" text-anchor="middle">Retry</text>
+
+  <!-- frontend to backend -->
+  <path class="line" d="M540 540 L610 540"/>
+  <text class="flow" x="558" y="522">REST</text>
+  <path class="line" d="M910 535 L945 535"/>
+
+  <!-- DB -->
+  <rect class="thin" x="80" y="420" width="125" height="210" rx="25"/>
+  <rect x="112" y="455" width="58" height="82" rx="15" fill="#cfe8ff" stroke="#2b6cb0" stroke-width="3"/>
+  <path d="M112 472 C112 450 170 450 170 472 C170 494 112 494 112 472 Z" fill="#3182f6"/>
+  <text class="mid" x="142" y="575" text-anchor="middle">MySQL</text>
+  <text class="small" x="142" y="600" text-anchor="middle">8.4</text>
+  <path class="double" d="M205 525 L280 525"/>
+
+  <!-- External -->
+  <rect class="thin" x="1210" y="420" width="290" height="230" rx="30"/>
+  <text class="label" x="1355" y="466" text-anchor="middle">External</text>
+  <rect x="1250" y="505" width="210" height="55" rx="16" fill="#eaf3ff" stroke="#3182f6" stroke-width="3"/>
+  <text class="mid blue" x="1355" y="540" text-anchor="middle">Kakao OAuth</text>
+  <rect x="1250" y="585" width="210" height="55" rx="16" fill="#fff7e6" stroke="#f59f00" stroke-width="3"/>
+  <text class="mid amber" x="1355" y="620" text-anchor="middle">GMS gpt-5.4-mini</text>
+  <path class="line" d="M910 602 C1040 602 1105 532 1250 532"/>
+  <path class="line" d="M1095 535 C1160 535 1185 612 1250 612"/>
+
+  <!-- Auth/JWT badge -->
+  <rect class="soft" x="560" y="735" width="240" height="70" rx="18"/>
+  <text class="mid red" x="680" y="765" text-anchor="middle">Auth</text>
+  <text class="small" x="680" y="790" text-anchor="middle">JWT · JJWT 0.12.6</text>
+
+  <!-- Infra row -->
+  <rect class="thin" x="130" y="890" width="250" height="125" rx="24"/>
+  <text class="label purple" x="255" y="930" text-anchor="middle">Runtime</text>
+  <text class="small" x="255" y="962" text-anchor="middle">Docker Compose</text>
+  <text class="small" x="255" y="987" text-anchor="middle">client · app · mysql</text>
+
+  <rect class="thin" x="470" y="890" width="280" height="125" rx="24"/>
+  <text class="label cyan" x="610" y="930" text-anchor="middle">Build</text>
+  <text class="small" x="610" y="962" text-anchor="middle">Node 22 Alpine</text>
+  <text class="small" x="610" y="987" text-anchor="middle">Gradle 8.14 JDK17 · Temurin JRE17</text>
+
+  <rect class="thin" x="840" y="890" width="285" height="125" rx="24"/>
+  <text class="label green" x="982" y="930" text-anchor="middle">Test</text>
+  <text class="small" x="982" y="962" text-anchor="middle">Vitest · Vue Test Utils · jsdom</text>
+  <text class="small" x="982" y="987" text-anchor="middle">JUnit 5 · Spring Boot Test</text>
+
+  <rect class="thin" x="1210" y="890" width="260" height="125" rx="24"/>
+  <text class="label amber" x="1340" y="930" text-anchor="middle">Docs</text>
+  <text class="small" x="1340" y="962" text-anchor="middle">Springdoc OpenAPI</text>
+  <text class="small" x="1340" y="987" text-anchor="middle">Markdown 산출물</text>
+
+  <!-- Local flow -->
+  <path class="line" d="M380 952 L470 952"/>
+  <path class="line" d="M750 952 L840 952"/>
+  <path class="line" d="M1125 952 L1210 952"/>
+
+  <!-- Ports -->
+  <rect class="soft" x="82" y="705" width="330" height="92" rx="20"/>
+  <text class="mid" x="247" y="740" text-anchor="middle">Local Ports</text>
+  <text class="small" x="247" y="768" text-anchor="middle">Frontend 15173 · Backend 18080 · MySQL 13306</text>
+
+  <rect class="soft" x="1210" y="705" width="290" height="92" rx="20"/>
+  <text class="mid" x="1355" y="740" text-anchor="middle">Secrets by Env</text>
+  <text class="small" x="1355" y="768" text-anchor="middle">JWT_SECRET · KAKAO_* · GMS_KEY</text>
+</svg>

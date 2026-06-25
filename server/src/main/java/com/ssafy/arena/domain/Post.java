@@ -14,8 +14,10 @@ public class Post {
     private Long id;
     private Long debateSessionId;
     private Long userId;
+    private Integer shareRoundNo;
     private String title;
     private String summaryCard;
+    private String shareBody;
     private String voteOptionA;
     private String voteOptionB;
     private Boolean isPublic;

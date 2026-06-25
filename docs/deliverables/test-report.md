@@ -85,7 +85,8 @@ No whitespace errors
 | `/auth/kakao/callback` | Kakao authorization code 처리 후 서비스 진입 | 통과 |
 | `/debates` | 로그인 사용자 닉네임 표시 | 통과 |
 | 상단 프로필 | 닉네임 수정 패널 열기, 저장, 원복 | 통과 |
-| `/new` | 선택형 후보 파이프라인 목업, 후보 3개 표시, 실용/예능 문구 제거 | 통과 |
+| `/new` | Spring AI 후보 생성 API 기반 후보 표시, 실용/예능 문구 제거 | 통과 |
+| `/debates/:id` | `debate-single-round-fast-generator.txt` 기반 10턴 배치 생성, 더미 fallback 제거 | 통과 |
 
 ## 수동 확인 포인트
 
@@ -93,8 +94,10 @@ No whitespace errors
 
 ```bash
 JWT_SECRET=...
-OPENAI_API_KEY=...
-OPENAI_MODEL=gpt-4o-mini
+GMS_KEY=...
+GMS_BASE_URL=https://gms.ssafy.io/gmsapi/api.openai.com
+GMS_COMPLETIONS_PATH=/v1/chat/completions
+GMS_MODEL=gpt-5.4-mini
 KAKAO_REST_API_KEY=...
 KAKAO_CLIENT_SECRET=...
 KAKAO_REDIRECT_URI=http://localhost:15173/auth/kakao/callback
@@ -110,6 +113,7 @@ Kakao Developers 콘솔에는 로컬 개발 포트에 맞춰 다음 값을 등�
 
 | 항목 | 설명 | 대응 |
 | --- | --- | --- |
-| 선택형 후보 생성 | 현재 `/new` 후보 생성/검증/정렬은 프론트 목업 | 실제 AI 파이프라인은 실험 브랜치 비교 후 서버 API로 확정 |
-| OpenAI 호출 | API 키와 과금 상태에 따라 실패 가능 | 데모 전 `.env`와 모델명 확인 |
+| 선택형 후보 생성 | 현재 `/new` 후보 생성/검증/정렬은 `POST /api/ai/round-candidates` API 사용 | 후보 생성 run과 prompt call log를 DB에 보존 |
+| 대화 생성 | 현재 `/api/debates/{id}/turns/batch`는 fast round prompt 기반 10턴 배치 Spring AI 호출 사용 | `ai_debate_turn_logs`에 prompt/raw/parsed/latency 저장 |
+| GMS 호출 | API 키와 quota 상태에 따라 실패 가능 | 데모 전 `.env`와 `GMS_MODEL=gpt-5.4-mini` 확인 |
 | Kakao OAuth | Redirect URI와 실행 포트가 일치해야 함 | 데모 포트를 고정하고 Kakao 콘솔 값 재확인 |

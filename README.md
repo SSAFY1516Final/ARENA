@@ -75,8 +75,10 @@ SSAFY 15기 서울 16반 관통 프로젝트 제출 저장소입니다. ARENA는
 JWT_SECRET=change-this-to-a-long-random-secret-key-32chars
 JWT_EXPIRATION_SECONDS=86400
 
-OPENAI_API_KEY=sk-...
-OPENAI_MODEL=gpt-4o-mini
+GMS_KEY=...
+GMS_BASE_URL=https://gms.ssafy.io/gmsapi/api.openai.com
+GMS_COMPLETIONS_PATH=/v1/chat/completions
+GMS_MODEL=gpt-5.4-mini
 CORS_ALLOWED_ORIGINS=http://localhost:5173,http://127.0.0.1:5173,http://localhost:15173
 
 KAKAO_REST_API_KEY=...

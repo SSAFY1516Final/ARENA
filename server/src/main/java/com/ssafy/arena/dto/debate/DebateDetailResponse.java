@@ -6,6 +6,7 @@ import java.util.List;
 public record DebateDetailResponse(
         CreateDebateResponse debate,
         List<DebateMessage> messages,
+        List<DebateRoundResponse> rounds,
         DebateSummaryResponse summary
 ) {
 }

@@ -1,0 +1,105 @@
+{
+  "title": "ARENA Architecture — Docker Compose 기반 AI 토론 서비스",
+  "canvas": {
+    "width": 1920,
+    "height": 1080,
+    "aspectRatio": "16:9",
+    "background": "#F8FAFC"
+  },
+  "areas": [
+    {
+      "id": "browser",
+      "title": "User / Browser",
+      "position": "top-right",
+      "items": [
+        "User Browser",
+        "ARENA Web UI",
+        "JWT 저장",
+        "REST API 호출"
+      ]
+    },
+    {
+      "id": "docker-compose-host",
+      "title": "Docker Compose Host",
+      "position": "center",
+      "containers": [
+        {
+          "id": "arena-client",
+          "label": "arena-client",
+          "stack": "Vue 3 + Vite",
+          "port": "Port 15173",
+          "roles": ["토론 생성/진행 UI", "결과/게시판 UI"]
+        },
+        {
+          "id": "arena-app",
+          "label": "arena-app",
+          "stack": "Spring Boot 3 API",
+          "port": "Port 18080 → 8080",
+          "roles": ["REST API", "Auth / JWT", "AI Pipeline", "Business Logic"]
+        },
+        {
+          "id": "arena-mysql",
+          "label": "arena-mysql",
+          "stack": "MySQL 8.4",
+          "port": "Port 13306 → 3306",
+          "roles": ["User / Debate / Post Data", "AI Logs"]
+        }
+      ]
+    },
+    {
+      "id": "external-services",
+      "title": "External Services",
+      "position": "right",
+      "items": [
+        {
+          "label": "Kakao OAuth API",
+          "subtitle": "Social Login"
+        },
+        {
+          "label": "GMS OpenAI-compatible API",
+          "subtitle": "GPT-5.4-mini",
+          "roles": ["Topic Candidates", "Debate Turns", "Summary"]
+        }
+      ]
+    },
+    {
+      "id": "local-development-flow",
+      "title": "Development / Demo Environment",
+      "position": "bottom",
+      "items": [
+        "Local Developer",
+        "GitHub Repository",
+        "docker compose up",
+        "Docker Containers"
+      ]
+    }
+  ],
+  "connections": [
+    {
+      "from": "User Browser",
+      "to": "arena-client",
+      "label": "http://localhost:15173"
+    },
+    {
+      "from": "arena-client",
+      "to": "arena-app",
+      "label": "REST API /api"
+    },
+    {
+      "from": "arena-app",
+      "to": "arena-mysql",
+      "label": "MyBatis"
+    },
+    {
+      "from": "arena-app",
+      "to": "Kakao OAuth API",
+      "label": "OAuth Login"
+    },
+    {
+      "from": "arena-app",
+      "to": "GMS OpenAI-compatible API",
+      "label": "Spring AI ChatClient"
+    }
+  ]
+}
+

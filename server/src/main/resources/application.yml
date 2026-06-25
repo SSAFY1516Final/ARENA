@@ -8,7 +8,12 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
   ai:
     openai:
-      api-key: ${OPENAI_API_KEY:}
+      api-key: ${GMS_KEY:}
+      base-url: ${GMS_BASE_URL:https://gms.ssafy.io/gmsapi/api.openai.com}
+      chat:
+        completions-path: ${GMS_COMPLETIONS_PATH:/v1/chat/completions}
+        options:
+          model: ${GMS_MODEL:gpt-5.4-mini}
 
 mybatis:
   mapper-locations: classpath:/mapper/*.xml

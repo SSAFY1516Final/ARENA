@@ -5,7 +5,8 @@ import { postApi } from '@/api/postApi'
 function mapPost(post) {
   return {
     ...post,
-    body: post.summaryCard || '',
+    body: post.shareBody || post.body || post.summaryCard || '',
+    shareBody: post.shareBody || '',
     voteA: post.voteCountA || 0,
     voteB: post.voteCountB || 0,
     userVoteChoice: null,

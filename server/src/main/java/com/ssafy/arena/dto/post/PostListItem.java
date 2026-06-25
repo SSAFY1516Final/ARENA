@@ -10,7 +10,9 @@ public class PostListItem {
     private Long postId;
     private String title;
     private DebateMode mode;
+    private Integer shareRoundNo;
     private String summaryCard;
+    private String shareBody;
     private String authorNickname;
     private Integer commentCount;
     private String voteOptionA;

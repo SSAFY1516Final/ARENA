@@ -1,11 +1,16 @@
-import { describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { createPinia } from 'pinia'
 import { createRouter, createWebHistory } from 'vue-router'
-import AuthView from '@/views/AuthView.vue'
+
+beforeEach(() => {
+  vi.stubEnv('VITE_KAKAO_REST_API_KEY', 'test-rest-api-key')
+  vi.stubEnv('VITE_KAKAO_REDIRECT_URI', 'http://localhost:15173/auth/kakao/callback')
+})
 
 describe('AuthView', () => {
   it('offers Kakao OAuth login without password inputs', async () => {
+    const { default: AuthView } = await import('@/views/AuthView.vue')
     const router = createRouter({
       history: createWebHistory(),
       routes: [
@@ -50,6 +55,8 @@ describe('AuthView', () => {
     expect(wrapper.text()).not.toContain('밸런스 코치')
     expect(wrapper.text()).not.toContain('회원가입')
     expect(wrapper.find('input[type="password"]').exists()).toBe(false)
-    expect(wrapper.find('.kakao-login-button').attributes('href')).toContain('kauth.kakao.com/oauth/authorize')
+    const kakaoLoginHref = wrapper.find('.kakao-login-button').attributes('href')
+    expect(kakaoLoginHref).toContain('kauth.kakao.com/oauth/authorize')
+    expect(kakaoLoginHref).toContain('lang=ko')
   })
 })

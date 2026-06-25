@@ -1,0 +1,52 @@
+flowchart LR
+  User["사용자 브라우저"]
+
+  subgraph Client["Frontend Container: arena-client / Vue 3 + Vite"]
+    Views["Views\nAuth / New / Debate Room / Result / Posts"]
+    Store["Pinia Store\nAuth / Debate / Post / Comment"]
+    Api["Axios API Client\nVITE_API_BASE_URL"]
+    Router["Vue Router\nAuth Guard"]
+  end
+
+  subgraph Backend["Backend Container: arena-app / Spring Boot 3"]
+    Security["Spring Security\nJWT Filter / CORS"]
+    Controllers["REST Controllers\nAuth / AI / Debate / Post / Comment / User / Admin"]
+    Services["Service Layer\nAuthService / DebateService / PostService / AiRoundCandidateService"]
+    AiLayer["AI Layer\nPromptTemplateLoader / AiPipelineService / SpringAiClient / Parser"]
+    Mappers["MyBatis Mappers"]
+    Async["Planned Extension\nBackground AI Generation Worker\nDuplicate Guard + Polling Support"]
+  end
+
+  subgraph DB["Database Container: arena-mysql / MySQL 8.4"]
+    CoreTables["Core Tables\nusers / debate_sessions / debate_messages / debate_summaries"]
+    CommunityTables["Community Tables\nposts / comments / post_votes"]
+    AiLogTables["AI Persistence\nai_round_candidate_runs / ai_round_candidates / ai_prompt_call_logs / ai_debate_turn_logs"]
+  end
+
+  subgraph External["External Services"]
+    Kakao["Kakao OAuth API"]
+    GMS["GMS OpenAI-compatible API\ngpt-5.4-mini"]
+  end
+
+  User --> Views
+  Views --> Router
+  Views --> Store
+  Store --> Api
+  Api -->|"JWT REST API\nlocalhost:18080"| Security
+  Security --> Controllers
+  Controllers --> Services
+  Services --> Mappers
+  Mappers --> CoreTables
+  Mappers --> CommunityTables
+  Mappers --> AiLogTables
+
+  Controllers -->|"POST /api/auth/kakao"| Services
+  Services --> Kakao
+
+  Services --> AiLayer
+  AiLayer -->|"Spring AI ChatClient"| GMS
+  AiLayer --> AiLogTables
+
+  Services -. "future async generation" .-> Async
+  Async -. "stores generated turns" .-> Mappers
+

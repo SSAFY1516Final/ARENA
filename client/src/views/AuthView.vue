@@ -6,7 +6,13 @@
           <span class="brand-mark" aria-hidden="true"></span>
           <span>ARENA</span>
         </RouterLink>
-        <a class="kakao-login-button auth-header-login" :href="kakaoAuthorizeUrl">
+        <a
+          class="kakao-login-button auth-header-login"
+          :class="{ 'kakao-login-button--disabled': !isKakaoConfigured }"
+          :href="isKakaoConfigured ? kakaoAuthorizeUrl : undefined"
+          :aria-disabled="!isKakaoConfigured"
+          @click="handleKakaoLoginClick"
+        >
           <svg class="kakao-login-button__icon" viewBox="0 0 24 22" aria-hidden="true">
             <path
               d="M12 1.5C5.92 1.5 1 5.32 1 10.03c0 3.05 2.07 5.72 5.18 7.23l-.86 3.16c-.08.28.24.5.48.34l3.78-2.5c.78.12 1.59.19 2.42.19 6.08 0 11-3.82 11-8.52S18.08 1.5 12 1.5Z"
@@ -25,7 +31,7 @@
             반박과 재반박까지 이어지는 토론을 바로 확인할 수 있습니다.
           </p>
 
-          <p v-if="!kakaoRestApiKey" class="auth-config-warning">
+          <p v-if="!isKakaoConfigured" class="auth-config-warning">
             카카오 REST API 키를 설정하면 실제 로그인이 가능합니다.
           </p>
         </section>
@@ -64,6 +70,7 @@ import { RouterLink } from 'vue-router'
 
 const kakaoRestApiKey = import.meta.env.VITE_KAKAO_REST_API_KEY || ''
 const kakaoRedirectUri = import.meta.env.VITE_KAKAO_REDIRECT_URI || `${window.location.origin}/auth/kakao/callback`
+const isKakaoConfigured = computed(() => Boolean(kakaoRestApiKey) && !kakaoRestApiKey.startsWith('your-'))
 const previewMessages = [
   {
     id: 1,
@@ -95,7 +102,14 @@ const kakaoAuthorizeUrl = computed(() => {
     client_id: kakaoRestApiKey,
     redirect_uri: kakaoRedirectUri,
     response_type: 'code',
+    lang: 'ko',
   })
   return `https://kauth.kakao.com/oauth/authorize?${params.toString()}`
 })
+
+const handleKakaoLoginClick = (event) => {
+  if (!isKakaoConfigured.value) {
+    event.preventDefault()
+  }
+}
 </script>

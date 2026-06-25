@@ -9,7 +9,7 @@
       <p class="page-copy">{{ post.body }}</p>
 
       <section class="log-box">
-        <h2>전체 토론 로그</h2>
+        <h2>공유 라운드 토론 로그</h2>
         <DebateMessage
           v-for="(message, index) in post.messages"
           :key="message.messageId"

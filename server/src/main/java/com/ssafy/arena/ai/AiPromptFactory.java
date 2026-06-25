@@ -2,7 +2,6 @@ package com.ssafy.arena.ai;
 
 import com.ssafy.arena.domain.Speaker;
 import com.ssafy.arena.dto.ai.AiNextTurnRequest;
-import com.ssafy.arena.dto.ai.AiSummaryRequest;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -25,22 +24,6 @@ public class AiPromptFactory {
                 라운드: %d
                 이전 발화: %s
                 """.formatted(request.topic(), request.mode(), speaker, request.roundNo(), request.previousMessages());
-    }
-
-    public String summarySystemPrompt() {
-        return """
-                ARENA 토론을 게시글 공유용으로 요약한다.
-                반드시 JSON만 반환한다.
-                keys: coreArguments, highlight, decisionCriteria, remainingIssue, summaryText.
-                """;
-    }
-
-    public String summaryUserPrompt(AiSummaryRequest request) {
-        return """
-                주제: %s
-                모드: %s
-                토론 로그: %s
-                """.formatted(request.topic(), request.mode(), request.messages());
     }
 
 }

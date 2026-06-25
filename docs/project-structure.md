@@ -27,6 +27,7 @@
 │           └── resources
 │               ├── application.yml
 │               ├── db/schema.sql
+│               ├── prompts
 │               └── mapper
 ├── docs
 │   ├── requirements.md
@@ -47,7 +48,7 @@
 | Service | 비즈니스 로직, 트랜잭션, 권한 검증. 인증 흐름은 `AuthService`, 사용자 관리는 `UserService`로 분리 |
 | Repository/Mapper | MyBatis 기반 DB 접근 |
 | Security | JWT 발급/검증, SecurityFilterChain, Role 기반 인가 |
-| AI | Spring AI ChatClient 호출, 프롬프트 관리, 응답 파싱 |
+| AI | Spring AI ChatClient 호출, `resources/prompts` 기반 프롬프트 관리, 후보/대화 응답 파싱과 로그 저장 |
 | Docs | 제출 산출물, 인증/AI/API 설계, 요구사항, 화면정의서 관리 |
 
 ## 제출 체크리스트
@@ -73,7 +74,7 @@
 - [ ] Spring AI 발화 생성
 - [ ] 토론 요약 생성
 - [ ] 닉네임 조회/수정 확인
-- [ ] `/new` 선택형 후보 목업 화면 확인
+- [ ] `/new` Spring AI 후보 생성 화면 확인
 
 ### 데모 확인
 

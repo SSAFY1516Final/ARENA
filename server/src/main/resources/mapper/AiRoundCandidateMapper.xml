@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssafy.arena.mapper.AiRoundCandidateMapper">
+    <insert id="insert" parameterType="com.ssafy.arena.domain.AiRoundCandidate" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO ai_round_candidates (
+            run_id, round_id, title, core_question, debate_axis,
+            side_a_frame, side_b_frame, sort_order, candidate_json
+        )
+        VALUES (
+            #{runId}, #{roundId}, #{title}, #{coreQuestion}, #{debateAxis},
+            #{sideAFrame}, #{sideBFrame}, #{sortOrder}, #{candidateJson}
+        )
+    </insert>
+
+    <select id="findByRunId" resultType="com.ssafy.arena.domain.AiRoundCandidate">
+        SELECT id, run_id, round_id, title, core_question, debate_axis,
+               side_a_frame, side_b_frame, sort_order, candidate_json, created_at
+        FROM ai_round_candidates
+        WHERE run_id = #{runId}
+        ORDER BY sort_order ASC, id ASC
+    </select>
+</mapper>

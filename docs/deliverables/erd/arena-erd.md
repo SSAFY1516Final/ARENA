@@ -13,7 +13,7 @@ GitLab Mermaid 렌더링 환경에 의존하지 않도록 이미지 산출물로
 | users 1:N debate_sessions | 한 사용자는 여러 토론을 생성할 수 있다. |
 | debate_sessions 1:N debate_messages | 한 토론은 여러 AI 발화 로그를 가진다. |
 | debate_sessions 1:1 debate_summaries | 중단된 토론은 하나의 요약을 가진다. |
-| debate_sessions 1:0..1 posts | 공유된 토론만 하나의 게시글이 된다. |
+| debate_sessions 1:N posts | 공유된 토론은 라운드 단위로 여러 게시글이 될 수 있다. |
 | users 1:N posts | 한 사용자는 여러 게시글을 작성할 수 있다. |
 | posts 1:N comments | 한 게시글은 여러 댓글을 가진다. |
 | users 1:N comments | 한 사용자는 여러 댓글을 작성할 수 있다. |
@@ -43,9 +43,17 @@ GitLab Mermaid 렌더링 환경에 의존하지 않도록 이미지 산출물로
 | id | BIGINT | PK, AUTO_INCREMENT | 토론 세션 ID |
 | user_id | BIGINT | FK users.id, NOT NULL | 생성자 |
 | topic | VARCHAR(255) | NOT NULL | 토론 주제 |
+| original_topic | VARCHAR(255) | NOT NULL | 사용자가 입력한 원본 주제 |
+| side_a_label | VARCHAR(120) | NULL | 후보 생성에서 만든 A 진영 이름 |
+| side_b_label | VARCHAR(120) | NULL | 후보 생성에서 만든 B 진영 이름 |
+| debate_axis | VARCHAR(255) | NULL | 선택 후보의 토론 축 |
+| side_a_frame | VARCHAR(1000) | NULL | A 진영 논증 프레임 |
+| side_b_frame | VARCHAR(1000) | NULL | B 진영 논증 프레임 |
 | mode | VARCHAR(30) | NOT NULL | PRACTICAL, ENTERTAINMENT |
 | status | VARCHAR(30) | NOT NULL | ACTIVE, STOPPED, SHARED |
 | peak_reached | BOOLEAN | NOT NULL DEFAULT FALSE | 논쟁 정점 감지 여부 |
+| selected_side | VARCHAR(30) | NULL | 결과 페이지에서 사용자가 고른 진영 |
+| selected_round_no | INT | NULL | 결과 페이지에서 우선 표시할 라운드 |
 | created_at | DATETIME | NOT NULL | 생성일 |
 | stopped_at | DATETIME | NULL | 중단일 |
 
@@ -78,10 +86,12 @@ GitLab Mermaid 렌더링 환경에 의존하지 않도록 이미지 산출물로
 | 컬럼 | 타입 | 제약 | 설명 |
 | --- | --- | --- | --- |
 | id | BIGINT | PK, AUTO_INCREMENT | 게시글 ID |
-| debate_session_id | BIGINT | FK debate_sessions.id, UNIQUE, NOT NULL | 공유된 토론 |
+| debate_session_id | BIGINT | FK debate_sessions.id, NOT NULL | 공유된 토론 라운드 세션 |
 | user_id | BIGINT | FK users.id, NOT NULL | 작성자 |
+| share_round_no | INT | NOT NULL DEFAULT 1 | 결과 페이지에서 공유한 라운드 번호 |
 | title | VARCHAR(120) | NOT NULL | 게시글 제목 |
 | summary_card | TEXT | NOT NULL | 목록용 요약 |
+| share_body | TEXT | NULL | 세부주제 제목, 상세설명, 사용자가 공유 모달에서 작성한 본문 |
 | vote_option_a | VARCHAR(80) | NOT NULL | 투표 선택지 A |
 | vote_option_b | VARCHAR(80) | NOT NULL | 투표 선택지 B |
 | is_public | BOOLEAN | NOT NULL DEFAULT TRUE | 공개 여부 |
@@ -122,7 +132,7 @@ Browser
               -> MyBatis XML
                   -> MySQL
           -> Spring AI 연동 계층
-              -> OpenAI API
+              -> GMS OpenAI-compatible API
 ```
 
 ### Controller 계층
@@ -139,7 +149,7 @@ MyBatis mapper interface와 XML SQL로 DB 접근을 담당한다. SQL은 `src/ma
 
 ### AI Client 계층
 
-Spring AI를 통해 OpenAI API 호출을 담당한다. 현재 `dev` 기준은 공통 호출 환경과 최소 계약만 유지하며, 선택형 주제 후보 등 고도화 파이프라인은 별도 실험 브랜치에서 비교한다. AI 생성 계층은 DB에 직접 접근하지 않는다.
+Spring AI를 통해 GMS OpenAI-compatible API 호출을 담당한다. 현재 `dev` 기준은 `gpt-5.4-mini` 기반 주제 후보 생성과 10턴 배치 토론 생성을 사용한다. AI 생성 계층은 DB에 직접 접근하지 않고, Service 계층이 생성 결과와 prompt log를 저장한다.
 
 ## 5. 주요 인덱스
 
@@ -150,6 +160,7 @@ Spring AI를 통해 OpenAI API 호출을 담당한다. 현재 `dev` 기준은 �
 | users | UNIQUE(provider, provider_id) | 외부 인증 제공자 계정 중복 가입 방지 |
 | debate_sessions | INDEX(user_id, created_at) | 내 토론 목록 조회 |
 | debate_messages | INDEX(debate_session_id, round_no, id) | 토론 로그 정렬 조회 |
+| posts | INDEX(debate_session_id) | 토론별 공유 게시글 조회 |
 | posts | INDEX(is_public, created_at) | 공개 게시글 최신순 조회 |
 | comments | INDEX(post_id, created_at) | 게시글 댓글 조회 |
 | post_votes | UNIQUE(post_id, user_id) | 중복 투표 방지 및 투표 변경 |
