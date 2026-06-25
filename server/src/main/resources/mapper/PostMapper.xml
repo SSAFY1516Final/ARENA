@@ -7,7 +7,9 @@
         p.id AS post_id,
         p.title,
         ds.mode,
+        p.share_round_no,
         p.summary_card,
+        p.share_body,
         u.nickname AS author_nickname,
         (SELECT COUNT(*) FROM comments c WHERE c.post_id = p.id AND c.deleted_at IS NULL) AS comment_count,
         p.vote_option_a,
@@ -27,15 +29,15 @@
 
     <insert id="insert" parameterType="com.ssafy.arena.domain.Post" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO posts (
-            debate_session_id, user_id, title, summary_card, vote_option_a, vote_option_b, is_public
+            debate_session_id, user_id, share_round_no, title, summary_card, share_body, vote_option_a, vote_option_b, is_public
         )
         VALUES (
-            #{debateSessionId}, #{userId}, #{title}, #{summaryCard}, #{voteOptionA}, #{voteOptionB}, #{isPublic}
+            #{debateSessionId}, #{userId}, #{shareRoundNo}, #{title}, #{summaryCard}, #{shareBody}, #{voteOptionA}, #{voteOptionB}, #{isPublic}
         )
     </insert>
 
     <select id="findById" resultType="com.ssafy.arena.domain.Post">
-        SELECT id, debate_session_id, user_id, title, summary_card, vote_option_a, vote_option_b,
+        SELECT id, debate_session_id, user_id, share_round_no, title, summary_card, share_body, vote_option_a, vote_option_b,
                is_public, created_at, updated_at
         FROM posts
         WHERE id = #{id}
@@ -58,6 +60,7 @@
         <if test="keyword != null">
             AND (p.title LIKE CONCAT('%', #{keyword}, '%')
                 OR p.summary_card LIKE CONCAT('%', #{keyword}, '%')
+                OR p.share_body LIKE CONCAT('%', #{keyword}, '%')
                 OR ds.topic LIKE CONCAT('%', #{keyword}, '%'))
         </if>
         <if test="mode != null">
@@ -85,6 +88,7 @@
         <if test="keyword != null">
             AND (p.title LIKE CONCAT('%', #{keyword}, '%')
                 OR p.summary_card LIKE CONCAT('%', #{keyword}, '%')
+                OR p.share_body LIKE CONCAT('%', #{keyword}, '%')
                 OR ds.topic LIKE CONCAT('%', #{keyword}, '%'))
         </if>
         <if test="mode != null">

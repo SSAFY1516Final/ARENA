@@ -1,8 +1,10 @@
 import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
 import { authApi } from '@/api/authApi'
+import { userApi } from '@/api/userApi'
 
 const TOKEN_STORAGE_KEY = 'arena_access_token'
+const AUTH_FAILURE_STATUSES = new Set([401, 403])
 
 function decodeJwtPayload(token) {
   const payload = token.split('.')[1]
@@ -17,6 +19,7 @@ export const useAuthStore = defineStore('auth', () => {
   const accessToken = ref(localStorage.getItem(TOKEN_STORAGE_KEY))
   const loading = ref(false)
   const errorMessage = ref('')
+  const profileSaving = ref(false)
 
   const isAuthenticated = computed(() => Boolean(accessToken.value && user.value))
 
@@ -28,7 +31,7 @@ export const useAuthStore = defineStore('auth', () => {
     user.value = {
       userId: payload?.userId,
       loginId: payload?.sub,
-      nickname: payload?.sub,
+      nickname: payload?.nickname || payload?.sub,
       role: payload?.role,
     }
     return user.value
@@ -39,7 +42,8 @@ export const useAuthStore = defineStore('auth', () => {
     errorMessage.value = ''
     try {
       const { data } = await authApi.kakaoLogin({ code, redirectUri })
-      return setSession(data)
+      setSession(data)
+      return await fetchMe()
     } catch (error) {
       errorMessage.value = error.userMessage || '카카오 로그인에 실패했습니다.'
       throw error
@@ -48,17 +52,59 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  async function logout() {
+  function clearSession() {
     localStorage.removeItem(TOKEN_STORAGE_KEY)
     accessToken.value = null
     user.value = null
   }
 
+  async function logout() {
+    clearSession()
+  }
+
   async function fetchMe() {
     if (!user.value && accessToken.value) {
-      setSession({ accessToken: accessToken.value })
+      try {
+        setSession({ accessToken: accessToken.value })
+      } catch {
+        clearSession()
+        return null
+      }
+    }
+    if (accessToken.value) {
+      try {
+        const { data } = await userApi.me()
+        user.value = {
+          ...user.value,
+          ...data,
+        }
+      } catch (error) {
+        if (AUTH_FAILURE_STATUSES.has(error.response?.status)) {
+          clearSession()
+          return null
+        }
+        // Keep the decoded token fallback so route guards do not log users out on transient API errors.
+      }
     }
     return user.value
+  }
+
+  async function updateNickname(nickname) {
+    profileSaving.value = true
+    errorMessage.value = ''
+    try {
+      const { data } = await userApi.updateNickname({ nickname })
+      user.value = {
+        ...user.value,
+        ...data,
+      }
+      return user.value
+    } catch (error) {
+      errorMessage.value = error.userMessage || '닉네임 변경에 실패했습니다.'
+      throw error
+    } finally {
+      profileSaving.value = false
+    }
   }
 
   return {
@@ -66,10 +112,12 @@ export const useAuthStore = defineStore('auth', () => {
     accessToken,
     loading,
     errorMessage,
+    profileSaving,
     isAuthenticated,
     setSession,
     loginWithKakaoCode,
     logout,
     fetchMe,
+    updateNickname,
   }
 })

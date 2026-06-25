@@ -4,17 +4,16 @@
       <div>
         <span class="eyebrow">Community Board</span>
         <h1>공유된 토론</h1>
-        <p class="page-copy">공유자가 남긴 본문과 토론 주제를 보고 의견을 남길 게시글을 탐색합니다.</p>
+        <p class="page-copy">토론 결과가 커뮤니티로 이어집니다. 공유된 판단 기준과 투표 흐름을 확인하세요.</p>
       </div>
-      <RouterLink class="button" to="/new">새 토론 만들기</RouterLink>
+      <RouterLink class="button" to="/new">새 토론</RouterLink>
     </section>
 
     <section class="toolbar" aria-label="게시글 검색과 필터">
       <input v-model="filters.keyword" class="input" placeholder="검색어를 입력하세요" @keyup.enter="search" />
       <select v-model="filters.mode" class="select" @change="search">
         <option value="ALL">전체</option>
-        <option value="PRACTICAL">실용 판정</option>
-        <option value="ENTERTAINMENT">예능 배틀</option>
+        <option value="PRACTICAL">토론</option>
       </select>
       <select v-model="filters.sort" class="select" @change="search">
         <option value="latest">최신순</option>
@@ -37,7 +36,7 @@
       >
         <div class="tag-row">
           <span class="tag" :class="post.mode === 'PRACTICAL' ? 'tag--teal' : 'tag--amber'">
-            {{ post.mode === 'PRACTICAL' ? '실용 판정' : '예능 배틀' }}
+            토론
           </span>
           <span class="tag">댓글 {{ post.commentCount }}</span>
         </div>

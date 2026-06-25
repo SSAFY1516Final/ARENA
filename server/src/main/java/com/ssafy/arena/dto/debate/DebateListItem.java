@@ -7,7 +7,10 @@ import java.time.LocalDateTime;
 
 public record DebateListItem(
         Long debateId,
+        String originalTopic,
         String topic,
+        Long candidateRunId,
+        Long selectedCandidateId,
         DebateMode mode,
         DebateStatus status,
         String summaryCard,
@@ -17,7 +20,10 @@ public record DebateListItem(
     public static DebateListItem from(DebateSession session) {
         return new DebateListItem(
                 session.getId(),
+                session.getOriginalTopic(),
                 session.getTopic(),
+                session.getCandidateRunId(),
+                session.getSelectedCandidateId(),
                 session.getMode(),
                 session.getStatus(),
                 session.getStatus().name(),

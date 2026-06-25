@@ -13,7 +13,18 @@ vi.mock('@/api/postApi', () => ({
 }))
 
 const detailResponse = {
-  post: { postId: 5, title: '오늘 점심 제육 vs 돈까스', mode: 'PRACTICAL', summaryCard: '점심을 고르는 기준이 매번 달라져서 공유합니다.', commentCount: 0, voteOptionA: '제육', voteOptionB: '돈까스', voteCountA: 42, voteCountB: 58 },
+  post: {
+    postId: 5,
+    title: '오늘 점심 제육 vs 돈까스',
+    mode: 'PRACTICAL',
+    summaryCard: 'AI가 생성한 토론 요약입니다.',
+    shareBody: '내가 직접 작성한 게시글 본문입니다.',
+    commentCount: 0,
+    voteOptionA: '제육',
+    voteOptionB: '돈까스',
+    voteCountA: 42,
+    voteCountB: 58,
+  },
   messages: [{ id: 1, speaker: 'COOL_HEADED', roundNo: 1, content: '안정성을 택하면 돈까스, 지금의 만족을 택하면 제육입니다.' }],
   comments: [],
 }
@@ -44,11 +55,12 @@ describe('PostDetailView', () => {
 
     const text = wrapper.text()
 
-    expect(text).toContain('점심을 고르는 기준이 매번 달라져서 공유합니다.')
+    expect(text).toContain('내가 직접 작성한 게시글 본문입니다.')
+    expect(text).not.toContain('AI가 생성한 토론 요약입니다.')
     expect(wrapper.find('.summary-detail').exists()).toBe(false)
     expect(text).not.toContain('핵심 주장')
     expect(text).not.toContain('선택 기준')
-    expect(text.indexOf('전체 토론 로그')).toBeLessThan(text.indexOf('사용자 투표'))
+    expect(text.indexOf('공유 라운드 토론 로그')).toBeLessThan(text.indexOf('사용자 투표'))
   })
 
   it('hides vote percentages until the user votes', async () => {

@@ -3,10 +3,12 @@ package com.ssafy.arena.controller;
 import com.ssafy.arena.domain.UserPrincipal;
 import com.ssafy.arena.dto.debate.*;
 import com.ssafy.arena.service.DebateService;
+import com.ssafy.arena.service.InitialTurnGenerationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,6 +23,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DebateController {
     private final DebateService debateService;
+    private final InitialTurnGenerationService initialTurnGenerationService;
 
     @GetMapping
     public List<DebateListItem> list(@AuthenticationPrincipal UserPrincipal user) {
@@ -52,12 +55,21 @@ public class DebateController {
         return debateService.nextTurn(user.getId(), debateId);
     }
 
-    @PostMapping("/{debateId}/stop")
-    public StopDebateResponse stop(
+    @PostMapping("/{debateId}/turns/batch")
+    public InitialTurnGenerationResponse generateInitialTurns(
             @AuthenticationPrincipal UserPrincipal user,
             @PathVariable Long debateId
     ) {
-        return debateService.stop(user.getId(), debateId);
+        return initialTurnGenerationService.requestGeneration(user.getId(), debateId);
+    }
+
+    @PostMapping("/{debateId}/stop")
+    public StopDebateResponse stop(
+            @AuthenticationPrincipal UserPrincipal user,
+            @PathVariable Long debateId,
+            @Valid @RequestBody(required = false) StopDebateRequest request
+    ) {
+        return debateService.stop(user.getId(), debateId, request);
     }
 
     @PostMapping("/{debateId}/share")
@@ -68,5 +80,14 @@ public class DebateController {
             @Valid @RequestBody ShareDebateRequest request
     ) {
         return debateService.share(user.getId(), debateId, request);
+    }
+
+    @DeleteMapping("/{debateId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(
+            @AuthenticationPrincipal UserPrincipal user,
+            @PathVariable Long debateId
+    ) {
+        debateService.delete(user.getId(), debateId);
     }
 }

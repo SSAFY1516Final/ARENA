@@ -22,7 +22,18 @@ describe('postStore', () => {
     const store = usePostStore()
     postApi.list.mockResolvedValue({
       data: {
-        items: [{ postId: 5, title: '제육 vs 돈까스', mode: 'PRACTICAL', summaryCard: '점심 선택', commentCount: 0, voteOptionA: '제육', voteOptionB: '돈까스', voteCountA: 2, voteCountB: 1 }],
+        items: [{
+          postId: 5,
+          title: '제육 vs 돈까스',
+          mode: 'PRACTICAL',
+          summaryCard: 'AI 요약',
+          shareBody: '내가 직접 쓴 공유 본문',
+          commentCount: 0,
+          voteOptionA: '제육',
+          voteOptionB: '돈까스',
+          voteCountA: 2,
+          voteCountB: 1,
+        }],
         page: 1,
         size: 10,
         totalCount: 1,
@@ -32,6 +43,7 @@ describe('postStore', () => {
     await store.fetchPosts({ keyword: '제육', mode: 'PRACTICAL', sort: 'latest' })
     expect(store.posts).toHaveLength(1)
     expect(store.posts[0].title).toContain('제육')
+    expect(store.posts[0].body).toBe('내가 직접 쓴 공유 본문')
     expect(store.posts[0].voteA).toBe(2)
   })
 
@@ -39,7 +51,18 @@ describe('postStore', () => {
     const store = usePostStore()
     postApi.detail.mockResolvedValue({
       data: {
-        post: { postId: 5, title: '제육 vs 돈까스', mode: 'PRACTICAL', summaryCard: '점심 선택', commentCount: 0, voteOptionA: '제육', voteOptionB: '돈까스', voteCountA: 2, voteCountB: 1 },
+        post: {
+          postId: 5,
+          title: '제육 vs 돈까스',
+          mode: 'PRACTICAL',
+          summaryCard: 'AI 요약',
+          shareBody: '상세에서 보여야 하는 공유 본문',
+          commentCount: 0,
+          voteOptionA: '제육',
+          voteOptionB: '돈까스',
+          voteCountA: 2,
+          voteCountB: 1,
+        },
         messages: [],
         comments: [],
       },
@@ -52,6 +75,7 @@ describe('postStore', () => {
     const result = await store.vote(5, { choice: 'A' })
 
     expect(result.choice).toBe('A')
+    expect(store.postDetail.body).toBe('상세에서 보여야 하는 공유 본문')
     expect(store.postDetail.userVoteChoice).toBe('A')
     expect(store.postDetail.voteA).toBe(3)
     expect(store.postDetail.voteB).toBe(1)

@@ -1,0 +1,153 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1120" viewBox="0 0 1600 1120" role="img" aria-labelledby="title desc">
+  <title id="title">ARENA Reference Style Architecture</title>
+  <desc id="desc">Reference-image style architecture diagram for ARENA using Docker Compose, Vue, Spring Boot, MySQL, Kakao OAuth, and GMS AI.</desc>
+  <defs>
+    <style>
+      .bg{fill:#ffffff}
+      .title{font:900 36px Arial,'Noto Sans KR',sans-serif;fill:#0b0b0b}
+      .subtitle{font:700 16px Arial,'Noto Sans KR',sans-serif;fill:#4b5563}
+      .box{fill:#ffffff;stroke:#111827;stroke-width:3}
+      .thin{fill:#ffffff;stroke:#111827;stroke-width:2.4}
+      .dashed{fill:#ffffff;stroke:#475569;stroke-width:2.4;stroke-dasharray:9 7}
+      .label{font:900 23px Arial,'Noto Sans KR',sans-serif;fill:#0b0b0b}
+      .mid{font:800 18px Arial,'Noto Sans KR',sans-serif;fill:#111827}
+      .small{font:700 14px Arial,'Noto Sans KR',sans-serif;fill:#374151}
+      .tiny{font:700 12px Arial,'Noto Sans KR',sans-serif;fill:#64748b}
+      .port{font:800 17px Arial,'Noto Sans KR',sans-serif;fill:#111827}
+      .orange{fill:#f97316}
+      .blue{fill:#3182f6}
+      .green{fill:#00a887}
+      .amber{fill:#f59f00}
+      .red{fill:#ff6b6b}
+      .dark{fill:#111827}
+      .line{stroke:#111827;stroke-width:3;fill:none;marker-end:url(#arrow)}
+      .line2{stroke:#111827;stroke-width:3;fill:none}
+      .dashline{stroke:#475569;stroke-width:2.8;fill:none;stroke-dasharray:9 7;marker-end:url(#arrow-gray)}
+      .double{stroke:#111827;stroke-width:3;fill:none;marker-start:url(#arrow-start);marker-end:url(#arrow)}
+    </style>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="4" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,8 L11,4 z" fill="#111827"/>
+    </marker>
+    <marker id="arrow-start" markerWidth="12" markerHeight="12" refX="1" refY="4" orient="auto" markerUnits="strokeWidth">
+      <path d="M11,0 L11,8 L0,4 z" fill="#111827"/>
+    </marker>
+    <marker id="arrow-gray" markerWidth="12" markerHeight="12" refX="10" refY="4" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,8 L11,4 z" fill="#475569"/>
+    </marker>
+  </defs>
+
+  <rect class="bg" x="0" y="0" width="1600" height="1120"/>
+  <text class="title" x="64" y="62">ARENA Architecture</text>
+  <text class="subtitle" x="64" y="92">Docker Compose 기반 AI 토론 서비스 구성도</text>
+
+  <!-- Front request -->
+  <circle cx="1304" cy="105" r="28" class="dark"/>
+  <path d="M1258 180 C1266 135 1342 135 1350 180 Z" class="dark"/>
+  <text class="label" x="1410" y="103" text-anchor="middle">FRONT</text>
+  <text class="label" x="1410" y="134" text-anchor="middle">REQUEST</text>
+  <path class="line" d="M1305 218 L1305 338 L1175 338"/>
+  <text class="port" x="1194" y="324">15173 port</text>
+
+  <!-- Domain entry -->
+  <rect x="665" y="72" width="110" height="86" rx="18" class="thin"/>
+  <path d="M694 121 L720 92 L746 121 L735 121 L735 146 L705 146 L705 121 Z" class="orange"/>
+  <text class="mid orange" x="790" y="126">localhost</text>
+  <path class="line" d="M725 164 L725 240"/>
+  <text class="label" x="725" y="278" text-anchor="middle">ARENA Docker Compose</text>
+
+  <!-- Docker host -->
+  <rect class="box" x="430" y="300" width="700" height="430" rx="42"/>
+  <text class="mid" x="475" y="340">Docker Host</text>
+  <text class="tiny" x="475" y="362">client + app + mysql containers</text>
+
+  <!-- Frontend inside docker -->
+  <rect class="thin" x="760" y="390" width="270" height="265" rx="28"/>
+  <text class="label" x="895" y="430" text-anchor="middle">Frontend</text>
+  <circle cx="895" cy="493" r="47" fill="#dff8ff" stroke="#4cc9f0" stroke-width="5"/>
+  <text class="label blue" x="895" y="501" text-anchor="middle">Vue</text>
+  <text class="small" x="895" y="562" text-anchor="middle">Vite · Pinia · Router</text>
+  <text class="small" x="895" y="586" text-anchor="middle">Naive UI · Axios</text>
+  <text class="port" x="895" y="625" text-anchor="middle">15173 port</text>
+
+  <!-- Backend inside docker -->
+  <rect class="thin" x="500" y="378" width="245" height="290" rx="28"/>
+  <text class="label" x="623" y="418" text-anchor="middle">Backend</text>
+  <circle cx="575" cy="475" r="30" fill="#e9fbf7" stroke="#00a887" stroke-width="4"/>
+  <text class="mid green" x="635" y="482">Spring Boot</text>
+  <circle cx="575" cy="535" r="30" fill="#eaf3ff" stroke="#3182f6" stroke-width="4"/>
+  <text class="mid blue" x="635" y="542">Security JWT</text>
+  <circle cx="575" cy="595" r="30" fill="#fff7e6" stroke="#f59f00" stroke-width="4"/>
+  <text class="mid amber" x="635" y="602">Spring AI</text>
+  <text class="small" x="623" y="642" text-anchor="middle">MyBatis · REST API</text>
+  <text class="port" x="623" y="696" text-anchor="middle">18080 → 8080 port</text>
+
+  <!-- frontend to backend -->
+  <path class="line" d="M760 525 L745 525"/>
+  <text class="port" x="737" y="512" text-anchor="end">REST API</text>
+
+  <!-- MySQL -->
+  <rect class="thin" x="115" y="390" width="260" height="210" rx="24"/>
+  <rect x="155" y="420" width="70" height="92" rx="18" fill="#cfe8ff" stroke="#2b6cb0" stroke-width="3"/>
+  <path d="M155 438 C155 412 225 412 225 438 C225 464 155 464 155 438 Z" fill="#3182f6"/>
+  <text class="label" x="245" y="466">MySQL</text>
+  <text class="small" x="245" y="492">arena-mysql</text>
+  <text class="small" x="245" y="516">users / debates</text>
+  <text class="small" x="245" y="540">posts / AI logs</text>
+  <text class="port" x="245" y="572">13306 → 3306</text>
+  <path class="double" d="M375 495 L500 495"/>
+
+  <!-- External APIs -->
+  <rect class="thin" x="1195" y="440" width="280" height="230" rx="28"/>
+  <text class="label" x="1335" y="480" text-anchor="middle">External API</text>
+  <rect x="1240" y="515" width="190" height="54" rx="14" fill="#eaf3ff" stroke="#3182f6" stroke-width="3"/>
+  <text class="mid blue" x="1335" y="549" text-anchor="middle">Kakao OAuth</text>
+  <rect x="1240" y="590" width="190" height="54" rx="14" fill="#fff7e6" stroke="#f59f00" stroke-width="3"/>
+  <text class="mid amber" x="1335" y="624" text-anchor="middle">GMS gpt-5.4-mini</text>
+  <path class="line" d="M745 535 C980 535 1010 542 1240 542"/>
+  <path class="line" d="M745 595 C980 595 1010 617 1240 617"/>
+
+  <!-- Background extension -->
+  <rect class="dashed" x="515" y="755" width="520" height="92" rx="20"/>
+  <text class="mid" x="775" y="790" text-anchor="middle">AI 생성 안정화 확장 예정</text>
+  <text class="small" x="775" y="818" text-anchor="middle">Background Worker · 중복 방지 · 재진입 Polling</text>
+  <path class="dashline" d="M775 755 L775 670"/>
+
+  <!-- Data persistence note -->
+  <rect class="thin" x="113" y="640" width="262" height="112" rx="22"/>
+  <text class="mid" x="244" y="675" text-anchor="middle">Data Persistence</text>
+  <text class="small" x="244" y="705" text-anchor="middle">프롬프트 / raw 응답</text>
+  <text class="small" x="244" y="728" text-anchor="middle">파싱 JSON / latency 저장</text>
+  <path class="line2" d="M244 600 L244 640"/>
+
+  <!-- Local / GitHub / Docker build -->
+  <rect class="thin" x="110" y="920" width="150" height="110" rx="18"/>
+  <text class="label" x="185" y="965" text-anchor="middle">Local</text>
+  <text class="small" x="185" y="995" text-anchor="middle">IntelliJ / VS Code</text>
+
+  <circle cx="420" cy="975" r="48" fill="#111827"/>
+  <text class="label" x="420" y="984" text-anchor="middle" fill="#ffffff">GitHub</text>
+  <path class="line" d="M260 975 L370 975"/>
+  <text class="port" x="308" y="955">Git Push</text>
+
+  <rect class="thin" x="610" y="910" width="170" height="130" rx="22"/>
+  <text class="label" x="695" y="955" text-anchor="middle">Docker</text>
+  <text class="small" x="695" y="985" text-anchor="middle">compose up</text>
+  <text class="small" x="695" y="1008" text-anchor="middle">--build</text>
+  <path class="line" d="M468 975 L610 975"/>
+  <text class="port" x="520" y="955">pull/build</text>
+
+  <rect class="thin" x="900" y="920" width="175" height="110" rx="20"/>
+  <text class="label" x="988" y="962" text-anchor="middle">Containers</text>
+  <text class="small" x="988" y="993" text-anchor="middle">client / app / mysql</text>
+  <path class="line" d="M780 975 L900 975"/>
+  <text class="port" x="826" y="955">run</text>
+
+  <path class="line" d="M988 920 C990 820 945 800 1035 730"/>
+
+  <!-- Legend -->
+  <rect class="thin" x="1200" y="890" width="300" height="140" rx="20"/>
+  <text class="mid" x="1350" y="925" text-anchor="middle">Current Scope</text>
+  <text class="small" x="1350" y="955" text-anchor="middle">로컬/시연: Docker Compose</text>
+  <text class="small" x="1350" y="980" text-anchor="middle">외부: Kakao + GMS</text>
+  <text class="small" x="1350" y="1005" text-anchor="middle">AWS 배포 구성은 미적용</text>
+</svg>

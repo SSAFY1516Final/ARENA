@@ -1,0 +1,142 @@
+{
+  "title": "ARENA Tech Stack",
+  "subtitle": "Vue 3 · Spring Boot 3 · MySQL · Docker Compose · Spring AI",
+  "canvas": {
+    "width": 1920,
+    "height": 1080,
+    "ratio": "16:9"
+  },
+  "categories": [
+    {
+      "title": "Frontend",
+      "technologies": [
+        "Vue 3.5",
+        "Vite 6",
+        "Pinia 3",
+        "Vue Router 4",
+        "Axios",
+        "Naive UI"
+      ],
+      "descriptions": [
+        "SPA UI",
+        "Routing",
+        "State Management",
+        "REST API Client"
+      ]
+    },
+    {
+      "title": "Backend",
+      "technologies": [
+        "Java 17",
+        "Spring Boot 3.5",
+        "Spring Security",
+        "Spring Validation",
+        "Spring Web MVC",
+        "MyBatis 3.0.5",
+        "Lombok"
+      ],
+      "descriptions": [
+        "REST API",
+        "Auth / Authorization",
+        "Business Logic",
+        "SQL Mapper"
+      ]
+    },
+    {
+      "title": "Authentication",
+      "technologies": [
+        "Kakao OAuth",
+        "JWT",
+        "JJWT 0.12.6",
+        "Spring Security"
+      ],
+      "descriptions": [
+        "Kakao Login",
+        "Access Token",
+        "Protected API"
+      ]
+    },
+    {
+      "title": "AI / Prompt",
+      "technologies": [
+        "Spring AI 1.0.0",
+        "Spring AI OpenAI starter",
+        "GMS OpenAI-compatible API",
+        "gpt-5.4-mini",
+        "Prompt Template",
+        "JSON Response Parser"
+      ],
+      "descriptions": [
+        "Topic Candidates",
+        "Debate Turns",
+        "Summary",
+        "JSON Parsing"
+      ]
+    },
+    {
+      "title": "Database",
+      "technologies": [
+        "MySQL 8.4",
+        "MySQL Connector/J",
+        "MyBatis Mapper XML"
+      ],
+      "descriptions": [
+        "User Data",
+        "Debate Data",
+        "Post / Comment / Vote",
+        "AI Logs"
+      ]
+    },
+    {
+      "title": "Infra / Runtime",
+      "technologies": [
+        "Docker",
+        "Docker Compose",
+        "Node 22 Alpine",
+        "Gradle 8.14",
+        "Eclipse Temurin 17 JRE"
+      ],
+      "descriptions": [
+        "arena-client",
+        "arena-app",
+        "arena-mysql",
+        "docker compose up"
+      ]
+    },
+    {
+      "title": "Testing",
+      "technologies": [
+        "Vitest 4",
+        "Vue Test Utils",
+        "jsdom",
+        "JUnit 5",
+        "Spring Boot Test",
+        "Spring Security Test",
+        "MyBatis Test"
+      ],
+      "descriptions": [
+        "Frontend Test",
+        "Backend Test",
+        "Security Test",
+        "MyBatis Test"
+      ]
+    },
+    {
+      "title": "API Docs",
+      "technologies": [
+        "Springdoc OpenAPI",
+        "Swagger UI"
+      ],
+      "descriptions": [
+        "REST API Documentation",
+        "Swagger UI"
+      ]
+    }
+  ],
+  "bottomFlow": [
+    "Local Developer",
+    "GitHub Repository",
+    "Docker Compose",
+    "Vue Client / Spring Boot API / MySQL"
+  ]
+}

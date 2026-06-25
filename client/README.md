@@ -199,11 +199,11 @@ Browser
       -> Axios API Client
       -> Spring Boot API
           -> MySQL
-          -> Python FastAPI AI Server
-              -> OpenAI API
+          -> Spring AI
+              -> GMS OpenAI-compatible API
 ```
 
-프론트엔드는 화면 상태와 사용자 상호작용을 담당합니다. 인증, 토론 생성, 게시글, 댓글, 투표 데이터는 Spring Boot API를 통해 처리합니다. Python AI 서버는 프론트엔드에서 직접 호출하지 않습니다.
+프론트엔드는 화면 상태와 사용자 상호작용을 담당합니다. 인증, 토론 생성, 게시글, 댓글, 투표 데이터는 Spring Boot API를 통해 처리합니다. AI Provider는 프론트엔드에서 직접 호출하지 않습니다.
 
 ## 권장 프로젝트 구조
 

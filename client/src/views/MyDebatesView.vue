@@ -1,60 +1,117 @@
 <template>
-  <main class="page">
-    <section class="list-header my-debates-header">
+  <main class="page debates-page">
+    <section class="debates-header">
       <div>
-        <span class="eyebrow">My Arena</span>
         <h1>내 토론</h1>
-        <p class="page-copy">내가 만든 토론 주제를 카드로 확인하고 이어서 진행합니다.</p>
       </div>
-      <RouterLink class="button" to="/new">새 토론</RouterLink>
-    </section>
-
-    <section v-if="debateStore.loading" class="loading-state">
-      내 토론을 불러오는 중입니다.
-    </section>
-
-    <section v-else-if="debateStore.myDebates.length" class="my-debate-grid" aria-label="내 토론 목록">
-      <RouterLink
-        v-for="debate in debateStore.myDebates"
-        :key="debate.debateId"
-        class="my-debate-card"
-        :to="`/debates/${debate.debateId}`"
-      >
-        <div class="tag-row">
-          <span class="tag" :class="debate.mode === 'PRACTICAL' ? 'tag--teal' : 'tag--amber'">
-            {{ debate.mode === 'PRACTICAL' ? '실용 판정' : '예능 배틀' }}
-          </span>
-          <span class="tag tag--blue">{{ statusLabel(debate.status) }}</span>
-        </div>
-        <h2>{{ debate.topic }}</h2>
-        <p>{{ debate.shareBody || debate.summaryCard }}</p>
-        <span class="card-link-label">이어가기</span>
+      <RouterLink class="new-debate-button-link" to="/new">
+        <NButton class="new-debate-button" type="primary" size="large" strong>
+          <template #icon>
+            <span class="new-debate-button__icon" aria-hidden="true">+</span>
+          </template>
+          새 토론 시작
+        </NButton>
       </RouterLink>
     </section>
 
-    <section v-else class="empty-state">
-      <h2>아직 만든 토론이 없습니다</h2>
-      <p>새 토론을 만들면 이곳에서 이어서 진행할 수 있습니다.</p>
-      <RouterLink class="button" to="/new">첫 토론 만들기</RouterLink>
-    </section>
+    <NCard class="debates-board-card" :bordered="false">
+      <div class="debates-board-header">
+        <div>
+          <span class="section-label">Recent debates</span>
+          <h2>최근 토론</h2>
+        </div>
+      </div>
+
+      <section v-if="debateStore.loading" class="loading-state">
+        내 토론을 불러오는 중입니다.
+      </section>
+
+      <section v-else-if="!displayDebates.length" class="empty-state">
+        <h2>아직 저장된 토론이 없습니다</h2>
+        <p>새 토론을 시작하면 이곳에서 다시 확인할 수 있습니다.</p>
+      </section>
+
+      <NGrid
+        v-else
+        cols="1 m:2"
+        :x-gap="14"
+        :y-gap="14"
+        responsive="screen"
+        class="my-debate-grid"
+        aria-label="내 토론 목록"
+      >
+        <NGridItem
+          v-for="debate in displayDebates"
+          :key="debate.debateId"
+        >
+          <NCard
+            class="my-debate-card"
+            hoverable
+            :bordered="false"
+            role="button"
+            tabindex="0"
+            @click="openDebate(debate)"
+            @keydown.enter="openDebate(debate)"
+          >
+            <div class="my-debate-card__body">
+              <div>
+                <h2>{{ debateTitle(debate) }}</h2>
+              </div>
+              <div class="my-debate-card__actions">
+                <button
+                  class="my-debate-card__delete"
+                  type="button"
+                  :disabled="deletingDebateId === debate.debateId"
+                  :aria-label="`${debateTitle(debate)} 삭제`"
+                  @click.stop="deleteDebate(debate)"
+                >
+                  ×
+                </button>
+              </div>
+            </div>
+          </NCard>
+        </NGridItem>
+      </NGrid>
+    </NCard>
   </main>
 </template>
 
 <script setup>
-import { onMounted } from 'vue'
-import { RouterLink } from 'vue-router'
+import { computed, onMounted, ref } from 'vue'
+import { RouterLink, useRouter } from 'vue-router'
+import { NButton, NCard, NGrid, NGridItem } from 'naive-ui'
 import { useDebateStore } from '@/stores/debateStore'
 
 const debateStore = useDebateStore()
+const router = useRouter()
+const deletingDebateId = ref(null)
+const displayDebates = computed(() => debateStore.myDebates)
 
 onMounted(() => {
   debateStore.fetchMyDebates()
 })
 
-function statusLabel(status) {
-  if (status === 'ACTIVE') return '진행 중'
-  if (status === 'STOPPED') return '요약 완료'
-  if (status === 'SHARED') return '공유됨'
-  return status
+function openDebate(debate) {
+  if (debate.status === 'ACTIVE') {
+    router.push(`/debates/${debate.debateId}`)
+    return
+  }
+  router.push({
+    path: `/debates/${debate.debateId}/result`,
+    query: { from: 'recent' },
+  })
+}
+
+function debateTitle(debate) {
+  return debate.originalTopic || debate.topic
+}
+
+async function deleteDebate(debate) {
+  deletingDebateId.value = debate.debateId
+  try {
+    await debateStore.deleteDebate(debate.debateId)
+  } finally {
+    deletingDebateId.value = null
+  }
 }
 </script>

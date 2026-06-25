@@ -27,6 +27,11 @@ const routes = [
     component: () => import('@/views/MyDebatesView.vue'),
   },
   {
+    path: '/debates/:debateId/result',
+    name: 'debate-result',
+    component: () => import('@/views/DebateResultView.vue'),
+  },
+  {
     path: '/debates/:debateId',
     name: 'debate-room',
     component: () => import('@/views/DebateRoomView.vue'),
@@ -56,14 +61,14 @@ const router = createRouter({
   },
 })
 
-router.beforeEach((to) => {
+router.beforeEach(async (to) => {
   const publicRoutes = ['auth', 'kakao-callback', 'post-list', 'post-detail']
   if (publicRoutes.includes(to.name)) {
     return true
   }
 
   const auth = useAuthStore()
-  auth.fetchMe()
+  await auth.fetchMe()
   if (!auth.isAuthenticated) {
     return '/auth'
   }

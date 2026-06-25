@@ -20,5 +20,7 @@ public interface UserMapper {
 
     List<User> findAll();
 
+    void updateNickname(@Param("id") Long id, @Param("nickname") String nickname);
+
     void updateRole(@Param("id") Long id, @Param("role") UserRole role);
 }

@@ -1,28 +1,31 @@
 <template>
   <article class="debate-message" :class="{ hot: message.speaker === 'PASSIONATE' }">
-    <div class="avatar" :class="{ hot: message.speaker === 'PASSIONATE' }">
-      {{ persona.shortLabel }}
-    </div>
-    <div class="bubble" :class="{ hot: message.speaker === 'PASSIONATE' }">
-      <div class="bubble__meta">
-        <strong>{{ persona.label }}</strong>
-        <span>Round {{ message.roundNo }}</span>
+    <div class="debate-message__body">
+      <strong class="debate-message__name">{{ sideLabel }}</strong>
+      <div class="bubble" :class="{ hot: message.speaker === 'PASSIONATE' }">
+        <p>{{ message.content }}</p>
       </div>
-      <p>{{ message.content }}</p>
     </div>
   </article>
 </template>
 
 <script setup>
 import { computed } from 'vue'
-import { personas } from '@/mocks/data'
 
 const props = defineProps({
   message: {
     type: Object,
     required: true,
   },
+  sideLabels: {
+    type: Object,
+    required: true,
+  },
+  displayIndex: {
+    type: Number,
+    required: true,
+  },
 })
 
-const persona = computed(() => personas[props.message.speaker] || personas.COOL_HEADED)
+const sideLabel = computed(() => props.sideLabels[props.message.speaker] || 'A 진영')
 </script>

@@ -1,0 +1,169 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="980" viewBox="0 0 1600 980" role="img" aria-labelledby="title desc">
+  <title id="title">ARENA System Architecture</title>
+  <desc id="desc">ARENA architecture showing browser, Vue frontend, Spring Boot backend, MySQL database, Kakao OAuth, and GMS AI integration.</desc>
+  <defs>
+    <style>
+      .bg{fill:#f4f7fb}
+      .group{fill:#ffffff;stroke:#cbd5e1;stroke-width:2}
+      .group-title{font:800 22px 'Noto Sans KR','Segoe UI',sans-serif;fill:#111827}
+      .group-sub{font:700 13px 'Noto Sans KR','Segoe UI',sans-serif;fill:#64748b}
+      .box{fill:#f8fafc;stroke:#94a3b8;stroke-width:2}
+      .box-blue{fill:#eaf3ff;stroke:#3182f6}
+      .box-teal{fill:#e9fbf7;stroke:#00a887}
+      .box-amber{fill:#fff7e6;stroke:#f59f00}
+      .box-rose{fill:#fff1f1;stroke:#ff6b6b}
+      .box-dashed{fill:#fbfcfd;stroke:#64748b;stroke-width:2;stroke-dasharray:8 7}
+      .label{font:800 16px 'Noto Sans KR','Segoe UI',sans-serif;fill:#111827}
+      .small{font:700 12px 'Noto Sans KR','Segoe UI',sans-serif;fill:#475569}
+      .tiny{font:700 11px 'Noto Sans KR','Segoe UI',sans-serif;fill:#64748b}
+      .arrow{stroke:#334155;stroke-width:2.5;fill:none;marker-end:url(#arrow)}
+      .arrow-blue{stroke:#2563eb;stroke-width:2.5;fill:none;marker-end:url(#arrow-blue)}
+      .arrow-dash{stroke:#64748b;stroke-width:2.3;fill:none;stroke-dasharray:7 6;marker-end:url(#arrow-gray)}
+      .flow{font:800 12px 'Noto Sans KR','Segoe UI',sans-serif;fill:#1f2937}
+    </style>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#334155"/>
+    </marker>
+    <marker id="arrow-blue" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#2563eb"/>
+    </marker>
+    <marker id="arrow-gray" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#64748b"/>
+    </marker>
+  </defs>
+
+  <rect class="bg" x="0" y="0" width="1600" height="980"/>
+  <text x="60" y="58" style="font:900 34px 'Noto Sans KR','Segoe UI',sans-serif;fill:#0f172a">ARENA 시스템 아키텍처</text>
+  <text x="60" y="88" class="small">Vue 3 + Spring Boot + MySQL + Kakao OAuth + GMS OpenAI-compatible API</text>
+
+  <!-- User -->
+  <rect class="box box-blue" x="60" y="410" rx="14" ry="14" width="170" height="112"/>
+  <text class="label" x="145" y="455" text-anchor="middle">사용자</text>
+  <text class="small" x="145" y="482" text-anchor="middle">브라우저</text>
+
+  <!-- Client group -->
+  <rect class="group" x="300" y="130" rx="18" ry="18" width="300" height="690"/>
+  <text class="group-title" x="330" y="170">Frontend</text>
+  <text class="group-sub" x="330" y="194">arena-client · localhost:15173</text>
+  <text class="group-sub" x="330" y="214">Vue 3 · Vite · Pinia · Router</text>
+
+  <rect class="box box-blue" x="335" y="250" rx="12" ry="12" width="230" height="92"/>
+  <text class="label" x="450" y="285" text-anchor="middle">Views</text>
+  <text class="tiny" x="450" y="310" text-anchor="middle">Auth / New / Debate Room</text>
+  <text class="tiny" x="450" y="328" text-anchor="middle">Result / Posts / My Debates</text>
+
+  <rect class="box" x="335" y="375" rx="12" ry="12" width="230" height="80"/>
+  <text class="label" x="450" y="408" text-anchor="middle">Pinia Store</text>
+  <text class="tiny" x="450" y="433" text-anchor="middle">auth · debate · post · comment</text>
+
+  <rect class="box" x="335" y="490" rx="12" ry="12" width="230" height="80"/>
+  <text class="label" x="450" y="523" text-anchor="middle">Vue Router</text>
+  <text class="tiny" x="450" y="548" text-anchor="middle">Auth Guard / Route Views</text>
+
+  <rect class="box box-teal" x="335" y="605" rx="12" ry="12" width="230" height="90"/>
+  <text class="label" x="450" y="638" text-anchor="middle">Axios API Client</text>
+  <text class="tiny" x="450" y="663" text-anchor="middle">JWT REST 호출</text>
+  <text class="tiny" x="450" y="681" text-anchor="middle">VITE_API_BASE_URL</text>
+
+  <!-- Backend group -->
+  <rect class="group" x="680" y="110" rx="18" ry="18" width="420" height="730"/>
+  <text class="group-title" x="710" y="150">Backend</text>
+  <text class="group-sub" x="710" y="174">arena-app · localhost:18080 → 8080</text>
+  <text class="group-sub" x="710" y="194">Spring Boot 3 · Security · MyBatis · Spring AI</text>
+
+  <rect class="box box-rose" x="720" y="235" rx="12" ry="12" width="330" height="76"/>
+  <text class="label" x="885" y="266" text-anchor="middle">Spring Security</text>
+  <text class="tiny" x="885" y="290" text-anchor="middle">JWT Filter / CORS / Role Guard</text>
+
+  <rect class="box box-blue" x="720" y="340" rx="12" ry="12" width="330" height="88"/>
+  <text class="label" x="885" y="373" text-anchor="middle">REST Controllers</text>
+  <text class="tiny" x="885" y="398" text-anchor="middle">Auth · AI · Debate · Post</text>
+  <text class="tiny" x="885" y="416" text-anchor="middle">Comment · User · Admin</text>
+
+  <rect class="box" x="720" y="460" rx="12" ry="12" width="330" height="86"/>
+  <text class="label" x="885" y="493" text-anchor="middle">Service Layer</text>
+  <text class="tiny" x="885" y="518" text-anchor="middle">AuthService / DebateService / PostService</text>
+  <text class="tiny" x="885" y="536" text-anchor="middle">AiRoundCandidateService</text>
+
+  <rect class="box box-amber" x="720" y="580" rx="12" ry="12" width="330" height="102"/>
+  <text class="label" x="885" y="612" text-anchor="middle">AI Layer</text>
+  <text class="tiny" x="885" y="637" text-anchor="middle">PromptTemplateLoader / AiPipelineService</text>
+  <text class="tiny" x="885" y="655" text-anchor="middle">SpringAiClient / Parser / Retry</text>
+
+  <rect class="box" x="720" y="715" rx="12" ry="12" width="330" height="72"/>
+  <text class="label" x="885" y="746" text-anchor="middle">MyBatis Mappers</text>
+  <text class="tiny" x="885" y="770" text-anchor="middle">SQL Mapper XML · Domain Mapping</text>
+
+  <rect class="box-dashed" x="785" y="845" rx="12" ry="12" width="260" height="82"/>
+  <text class="label" x="915" y="876" text-anchor="middle">확장 예정</text>
+  <text class="tiny" x="915" y="900" text-anchor="middle">Background AI Generation Worker</text>
+  <text class="tiny" x="915" y="918" text-anchor="middle">중복 방지 + Polling 재진입</text>
+
+  <!-- DB group -->
+  <rect class="group" x="1180" y="210" rx="18" ry="18" width="340" height="500"/>
+  <text class="group-title" x="1210" y="250">Database</text>
+  <text class="group-sub" x="1210" y="274">arena-mysql · localhost:13306 → 3306</text>
+  <text class="group-sub" x="1210" y="294">MySQL 8.4 · arena-mysql-data volume</text>
+
+  <rect class="box box-teal" x="1220" y="335" rx="12" ry="12" width="260" height="86"/>
+  <text class="label" x="1350" y="368" text-anchor="middle">Core Tables</text>
+  <text class="tiny" x="1350" y="393" text-anchor="middle">users / debate_sessions</text>
+  <text class="tiny" x="1350" y="411" text-anchor="middle">debate_messages / summaries</text>
+
+  <rect class="box box-blue" x="1220" y="455" rx="12" ry="12" width="260" height="78"/>
+  <text class="label" x="1350" y="488" text-anchor="middle">Community Tables</text>
+  <text class="tiny" x="1350" y="513" text-anchor="middle">posts / comments / post_votes</text>
+
+  <rect class="box box-amber" x="1220" y="565" rx="12" ry="12" width="260" height="98"/>
+  <text class="label" x="1350" y="598" text-anchor="middle">AI Persistence</text>
+  <text class="tiny" x="1350" y="623" text-anchor="middle">candidate runs / candidates</text>
+  <text class="tiny" x="1350" y="641" text-anchor="middle">prompt logs / debate turn logs</text>
+
+  <!-- External group -->
+  <rect class="group" x="1160" y="750" rx="18" ry="18" width="370" height="170"/>
+  <text class="group-title" x="1190" y="790">External Services</text>
+  <rect class="box box-blue" x="1200" y="820" rx="12" ry="12" width="130" height="70"/>
+  <text class="label" x="1265" y="850" text-anchor="middle">Kakao</text>
+  <text class="tiny" x="1265" y="872" text-anchor="middle">OAuth API</text>
+  <rect class="box box-amber" x="1365" y="820" rx="12" ry="12" width="130" height="70"/>
+  <text class="label" x="1430" y="850" text-anchor="middle">GMS</text>
+  <text class="tiny" x="1430" y="872" text-anchor="middle">gpt-5.4-mini</text>
+
+  <!-- Arrows -->
+  <path class="arrow-blue" d="M230 466 C265 466,270 296,335 296"/>
+  <text class="flow" x="238" y="445">화면 조작</text>
+
+  <path class="arrow" d="M450 342 L450 375"/>
+  <path class="arrow" d="M450 455 L450 490"/>
+  <path class="arrow" d="M450 570 L450 605"/>
+
+  <path class="arrow-blue" d="M565 650 C610 650,650 273,720 273"/>
+  <text class="flow" x="585" y="625">JWT REST API</text>
+
+  <path class="arrow" d="M885 311 L885 340"/>
+  <path class="arrow" d="M885 428 L885 460"/>
+  <path class="arrow" d="M885 546 L885 580"/>
+  <path class="arrow" d="M885 682 L885 715"/>
+
+  <path class="arrow" d="M1050 751 C1100 751,1138 378,1220 378"/>
+  <text class="flow" x="1082" y="724">MyBatis SQL</text>
+
+  <path class="arrow" d="M1050 751 C1110 751,1138 494,1220 494"/>
+  <path class="arrow" d="M1050 631 C1110 631,1138 614,1220 614"/>
+
+  <path class="arrow-blue" d="M885 580 C920 820,1135 855,1200 855"/>
+  <text class="flow" x="975" y="816">Kakao 로그인 검증</text>
+
+  <path class="arrow-blue" d="M1050 631 C1160 710,1265 855,1365 855"/>
+  <text class="flow" x="1115" y="696">Spring AI ChatClient</text>
+
+  <path class="arrow-dash" d="M915 787 L915 845"/>
+  <text class="flow" x="930" y="825">AI 생성 안정화</text>
+
+  <!-- Flow legend -->
+  <rect class="group" x="60" y="780" rx="14" ry="14" width="555" height="140"/>
+  <text class="label" x="90" y="820">핵심 플로우</text>
+  <text class="small" x="90" y="850">1. Kakao OAuth → /api/auth/kakao → JWT 발급</text>
+  <text class="small" x="90" y="875">2. /api/ai/round-candidates → 주제 후보 5개 생성 및 로그 저장</text>
+  <text class="small" x="90" y="900">3. /api/debates/{id}/turns/batch → 10개 발화 생성, DB 저장</text>
+</svg>

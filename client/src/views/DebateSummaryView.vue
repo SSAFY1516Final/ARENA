@@ -10,7 +10,7 @@
       <article class="summary-card">
         <div class="tag-row">
           <span class="tag tag--amber">요약 생성 완료</span>
-          <span class="tag tag--teal">{{ modeLabel }}</span>
+          <span class="tag tag--teal">토론</span>
         </div>
         <h2>제육은 만족감, 돈까스는 안정성</h2>
         <p>{{ summary.summaryText }}</p>
@@ -60,10 +60,6 @@ const summary = computed(() => debateStore.summary || {
   summaryText: '선택 기준은 안정성과 만족감의 차이입니다.',
   decisionCriteria: '선택 기준: 오후 일정이 중요하면 돈까스, 지금의 만족이 중요하면 제육',
 })
-const modeLabel = computed(() =>
-  debateStore.currentDebate.mode === 'PRACTICAL' ? '실용 판정' : '예능 배틀',
-)
-
 onMounted(async () => {
   await debateStore.fetchDebate(route.params.debateId)
   if (!debateStore.summary) {

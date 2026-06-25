@@ -1,0 +1,354 @@
+Generate one complete debate round. Return valid JSON only. Do not explain.
+
+JSON VALIDITY IS MANDATORY
+- Return one valid JSON object and nothing else.
+- Do not use markdown code fences.
+- Do not add comments.
+- Do not use trailing commas.
+- Every JSON string value must be wrapped in double quotes.
+- The "side" field must be exactly "A" or "B" as a quoted string.
+- The "dialogueMove" field must be a quoted string from the allowed list.
+- The "turnIndex" field must be a number, not a string.
+- The "replyTo" field must be null for turn 1 and a number for later turns. Never use strings such as "turn-1".
+- The "turns" field must be an array of exactly {{totalTurnCount}} objects.
+- Every "message" value must be exactly 3 natural Korean sentences. Never output a 1-sentence or 2-sentence message.
+- Do not add fields outside the OUTPUT JSON SCHEMA.
+- Do not put unescaped double quotes inside Korean messages.
+- If a Korean message needs emphasis, use plain wording instead of quotation marks.
+- Before output, parse your own JSON mentally; if it is not valid JSON, rewrite it.
+
+INPUT
+- mode={{mode}}
+- bigTopic={{bigTopic}}
+- roundTitle={{roundTitle}}
+- coreQuestion={{coreQuestion}}
+- debateAxis={{debateAxis}}
+- sideA={{sideA}}
+- sideB={{sideB}}
+- sideAFrame={{sideAFrame}}
+- sideBFrame={{sideBFrame}}
+- basicConditions={{basicConditions}}
+- totalTurnCount={{totalTurnCount}}
+- tone={{tone}}
+- creativityLevel={{creativityLevel}}
+- evidencePolicy={{evidencePolicy}}
+- evidenceSourcesJson={{evidenceSourcesJson}}
+
+SUBJECT FOCUS
+- First identify whether the request has a core subject: a person, player, team, company, technology, product, policy, job, service, or other named decision target.
+- If there is a core subject, keep both the selectedRound axis and that subject fixed throughout the round.
+- Use only these inputs as subject context: bigTopic, coreQuestion, sideA, sideB, basicConditions, sideAFrame, sideBFrame, selectedRound fields, and evidenceSourcesJson.
+- If optional subjectProfile or userProvidedFacts are included inside the rendered input or evidenceSourcesJson, treat them as user-provided subject context.
+- Subject context may include strengths, weaknesses, role fit, constraints, replacement resources, alternative options, or evidence ids.
+- If a subject trait is explicitly written in the topic, topicFrame, selectedRound, side frames, subjectProfile-like content, userProvidedFacts, or evidenceSourcesJson, use that trait in the debate.
+- If no subject trait is provided, do not invent real traits, records, recent performance, actual cases, named alternatives, or current conditions for the subject.
+- When no subject trait is provided, you may still discuss the role logic in the selectedRound, but do not make it sound like verified information about the subject.
+- For specific-subject topics, at least 7 turns must directly reflect the subject name or a provided subject trait, role fit, constraint, or alternative option.
+- If evidenceSourcesJson contains relevant subject traits or constraints and evidencePolicy is not NONE, exactly 2 subject-focused turns should visibly use a concrete fact from evidenceSourcesJson and include the matching evidenceRefs.
+- Do not ignore relevant user-provided subject context just because the same trait sounds generally plausible.
+- Do not repeat the subject name mechanically. Connect each subject mention to the selectedRound axis, a role fit, a cost, a constraint, or a pressure question.
+- A turn that only says a generic A/B claim without tying it to the core subject is too weak. Rewrite it.
+- Named replacement resources or named alternatives are allowed only if they are present in input subject context or evidenceSourcesJson.
+- If no named replacement resource is provided, you may still use an unnamed realistic role, resource, or method as an alternative attack, such as asking who covers the missing role or what practical route avoids the opponent's cost.
+
+EVIDENCE CONTEXT
+- Treat evidenceSourcesJson as the optional evidenceContext/sourceFacts for this request.
+- evidenceSourcesJson may be an empty array. If it is empty, do not invent real cases, dates, numbers, records, lineups, quotes, study results, official documents, or named events.
+- If evidenceSourcesJson is empty, do not say "기록상", "최근 흐름", "실제로 그랬다", "공식 기록", or any phrase that sounds like a verified real case.
+- Use only facts that are explicitly present in evidenceSourcesJson.
+- Do not create a source, statistic, historical event, match result, policy, legal case, official record, or named person's statement that is not in evidenceSourcesJson.
+- If subjectProfile-like content has evidence ids, use those ids in evidenceRefs only when the message visibly uses the connected fact.
+- If subjectProfile-like content has no evidence id, write it as an input premise, not as a verified record or external case.
+- If evidenceSourcesJson is user-provided subject context, refer to it naturally as an input condition or provided context. Do not make it sound like an external report.
+- In evidence-backed turns, mention a visible trait, constraint, role fit, or alternative from the source summary in the message itself.
+- If you use a source, weave the fact naturally into the message. Do not turn the message into a citation report.
+- When evidenceSourcesJson contains sources that are relevant to the selectedRound, use evidence in 2 to 4 turns.
+- If at least two relevant sources are provided, use at least two distinct evidence ids across the whole round.
+- Do not force evidence into every turn.
+- evidenceRefs must contain only ids that actually appear in evidenceSourcesJson and are actually used in that turn's message.
+- If evidenceRefs includes an id, the message must explicitly mention a concrete fact from that source's title or summary.
+- Do not use an evidence id as hidden background inspiration. The fact must be visible in the message.
+- A valid evidence use should make it clear why that source supports the current attack or defense.
+- If a turn does not use evidence, set evidenceRefs to [].
+- If evidencePolicy is OPTIONAL, it is fine to use no evidence when the evidence does not fit the selectedRound.
+- If a fact is uncertain or not provided, do not mention it.
+
+MAIN GOAL
+Generate exactly {{totalTurnCount}} turns for the selected round only.
+This is not a polite comparison of two views. It is a sharp logical clash between sideAFrame and sideBFrame.
+The speakers must attack each other's premises, costs, standards, and real-world applicability without insults.
+
+ROUND SCOPE
+- Stay inside the selectedRound only: roundTitle, coreQuestion, debateAxis, sideAFrame, sideBFrame.
+- If the topic has a core subject, stay inside both the selectedRound axis and the subject's provided role/trait context.
+- Do not drift into the broader topic unless it directly supports this selected round's axis.
+- Every A turn must push sideAFrame as the stronger frame.
+- Every B turn must push sideBFrame as the stronger frame.
+- If a turn could fit any generic debate on the bigTopic, rewrite it to use the selected round's exact axis.
+- If a turn could fit the same debate with the subject replaced by any other subject, rewrite it to connect to the provided subject traits, role fit, constraints, or alternatives.
+- Every message must contain at least one concrete word or condition from roundTitle, coreQuestion, debateAxis, sideAFrame, or sideBFrame.
+- Do not introduce a new broad topic that is not required by the selectedRound axis.
+- If a concrete case is needed, use only the selectedRound details or evidenceSourcesJson. Do not make up examples that look like real events.
+
+TONE
+- Firm, confident, adversarial, and logical.
+- No profanity, insults, mockery, belittling, hate, or attacks on the person.
+- Attack the claim, premise, standard, hidden cost, feasibility, or missing condition.
+- Do not sound like a neutral moderator.
+- Do not end by saying both sides are right.
+
+FORBIDDEN SOFTENING
+Do not use these meanings or near-equivalents:
+- both are right
+- it depends on the situation
+- balance is important
+- each side has pros and cons
+- there is no single answer
+- it is a matter of choice
+- divide the two options and use both
+- A is right and B is also right
+- that is also true
+- that point is valid
+- "그 말도 맞아"
+- "둘 다 맞다"
+- "균형이 중요하다"
+- "상황에 따라 다르다"
+- "각자 장단점이 있다"
+- "결국 선택의 문제다"
+
+FORBIDDEN MESSAGE STRINGS
+Messages must never contain these exact strings or close variants:
+- "전제가 있어야"
+- "해당 기준"
+- "이 라운드"
+- "라운드의 기준"
+- "라운드 기준"
+- "기준이야"
+- "기준에서"
+- "기준으로"
+- "selectedRound"
+- "sideAFrame"
+- "sideBFrame"
+- "debateAxis"
+- "coreQuestion"
+- "prompt"
+- "schema"
+- "JSON"
+- "프롬프트"
+- "스키마"
+- "필드"
+- "프레임"
+- "축"
+- "전술적으로 유리하다"
+- "효율성을 극대화한다"
+- "중요한 요소다"
+- "라고 볼 수 있다"
+- "상황에 따라"
+- "균형이 중요"
+- "정답은 없다"
+
+FORBIDDEN USER-FACING INTERNAL TERMS
+- User-facing message values must not expose internal prompt, schema, or debate-construction terms.
+- The "message" field must sound like a person arguing the topic, not like it is describing this prompt or round setup.
+- Do not mention that this is a round, selected round, axis, frame, schema, prompt, field, JSON output, generation rule, or evaluation setup.
+- Do not translate internal instructions such as selectedRound standard into Korean phrases like "이 라운드의 기준", "라운드 기준", "기준이야", "기준으로 보면", or close variants.
+- If a message needs a judging standard, name the topic-specific issue directly, such as "보안과 데이터 통제", "외부 의존", or "운영 부담", instead of saying "기준".
+- Planning fields such as roundPlan may use internal terms, but every user-facing "message" value must avoid them.
+
+PARTIAL_AGREE_SHIFT LIMIT
+- Use PARTIAL_AGREE_SHIFT at most once in the whole 10-turn round.
+- If used, the concession must be short and immediately become an attack.
+- Do not start with "that is right", "I agree", or "that also makes sense".
+- Do not start with "그 말도 맞아", "맞아", "동의해", "일리 있어", or "그 점은 인정해".
+
+EACH TURN MUST PRESSURE THE PREVIOUS TURN
+Every turn after turn 1 must do at least one of these:
+- attack a premise in the previous turn
+- expose a hidden cost the previous turn ignored
+- show how the previous standard breaks in a concrete scene
+- argue that the previous turn dodged the selectedRound axis
+- flip the previous advantage into a weakness
+- force a vague claim into a concrete condition
+
+ALTERNATIVE USE
+- Some turns may mention a realistic alternative, but the alternative must stay inside the selectedRound axis.
+- An alternative means a real substitute choice, resource, role, method, or way to cover a weak point in the current decision.
+- Use alternatives as an attack tool, not as a compromise.
+- Mention realistic alternatives in 1 to 3 turns in the whole round.
+- For a specific-subject topic, include at least 1 and at most 2 alternative or replacement-resource mentions in the whole round.
+- Good places are COUNTER_EXAMPLE, HIDDEN_COST, PRACTICAL_CONSTRAINT, TRADEOFF, USER_SCENE, or QUESTION_CHALLENGE turns.
+- Do not make every restatement of your own side sound like an alternative.
+- A normal defense of sideAFrame or sideBFrame is not an alternative. An alternative must be a concrete way to handle the opponent's weakness while still supporting your side.
+- The alternative must be something real users could plausibly suggest in this topic's decision context.
+- The alternative must strengthen the speaker's side or expose a weakness in the opponent's side.
+- If the topic has a core subject, the alternative must explain how the subject's role, burden, weakness, strength, or replacement-resource question changes.
+- Do not let an alternative turn into "both are right", "it depends", "use a mix", "balance is important", "there is no answer", or any neutral ending.
+- Do not add a new field for alternatives. Put the alternative naturally inside the message only.
+- If an alternative relies on a real person, named resource, real case, recent trend, record, date, statistic, event, quote, or named source, it must come from evidenceSourcesJson and must use evidenceRefs.
+- If the alternative is just a general logical suggestion, keep evidenceRefs as [] and do not make it sound like a real historical case.
+- If input subject context or evidenceSourcesJson does not name a specific person/resource/record, do not invent that name as an alternative.
+- An unnamed role or method alternative is allowed only when it is realistic, stays inside the selectedRound axis, and supports one side's attack.
+- A replacement-resource pressure question can count as an alternative mention only when it clearly asks who or what covers the opponent's missing role while keeping pressure on that opponent.
+- Avoid stiff phrases such as "대안적 접근 방식", "보완 전략", "혼합 운용", "절충적 해결책", "효율성을 극대화하는 방안", "상황별 최적화".
+- Prefer natural wording such as "그 문제는 이렇게 풀 수도 있지", "굳이 그 방식만 고집할 필요 없잖아", "그게 있으면 네 주장 힘이 빠지지", "그걸 못 하면 네 주장은 좀 약해".
+
+MESSAGE STRUCTURES
+Use these as intent patterns only. Do not translate them literally. Write every message in casual Korean.
+
+Premise attack:
+Point out what the opponent is assuming, then say why that assumption breaks in the selectedRound.
+
+Hidden cost attack:
+Say the opponent's advantage has a cost, then connect that cost back to your side.
+
+Standard flip:
+Use the opponent's own standard against them and push your side as the better answer.
+
+Concrete scene pressure:
+Give a plausible situation inside selectedRound, then show where the opponent's method gets stuck.
+
+Question pressure:
+Ask a direct pressure question that leaves the opponent's weak point unresolved.
+
+NATURALNESS
+- Write Korean comments that a real person could post in a debate thread.
+- Each message must be exactly 3 natural Korean sentences.
+- Do not write 1 or 2 sentences. If the point feels complete in 2 sentences, add one more direct pressure sentence tied to the selectedRound.
+- Each sentence should end with a Korean period or question mark so the sentence count is obvious.
+- Write like people seriously arguing about a topic they know well, not like a report or moderator script.
+- Every sentence must use casual Korean banmal.
+- Do not use honorific endings.
+- Do not use "합니다", "됩니다", "보입니다", "입니다", "습니다".
+- Avoid hard written endings such as "한다", "된다", "성립한다", "유리하다", "필요하다", "중요하다", "가능하다", "적합하다", "해당한다", "강하다", "나타난다".
+- Prefer endings like "잖아", "거야", "지", "아니야?", "맞잖아", "힘들지", "약해", "커", "죽어", "살아", "보여", "말이 돼", "말이 안 돼", "봐야지", "그게 문제야".
+- Prefer short, clear sentences with obvious cause and effect.
+- Avoid report tone, translation tone, abstract noun piles, and bureaucratic phrasing.
+- Do not use generic benefit claims like "good opportunity", "helpful", "effective", "important", "has advantages".
+- Do not use subjective mood claims like "feels good", "refreshing", "clear-minded", "relieves stress", "energized".
+- Do not use formal report phrases such as "효율성을 극대화합니다", "중요한 요소라고 볼 수 있습니다", "균형 있는 접근이 필요합니다", or close equivalents.
+- Do not use stiff phrases such as "성립한다", "전제가 있어야", "해당 기준에 따르면", "~라고 볼 수 있다", or close equivalents.
+- Prefer natural pressure phrases such as "그건 좀 다르게 봐야지", "그 말은 너무 한쪽만 본 거야", "근데 그게 진짜 문제야", "오히려 반대 아니야?", "그렇게 쓰면 장점이 죽어", "그 상황이면 말이 달라지지", "그걸 어떻게 계속 만들 건데?", "그 답이 없으면 네 주장은 좀 약해".
+- Avoid weak neutral endings. Each message should leave pressure on the other side.
+
+ANTI-REPETITION
+- No core claim may appear twice with different wording.
+- Each turn must add one new pressure point.
+- Do not repeat the same opening phrase.
+- Do not let A repeatedly restate sideAFrame or B repeatedly restate sideBFrame.
+- If the same reasoning appears twice, rewrite the later turn into a new attack: premise, hidden cost, concrete failure case, burden shift, or question.
+- A's five turns must each use a different pressure point.
+- B's five turns must each use a different pressure point.
+- Do not repeat the same noun cluster or sentence pattern across turns.
+- If a turn only says the same idea more strongly, rewrite it to move the debate forward.
+
+REASONING UNIT
+Each message must include at least one:
+- condition: what must be true for the opponent's claim to hold
+- failure_case: what happens when that condition breaks
+- hidden_cost: what cost the opponent hides
+- tradeoff: what is gained and what is lost, with your side framed as more defensible
+- sustainability: what happens when this repeats over time
+- user_decision_burden: where the user must decide, reschedule, cancel, negotiate, or take responsibility
+- reframe: how the judging standard should change in favor of your side
+
+DIALOGUE MOVES
+Use only these values:
+CLAIM, DIRECT_REBUTTAL, PARTIAL_AGREE_SHIFT, COUNTER_EXAMPLE, REFRAME,
+HIDDEN_COST, PRACTICAL_CONSTRAINT, USER_SCENE, QUESTION_CHALLENGE,
+TRADEOFF, SUMMARY_PIVOT.
+
+Map stronger debate moves like this:
+- PREMISE_ATTACK -> REFRAME or DIRECT_REBUTTAL
+- HIDDEN_COST_ATTACK -> HIDDEN_COST
+- BURDEN_SHIFT -> QUESTION_CHALLENGE
+- SUMMARY_ATTACK -> SUMMARY_PIVOT
+
+Preferred 10-turn conflict arc:
+1A CLAIM: A strongly sets the selectedRound standard for sideAFrame. If there is a core subject, connect A's frame to a provided core strength or role fit.
+2B DIRECT_REBUTTAL or REFRAME: B immediately attacks A's premise. If there is a core subject, use another provided strength, weakness, or constraint to push B's frame.
+3A REFRAME or DIRECT_REBUTTAL: A hits back and explains why the subject trait fits A's side better than B's side.
+4B COUNTER_EXAMPLE: B gives a plausible situation, evidenceSourcesJson-based case, or provided alternative resource where A's standard breaks. B may mention a realistic alternative if it attacks A.
+5A HIDDEN_COST: A attacks the hidden cost in B's position and points out where B kills the subject's provided strength or role fit. A may mention a realistic alternative if it avoids B's hidden cost while supporting A.
+6B PRACTICAL_CONSTRAINT: B attacks the real-world cost in A's position. B may pressure A with missing replacement resources or a provided alternative that exposes A's weakness while still supporting B.
+7A TRADEOFF: A accepts the opponent's standard for a moment, then argues it still favors A. A may use a provided or realistic unnamed alternative to show A's side handles the subject's tradeoff better.
+8B USER_SCENE: B pressures A with a plausible selectedRound situation or an evidenceSourcesJson-based case. B may mention a realistic alternative if it keeps pressure on A.
+9A SUMMARY_PIVOT: A summarizes the clash as an attack, not a compromise, and ties the subject's provided trait back to the selectedRound axis.
+10B QUESTION_CHALLENGE: B leaves a sharp unresolved challenge against A's final claim. B may ask what realistic alternative A has if A's plan breaks or replacement resources are missing.
+
+The arc is mandatory:
+- Turn 1 must be A.
+- Turn 2 must be B.
+- Odd turns must be A and even turns must be B.
+- There must be exactly 5 A turns and exactly 5 B turns.
+- Do not end with agreement, compromise, neutral summary, or a split recommendation.
+
+ENDING RULE
+- Do not resolve the round with compromise.
+- The final turn must leave tension and a concrete unanswered burden.
+- The user should want to continue because the clash is still alive.
+
+INTERNAL CHECK BEFORE OUTPUT
+Rewrite any turn that fails any check:
+- Is it inside the selectedRound axis?
+- If there is a core subject, is the turn tied to that subject instead of only generic A/B logic?
+- For specific-subject topics, do at least 7 turns reflect the subject name or a provided subject trait, role fit, constraint, or alternative option?
+- If relevant evidenceSourcesJson subject context exists and evidencePolicy is not NONE, do exactly 2 turns visibly use it and include the matching evidenceRefs?
+- Is every subject-specific real fact, record, named alternative, recent condition, or actual case present in input subject context or evidenceSourcesJson?
+- Does each subject mention connect to role fit, cost, constraint, alternative, or the selectedRound axis instead of empty name repetition?
+- Does it pressure the previous turn?
+- Does it show confidence that its side is stronger?
+- Does it avoid polite neutral convergence?
+- Does it avoid broad bigTopic generalities?
+- Does it avoid repeated claims?
+- Is the Korean natural on first read?
+- If an alternative is mentioned, does it strengthen one side instead of neutralizing the debate?
+- Is the alternative realistic and inside the selectedRound axis?
+- Are alternatives used 1 to 3 times, and not more?
+- For a specific-subject topic, is there at least 1 alternative or replacement-resource mention without turning the debate into compromise?
+- If an alternative mentions a real person, named resource, record, recent trend, or actual case, is it present in input subject context or evidenceSourcesJson, and are evidenceRefs used when an evidence id supports it?
+- Does every sentence avoid honorifics and stiff endings such as "한다" and "된다"?
+- Does every message avoid every string in FORBIDDEN MESSAGE STRINGS?
+- Does every user-facing message avoid internal terms such as round, selectedRound, frame, axis, prompt, schema, JSON, field, and their Korean equivalents?
+- If a message contains "기준", did you rewrite it into a concrete topic-specific issue instead?
+- Does every message have exactly 3 natural Korean sentences, never 1 or 2?
+- Does each side have exactly 5 turns?
+- Are all side values quoted as "A" or "B"?
+- Is turnIndex a number?
+- Is replyTo null for turn 1 and a number for later turns, never a string?
+- Does every evidenceRefs value refer to an id from evidenceSourcesJson?
+- If evidenceSourcesJson is empty, are all evidenceRefs arrays empty and all real-world factual claims avoided?
+- Is the output valid JSON with no markdown, no comments, and no trailing comma?
+
+OUTPUT JSON SCHEMA
+{
+  "roundPlan": {
+    "roundIntent": "core clash inside the selectedRound axis",
+    "antiRepetitionRules": [
+      "specific claim not to repeat"
+    ],
+    "turnArc": [
+      {
+        "turnIndex": 1,
+        "side": "A",
+        "dialogueMove": "CLAIM",
+        "newPoint": "new pressure point for this turn",
+        "mustNotRepeat": []
+      }
+    ]
+  },
+  "turns": [
+    {
+      "turnIndex": 1,
+      "side": "A",
+      "speakerName": "A",
+      "stance": "{{sideAFrame}}",
+      "message": "actual Korean utterance",
+      "dialogueMove": "CLAIM",
+      "claimType": "LOGIC_BASED",
+      "evidenceRefs": [],
+      "replyTo": null,
+      "creativeAngle": "premise attack / hidden cost / concrete scene / burden shift"
+    }
+  ],
+  "qualityWarnings": []
+}
