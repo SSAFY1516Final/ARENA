@@ -98,6 +98,8 @@ describe('HomeView', () => {
         { path: '/posts', component: { template: '<div />' } },
       ],
     })
+    await router.push('/')
+    await router.isReady()
 
     const wrapper = mount(HomeView, {
       global: {
@@ -159,6 +161,36 @@ describe('HomeView', () => {
     expect(wrapper.get('textarea#topic').element.value).toBe('')
     expect(wrapper.text()).toContain('0/120')
     expect(mockDebateApi.generateRoundCandidates).not.toHaveBeenCalled()
+  })
+
+  it('submits candidate generation with Enter and keeps Shift Enter for new lines', async () => {
+    const router = createRouter({
+      history: createWebHistory(),
+      routes: [
+        { path: '/', component: HomeView },
+      ],
+    })
+
+    const wrapper = mount(HomeView, {
+      global: {
+        plugins: [createPinia(), router],
+      },
+    })
+
+    const topicInput = wrapper.get('textarea#topic')
+    await topicInput.setValue('오늘 점심 제육 vs 돈까스')
+    await topicInput.trigger('keydown', { key: 'Enter', shiftKey: true })
+
+    expect(mockDebateApi.generateRoundCandidates).not.toHaveBeenCalled()
+
+    await topicInput.trigger('keydown', { key: 'Enter' })
+    await flushPromises()
+
+    expect(mockDebateApi.generateRoundCandidates).toHaveBeenCalledWith({
+      topic: '오늘 점심 제육 vs 돈까스',
+      mode: 'PRACTICAL',
+      candidateCount: 5,
+    })
   })
 
   it('shows a loading state while recommendations are being generated', async () => {
@@ -288,6 +320,35 @@ describe('HomeView', () => {
     expect(wrapper.find('.debate-start-loading').exists()).toBe(false)
     expect(router.currentRoute.value.path).toBe('/debates/11')
     expect(router.currentRoute.value.query.starting).toBe('1')
+  })
+
+  it('allows navigation away from generated detailed topic candidates', async () => {
+    const router = createRouter({
+      history: createWebHistory(),
+      routes: [
+        { path: '/', component: HomeView },
+        { path: '/posts', component: { template: '<div>게시판</div>' } },
+      ],
+    })
+    await router.push('/')
+    await router.isReady()
+
+    const wrapper = mount(HomeView, {
+      global: {
+        plugins: [createPinia(), router],
+      },
+    })
+
+    await wrapper.get('textarea#topic').setValue('오늘 점심 제육 vs 돈까스')
+    await wrapper.get('.workspace-setup form').trigger('submit')
+    await flushPromises()
+
+    expect(wrapper.find('.pipeline-candidate-grid').exists()).toBe(true)
+
+    await router.push('/posts')
+    await flushPromises()
+
+    expect(router.currentRoute.value.path).toBe('/posts')
   })
 
   it('reopens detailed topic candidates from a debate question query', async () => {

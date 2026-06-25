@@ -152,6 +152,8 @@ async function mountResult(path = '/debates/10/result?choice=COOL_HEADED') {
     routes: [
       { path: '/debates/:debateId/result', component: DebateResultView },
       { path: '/new', component: { template: '<div>새 토론</div>' } },
+      { path: '/debates', component: { template: '<div>내 토론</div>' } },
+      { path: '/posts', component: { template: '<div>게시판</div>' } },
       { path: '/posts/:postId', component: { template: '<div>게시글 상세</div>' } },
     ],
   })
@@ -273,6 +275,93 @@ describe('DebateResultView', () => {
     const shareButton = wrapper.find('.result-share-button')
     expect(shareButton.attributes('disabled')).toBeDefined()
     expect(shareButton.text()).toContain('결과 정리 중')
+    expect(wrapper.get('.result-summary-note').text()).toContain('요약 중')
+  })
+
+  it('uses the frontend-selected side immediately while the stop summary is pending', async () => {
+    debateApi.detail.mockResolvedValueOnce({
+      data: {
+        debate: {
+          debateId: 10,
+          originalTopic: '오늘 점심 제육 vs 돈까스',
+          topic: '오늘 점심 제육 vs 돈까스, 지금 바로 선택해야 한다면 무엇이 더 나은가',
+          sideALabel: '제육',
+          sideBLabel: '돈까스',
+          mode: 'PRACTICAL',
+          status: 'ACTIVE',
+          selectedSide: 'COOL_HEADED',
+        },
+        messages: messages(),
+        rounds: [
+          {
+            roundNo: 1,
+            debateId: 10,
+            title: '점심 안정성',
+            topic: '오늘 점심 제육 vs 돈까스, 지금 바로 선택해야 한다면 무엇이 더 나은가',
+            description: '안정성 vs 만족감',
+          },
+        ],
+        summary: null,
+      },
+    })
+
+    const { wrapper } = await mountResult('/debates/10/result?choice=PASSIONATE')
+
+    expect(wrapper.get('.result-selected-side-pill').text()).toBe('돈까스파')
+    expect(wrapper.get('.result-summary-note').text()).toContain('요약 중')
+  })
+
+  it('scores the pending frontend-selected side for the latest round before the summary is saved', async () => {
+    debateApi.detail.mockResolvedValueOnce({
+      data: {
+        debate: {
+          debateId: 11,
+          originalTopic: '오늘 점심 제육 vs 돈까스',
+          topic: 'Which lunch tradeoff matters more?',
+          sideALabel: '제육',
+          sideBLabel: '돈까스',
+          mode: 'PRACTICAL',
+          status: 'ACTIVE',
+        },
+        messages: [
+          ...messages().map((message) => ({
+            ...message,
+            roundNo: 1,
+            content: `R1 ${message.content}`,
+          })),
+          ...messages().map((message) => ({
+            ...message,
+            messageId: 100 + message.messageId,
+            roundNo: 2,
+            content: `R2 ${message.content}`,
+          })),
+        ],
+        rounds: [
+          {
+            roundNo: 1,
+            debateId: 10,
+            title: 'Stability vs thrill',
+            selectedSide: 'COOL_HEADED',
+          },
+          {
+            roundNo: 2,
+            debateId: 11,
+            title: 'Speed vs comfort',
+          },
+        ],
+        summary: null,
+      },
+    })
+
+    const { wrapper } = await mountResult('/debates/11/result?choice=PASSIONATE')
+    const roundCards = wrapper.findAll('.result-round-card')
+
+    expect(wrapper.get('.result-selected-round__head h2').text()).toBe('Speed vs comfort')
+    expect(wrapper.get('.result-selected-side-pill').text()).toBe('돈까스파')
+    expect(wrapper.get('.result-score-card .result-choice-score').text()).toBe('제육파 1 : 1 돈까스파')
+    expect(roundCards[1].classes()).toContain('result-round-card--hot')
+    expect(roundCards[1].text()).toContain('돈까스파')
+    expect(wrapper.get('.result-summary-note').text()).toContain('요약 중')
   })
 
   it('refreshes the result until the stop summary is saved', async () => {
@@ -652,6 +741,27 @@ describe('DebateResultView', () => {
       topic: '오늘 점심 제육 vs 돈까스',
       candidateRunId: '100',
     })
+  })
+
+  it('exits the locked result flow to my debates from the top action', async () => {
+    const { wrapper, router } = await mountResult()
+
+    expect(wrapper.find('.result-topbar .result-exit-button').exists()).toBe(true)
+    expect(wrapper.find('.result-summary-card .result-exit-button').exists()).toBe(false)
+
+    await wrapper.get('.result-exit-button').trigger('click')
+    await flushPromises()
+
+    expect(router.currentRoute.value.path).toBe('/debates')
+  })
+
+  it('allows normal navigation away from the result page', async () => {
+    const { router } = await mountResult()
+
+    await router.push('/posts')
+    await flushPromises()
+
+    expect(router.currentRoute.value.path).toBe('/posts')
   })
 
   it('registers a post from the selected round and opens the post detail', async () => {

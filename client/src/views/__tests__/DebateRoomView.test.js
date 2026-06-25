@@ -405,7 +405,7 @@ describe('DebateRoomView', () => {
 
     expect(wrapper.find('.debate-room-start-loading').exists()).toBe(true)
     expect(wrapper.text()).toContain('토론 대결을 준비중입니다')
-    expect(wrapper.text()).toContain('1분 정도 소요될 수 있습니다')
+    expect(wrapper.text()).toContain('토론을 준비중입니다. 30초에서 1분 정도 소요됩니다. 화면을 떠나도 중단되지 않습니다.')
     expect(wrapper.find('.typing-message').exists()).toBe(false)
 
     resolveInitialTurns()
@@ -456,6 +456,42 @@ describe('DebateRoomView', () => {
 
     resolveInitialTurns()
     await flushPromises()
+  })
+
+  it('stops the preparation loading when initial generation fails', async () => {
+    vi.useFakeTimers()
+    mockDebateDetail('ACTIVE', [])
+    debateApi.generateInitialTurns
+      .mockResolvedValueOnce({ data: { status: 'GENERATING', messages: [] } })
+      .mockResolvedValueOnce({ data: { status: 'FAILED', messages: [] } })
+    const router = createRouter({
+      history: createWebHistory(),
+      routes: [
+        { path: '/debates/:debateId/result', component: { template: '<div>result</div>' } },
+        { path: '/debates/:debateId', component: DebateRoomView },
+        { path: '/new', component: { template: '<div>new</div>' } },
+        { path: '/debates', component: { template: '<div>debates</div>' } },
+        { path: '/posts/:postId', component: { template: '<div />' } },
+      ],
+    })
+    await router.push('/debates/999?starting=1')
+    await router.isReady()
+
+    const wrapper = mount(DebateRoomView, {
+      global: {
+        plugins: [createPinia(), router],
+      },
+    })
+    await flushPromises()
+
+    expect(wrapper.find('.debate-room-start-loading').exists()).toBe(true)
+
+    await vi.advanceTimersByTimeAsync(2000)
+    await flushPromises()
+
+    expect(debateApi.generateInitialTurns).toHaveBeenCalledTimes(2)
+    expect(wrapper.find('.debate-room-start-loading').exists()).toBe(false)
+    expect(wrapper.text()).toContain('토론 생성에 실패했습니다. 잠시 후 다시 시도해주세요.')
   })
 
   it('shows the typing indicator while revealing generated batch turns', async () => {
@@ -531,36 +567,13 @@ describe('DebateRoomView', () => {
     expect(wrapper.find('.typing-message').exists()).toBe(true)
   })
 
-  it('polls saved debate detail until backend background generation finishes', async () => {
+  it('polls initial generation status until backend background generation finishes', async () => {
     vi.useFakeTimers()
-    debateApi.detail
-      .mockResolvedValueOnce({
-        data: {
-          debate: { debateId: 999, topic: '오늘 점심 제육 vs 돈까스', mode: 'PRACTICAL', status: 'ACTIVE' },
-          messages: [],
-          summary: null,
-        },
-      })
-      .mockResolvedValueOnce({
-        data: {
-          debate: { debateId: 999, topic: '오늘 점심 제육 vs 돈까스', mode: 'PRACTICAL', status: 'ACTIVE' },
-          messages: [],
-          summary: null,
-        },
-      })
-      .mockResolvedValueOnce({
-        data: {
-          debate: { debateId: 999, topic: '오늘 점심 제육 vs 돈까스', mode: 'PRACTICAL', status: 'ACTIVE' },
-          messages: createMessages(10),
-          summary: null,
-        },
-      })
-    debateApi.generateInitialTurns.mockResolvedValue({
-      data: {
-        status: 'GENERATING',
-        messages: [],
-      },
-    })
+    mockDebateDetail('ACTIVE', [])
+    debateApi.generateInitialTurns
+      .mockResolvedValueOnce({ data: { status: 'GENERATING', messages: [] } })
+      .mockResolvedValueOnce({ data: { status: 'GENERATING', messages: [] } })
+      .mockResolvedValueOnce({ data: { status: 'COMPLETE', messages: createMessages(10) } })
     const router = createRouter({
       history: createWebHistory(),
       routes: [
@@ -584,12 +597,14 @@ describe('DebateRoomView', () => {
 
     await vi.advanceTimersByTimeAsync(2000)
     await flushPromises()
-    expect(debateApi.detail).toHaveBeenCalledTimes(2)
+    expect(debateApi.detail).toHaveBeenCalledTimes(1)
+    expect(debateApi.generateInitialTurns).toHaveBeenCalledTimes(2)
     expect(wrapper.findAll('.debate-message')).toHaveLength(0)
 
     await vi.advanceTimersByTimeAsync(2000)
     await flushPromises()
-    expect(debateApi.detail).toHaveBeenCalledTimes(3)
+    expect(debateApi.detail).toHaveBeenCalledTimes(1)
+    expect(debateApi.generateInitialTurns).toHaveBeenCalledTimes(3)
 
     for (let index = 0; index < 10; index += 1) {
       await vi.advanceTimersByTimeAsync(2000)
@@ -835,7 +850,8 @@ describe('DebateRoomView', () => {
     await flushPromises()
 
     expect(wrapper.findAll('.debate-message')).toHaveLength(0)
-    expect(wrapper.text()).toContain('AI response generation failed. Please try again.')
+    expect(wrapper.text()).toContain('토론 생성에 실패했습니다. 잠시 후 다시 시도해주세요.')
+    expect(wrapper.find('.typing-message').exists()).toBe(false)
     expect(wrapper.text()).not.toContain('제육은 보상감이 있어요.')
   })
 
@@ -889,6 +905,38 @@ describe('DebateRoomView', () => {
     expect(wrapper.text()).not.toContain('결과 페이지로 이동하고 있습니다.')
     expect(router.currentRoute.value.path).toBe('/debates/999/result')
     expect(router.currentRoute.value.query.choice).toBe('COOL_HEADED')
+  })
+
+  it('only blocks returning to detailed topic selection before choosing a side', async () => {
+    const router = createRouter({
+      history: createWebHistory(),
+      routes: [
+        { path: '/debates/:debateId/result', component: { template: '<div>result</div>' } },
+        { path: '/debates/:debateId', component: DebateRoomView },
+        { path: '/new', component: { template: '<div>새 토론</div>' } },
+        { path: '/debates', component: { template: '<div>내 토론</div>' } },
+        { path: '/posts/:postId', component: { template: '<div />' } },
+      ],
+    })
+    await router.push('/debates/999?starting=1')
+    await router.isReady()
+
+    mount(DebateRoomView, {
+      global: {
+        plugins: [createPinia(), router],
+      },
+    })
+    await flushPromises()
+
+    await router.push('/new?topic=오늘%20점심&candidateRunId=100')
+    await flushPromises()
+
+    expect(router.currentRoute.value.path).toBe('/debates/999')
+
+    await router.push('/debates')
+    await flushPromises()
+
+    expect(router.currentRoute.value.path).toBe('/debates')
   })
 
   it('allows sharing only from a finished debate and moves to the created post detail', async () => {

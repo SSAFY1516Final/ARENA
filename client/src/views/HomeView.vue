@@ -3,6 +3,7 @@
     <section class="workspace-header new-template-header">
       <div>
         <h1>토론 생성하기</h1>
+        <p class="workspace-header__lead">큰 주제를 입력하면 바로 토론 가능한 세부 질문을 추천합니다.</p>
       </div>
     </section>
 
@@ -17,6 +18,7 @@
             <div class="workspace-setup__section">
               <span class="section-label">토론 만들기</span>
               <h2>주제를 입력하세요</h2>
+              <p>비교하고 싶은 두 선택지나 고민을 짧게 적어주세요.</p>
             </div>
 
             <div class="workspace-setup__topic">
@@ -33,6 +35,7 @@
                 placeholder="예: 오늘 점심 제육 vs 돈까스"
                 :disabled="isTopicInputLocked"
                 :input-props="{ id: 'topic', required: true }"
+                @keydown.enter.exact.prevent="submitTopicFromKeyboard"
               />
             </div>
 
@@ -73,7 +76,7 @@
 
           <div class="pipeline-candidate-grid">
             <NCard
-              v-for="candidate in candidateCards"
+              v-for="(candidate, index) in candidateCards"
               :key="candidate.id"
               class="pipeline-candidate-card new-candidate-card"
               :class="{
@@ -89,6 +92,11 @@
               @keydown.enter="selectCandidate(candidate)"
               @keydown.space.prevent="selectCandidate(candidate)"
             >
+              <div class="pipeline-candidate-card__meta">
+                <span>세부 주제 {{ index + 1 }}</span>
+                <span v-if="selectedCandidateId === candidate.id" class="pipeline-candidate-card__state">선택됨</span>
+                <span v-else-if="isCandidateUsed(candidate)" class="pipeline-candidate-card__state pipeline-candidate-card__state--muted">사용 완료</span>
+              </div>
               <strong>{{ candidate.candidateTitle }}</strong>
               <p>{{ candidate.scene }}</p>
             </NCard>
@@ -96,7 +104,7 @@
 
           <div class="pipeline-start-action">
             <NButton type="primary" strong :loading="isStartingDebate" :disabled="isStartingDebate || !selectedCandidate" @click="startDebate">
-              이 주제로 시작하기
+              토론 시작하기
             </NButton>
           </div>
         </NCard>
@@ -159,6 +167,7 @@ const selectedCandidate = computed(() => {
 
 async function generateCandidates() {
   if (isGeneratingCandidates.value || hasGeneratedCandidates.value) return
+  if (!topic.value.trim()) return
 
   hasGeneratedCandidates.value = false
   isGeneratingCandidates.value = true
@@ -173,6 +182,11 @@ async function generateCandidates() {
   } finally {
     isGeneratingCandidates.value = false
   }
+}
+
+function submitTopicFromKeyboard() {
+  if (isTopicInputLocked.value || !topic.value.trim()) return
+  generateCandidates()
 }
 
 async function loadExistingCandidateRun(runId) {
@@ -221,7 +235,7 @@ async function startDebate() {
       candidateRunId: debateStore.candidateRunId || null,
       selectedCandidateId: selectedCandidate.value.candidateId || null,
     })
-    router.push({
+    await router.push({
       path: `/debates/${debate.debateId}`,
       query: { starting: '1' },
     })

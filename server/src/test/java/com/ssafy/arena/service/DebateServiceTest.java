@@ -160,6 +160,60 @@ class DebateServiceTest {
     }
 
     @Test
+    void listMyDebatesIncludesRoundProgressAndSelectionScore() {
+        when(debateMapper.findSessionsByUserId(7L)).thenReturn(List.of(
+                DebateSession.builder()
+                        .id(3L)
+                        .userId(7L)
+                        .originalTopic("오늘 점심 제육 vs 돈까스")
+                        .topic("안정성 기준")
+                        .sideALabel("제육")
+                        .sideBLabel("돈까스")
+                        .mode(DebateMode.PRACTICAL)
+                        .status(DebateStatus.STOPPED)
+                        .selectedSide(Speaker.COOL_HEADED)
+                        .selectedRoundNo(1)
+                        .createdAt(LocalDateTime.of(2026, 6, 11, 12, 0))
+                        .stoppedAt(LocalDateTime.of(2026, 6, 11, 12, 30))
+                        .build(),
+                DebateSession.builder()
+                        .id(4L)
+                        .userId(7L)
+                        .originalTopic("오늘 점심 제육 vs 돈까스")
+                        .topic("만족감 기준")
+                        .sideALabel("제육")
+                        .sideBLabel("돈까스")
+                        .mode(DebateMode.PRACTICAL)
+                        .status(DebateStatus.STOPPED)
+                        .selectedSide(Speaker.PASSIONATE)
+                        .selectedRoundNo(2)
+                        .createdAt(LocalDateTime.of(2026, 6, 11, 13, 0))
+                        .stoppedAt(LocalDateTime.of(2026, 6, 11, 13, 30))
+                        .build(),
+                DebateSession.builder()
+                        .id(5L)
+                        .userId(7L)
+                        .originalTopic("오늘 점심 제육 vs 돈까스")
+                        .topic("회복 가능성 기준")
+                        .sideALabel("제육")
+                        .sideBLabel("돈까스")
+                        .mode(DebateMode.PRACTICAL)
+                        .status(DebateStatus.ACTIVE)
+                        .createdAt(LocalDateTime.of(2026, 6, 11, 14, 0))
+                        .build()
+        ));
+
+        DebateListItem item = debateService.listMyDebates(7L).get(0);
+
+        assertThat(item.debateId()).isEqualTo(5L);
+        assertThat(item.roundCount()).isEqualTo(3);
+        assertThat(item.coolCount()).isEqualTo(1);
+        assertThat(item.hotCount()).isEqualTo(1);
+        assertThat(item.sideALabel()).isEqualTo("제육");
+        assertThat(item.sideBLabel()).isEqualTo("돈까스");
+    }
+
+    @Test
     void createStoresPersistedSideLabels() {
         debateService.create(7L, new CreateDebateRequest(
                 "Lunch",
@@ -287,9 +341,9 @@ class DebateServiceTest {
         assertThat(savedPost.getTitle()).isEqualTo("오늘 점심 제육 vs 돈까스");
         assertThat(savedPost.getShareRoundNo()).isEqualTo(1);
         assertThat(savedPost.getSummaryCard()).isEqualTo("AI가 생성한 토론 요약");
-        assertThat(savedPost.getShareBody()).contains("세부주제\n점심 안정성");
-        assertThat(savedPost.getShareBody()).contains("상세설명\n오늘 점심 제육 vs 돈까스, 지금 바로 선택해야 한다면 무엇이 더 나은가");
-        assertThat(savedPost.getShareBody()).contains("본문\n내가 게시글에 직접 작성한 본문");
+        assertThat(savedPost.getShareBody()).isEqualTo("내가 게시글에 직접 작성한 본문");
+        assertThat(savedPost.getShareBody()).doesNotContain("세부주제");
+        assertThat(savedPost.getShareBody()).doesNotContain("상세설명");
         assertThat(savedPost.getShareBody()).doesNotContain("제육파:");
     }
 
@@ -327,7 +381,7 @@ class DebateServiceTest {
         ArgumentCaptor<Post> postCaptor = ArgumentCaptor.forClass(Post.class);
         verify(postMapper).insert(postCaptor.capture());
         assertThat(response.postId()).isEqualTo(78L);
-        assertThat(postCaptor.getValue().getShareBody()).contains("본문\n두 번째 공유 본문");
+        assertThat(postCaptor.getValue().getShareBody()).isEqualTo("두 번째 공유 본문");
     }
 
     @Test

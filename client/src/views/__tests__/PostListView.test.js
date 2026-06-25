@@ -26,7 +26,7 @@ describe('PostListView', () => {
     })
   })
 
-  it('shows shared body copy without vote widgets or summary copy on board cards', async () => {
+  it('shows shared body copy and vote ratios without the debate pill on board cards', async () => {
     const router = createRouter({
       history: createWebHistory(),
       routes: [
@@ -49,11 +49,12 @@ describe('PostListView', () => {
     expect(wrapper.text()).toContain('토론 결과가 커뮤니티로 이어집니다')
     expect(wrapper.text()).toContain('댓글 2')
     expect(wrapper.text()).toContain('점심을 고르는 기준이 매번 달라져서 공유합니다.')
+    expect(wrapper.findAll('.tag')).toHaveLength(1)
+    expect(wrapper.text()).toContain('제육 42%')
+    expect(wrapper.text()).toContain('돈까스 58%')
     expect(wrapper.text()).not.toContain('사용자 투표')
     expect(wrapper.text()).not.toContain('상세에서 투표하기')
     expect(wrapper.text()).not.toContain('안정성을 택하면 돈까스, 지금의 만족을 택하면 제육입니다.')
-    expect(wrapper.text()).not.toContain('42%')
-    expect(wrapper.text()).not.toContain('58%')
     expect(wrapper.text()).not.toContain('71%')
     expect(wrapper.text()).not.toContain('29%')
   })

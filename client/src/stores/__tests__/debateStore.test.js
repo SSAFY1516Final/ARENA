@@ -78,6 +78,11 @@ describe('debateStore', () => {
         status: 'ACTIVE',
         summaryCard: 'ACTIVE',
         shareBody: '',
+        sideALabel: '제육',
+        sideBLabel: '돈까스',
+        roundCount: 3,
+        coolCount: 2,
+        hotCount: 1,
         updatedAt: '2026-06-11T12:00:00',
       }],
     })
@@ -96,6 +101,11 @@ describe('debateStore', () => {
     expect(store.myDebates).toHaveLength(1)
     expect(store.myDebates[0].candidateRunId).toBe(100)
     expect(store.myDebates[0].selectedCandidateId).toBe(11)
+    expect(store.myDebates[0].sideALabel).toBe('제육')
+    expect(store.myDebates[0].sideBLabel).toBe('돈까스')
+    expect(store.myDebates[0].roundCount).toBe(3)
+    expect(store.myDebates[0].coolCount).toBe(2)
+    expect(store.myDebates[0].hotCount).toBe(1)
     expect(store.currentDebate.originalTopic).toContain('오타니')
     expect(store.currentDebate.topic).toContain('오타니')
     expect(store.messages[0].messageId).toBe(9)

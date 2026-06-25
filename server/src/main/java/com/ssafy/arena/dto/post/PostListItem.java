@@ -2,6 +2,7 @@ package com.ssafy.arena.dto.post;
 
 
 import com.ssafy.arena.domain.DebateMode;
+import com.ssafy.arena.domain.VoteChoice;
 import java.time.LocalDateTime;
 import lombok.Data;
 
@@ -21,5 +22,7 @@ public class PostListItem {
     private Integer voteCountB;
     private Double voteRatioA;
     private Double voteRatioB;
+    private VoteChoice userVoteChoice;
+    private Boolean isOwner = false;
     private LocalDateTime createdAt;
 }

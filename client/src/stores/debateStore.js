@@ -23,6 +23,9 @@ function mapDebate(debate) {
     selectedRoundNo: debate.selectedRoundNo || null,
     summaryCard: debate.summaryCard || debate.status,
     shareBody: debate.shareBody || '',
+    roundCount: Number(debate.roundCount) || 0,
+    coolCount: Number(debate.coolCount) || 0,
+    hotCount: Number(debate.hotCount) || 0,
     updatedAt: debate.updatedAt,
   }
 }

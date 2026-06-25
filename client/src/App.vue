@@ -23,10 +23,10 @@ const auth = useAuthStore()
 const authRouteNames = ['auth', 'kakao-callback']
 const naiveThemeOverrides = {
   common: {
-    primaryColor: '#3182f6',
-    primaryColorHover: '#1b64da',
+    primaryColor: '#256fdb',
+    primaryColorHover: '#1f5fc2',
     primaryColorPressed: '#174ea6',
-    primaryColorSuppl: '#3182f6',
+    primaryColorSuppl: '#256fdb',
     borderRadius: '8px',
     borderRadiusSmall: '6px',
     fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif',

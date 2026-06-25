@@ -19,11 +19,17 @@ public interface PostMapper {
 
     int countPosts(PostSearchCondition condition);
 
+    void deleteVotesByPostId(@Param("postId") Long postId);
+
+    void deleteCommentsByPostId(@Param("postId") Long postId);
+
     void deleteById(@Param("id") Long id);
 
     void updateVisibility(@Param("id") Long id, @Param("isPublic") boolean isPublic);
 
     Integer countVotes(@Param("postId") Long postId, @Param("choice") VoteChoice choice);
+
+    VoteChoice findVoteChoice(@Param("postId") Long postId, @Param("userId") Long userId);
 
     void upsertVote(@Param("postId") Long postId, @Param("userId") Long userId, @Param("choice") VoteChoice choice);
 }

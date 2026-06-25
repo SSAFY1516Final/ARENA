@@ -33,3 +33,4 @@ client/dist/
 client/.env
 client/.env.local
 client/coverage/
+.gstack/

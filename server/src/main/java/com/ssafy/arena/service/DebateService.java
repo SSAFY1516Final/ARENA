@@ -73,7 +73,16 @@ public class DebateService {
         );
 
         return latestSessionsByOriginalQuestion.values().stream()
-                .map(DebateListItem::from)
+                .map(session -> DebateListItem.from(session, roundSessionsFor(sessions, session)))
+                .toList();
+    }
+
+    private List<DebateSession> roundSessionsFor(List<DebateSession> sessions, DebateSession anchorSession) {
+        return sessions.stream()
+                .filter(session -> originalQuestionKey(session).equals(originalQuestionKey(anchorSession)))
+                .sorted(Comparator
+                        .comparing(DebateService::createdAtOf)
+                        .thenComparing(DebateService::sessionIdOf))
                 .toList();
     }
 
@@ -388,7 +397,7 @@ public class DebateService {
                 .shareRoundNo(shareRoundNo)
                 .title(sharePostTitle(targetSession, request.title()))
                 .summaryCard(summary.getSummaryText())
-                .shareBody(sharePostBody(targetSession, request.body()))
+                .shareBody(sharePostBody(request.body()))
                 .voteOptionA(request.voteOptionA())
                 .voteOptionB(request.voteOptionB())
                 .isPublic(request.isPublic())
@@ -452,32 +461,8 @@ public class DebateService {
         return firstPresent(session.getOriginalTopic(), session.getTopic(), fallbackTitle);
     }
 
-    private String shareRoundTitle(DebateSession session) {
-        return firstPresent(session.getRoundTitle(), session.getTopic(), session.getOriginalTopic());
-    }
-
-    private String shareRoundDescription(DebateSession session, String roundTitle) {
-        if (session.getTopic() != null && !session.getTopic().isBlank() && !session.getTopic().equals(roundTitle)) {
-            return session.getTopic().trim();
-        }
-        return firstPresent(session.getDebateAxis(), session.getBasicConditions());
-    }
-
-    private String sharePostBody(DebateSession session, String userBody) {
-        List<String> sections = new ArrayList<>();
-        String roundTitle = shareRoundTitle(session);
-        String roundDescription = shareRoundDescription(session, roundTitle);
-        if (!roundTitle.isBlank()) {
-            sections.add("세부주제\n" + roundTitle);
-        }
-        if (!roundDescription.isBlank()) {
-            sections.add("상세설명\n" + roundDescription);
-        }
-        String trimmedUserBody = blankToNull(userBody);
-        if (trimmedUserBody != null) {
-            sections.add("본문\n" + trimmedUserBody);
-        }
-        return sections.isEmpty() ? null : String.join("\n\n", sections);
+    private String sharePostBody(String userBody) {
+        return blankToNull(userBody);
     }
 
     private List<AiMessagePayload> toPayload(List<DebateMessage> messages) {

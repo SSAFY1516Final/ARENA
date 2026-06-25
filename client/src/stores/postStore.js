@@ -2,14 +2,22 @@ import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
 import { postApi } from '@/api/postApi'
 
+function normalizeShareBody(value) {
+  const body = value?.trim() || ''
+  const sectionMatch = body.match(/(?:^|\n)본문\s*\n([\s\S]*)$/)
+  return sectionMatch ? sectionMatch[1].trim() : body
+}
+
 function mapPost(post) {
+  const shareBody = normalizeShareBody(post.shareBody || post.body || '')
   return {
     ...post,
-    body: post.shareBody || post.body || post.summaryCard || '',
-    shareBody: post.shareBody || '',
+    body: shareBody || post.summaryCard || '',
+    shareBody,
     voteA: post.voteCountA || 0,
     voteB: post.voteCountB || 0,
-    userVoteChoice: null,
+    userVoteChoice: post.userVoteChoice || null,
+    isOwner: Boolean(post.isOwner ?? post.owner),
   }
 }
 
@@ -17,6 +25,7 @@ function mapComment(comment) {
   return {
     ...comment,
     author: comment.authorNickname,
+    isOwner: Boolean(comment.isOwner ?? comment.owner),
   }
 }
 
@@ -59,7 +68,7 @@ export const usePostStore = defineStore('post', () => {
       const { data } = await postApi.list(requestParams)
       posts.value = data.items.map((post) => ({
         ...mapPost(post),
-        userVoteChoice: userVotes.value[post.postId] || null,
+        userVoteChoice: post.userVoteChoice || userVotes.value[post.postId] || null,
       }))
       pagination.value = {
         page: data.page,
@@ -77,8 +86,9 @@ export const usePostStore = defineStore('post', () => {
     const post = mapPost(data.post)
     postDetail.value = {
       ...post,
-      userVoteChoice: userVotes.value[post.postId] || null,
+      userVoteChoice: post.userVoteChoice || userVotes.value[post.postId] || null,
       summary: data.summary,
+      round: data.round || null,
       messages: (data.messages || []).map(mapMessage),
       comments: (data.comments || []).map(mapComment),
     }
@@ -130,6 +140,29 @@ export const usePostStore = defineStore('post', () => {
   async function deletePost(postId) {
     await postApi.remove(postId)
     posts.value = posts.value.filter((post) => String(post.postId) !== String(postId))
+    if (String(postDetail.value?.postId) === String(postId)) {
+      postDetail.value = null
+    }
+  }
+
+  function addCommentToDetail(comment) {
+    if (!postDetail.value) return
+    if (postDetail.value.comments.some((item) => String(item.commentId) === String(comment.commentId))) return
+    postDetail.value = {
+      ...postDetail.value,
+      comments: [
+        ...postDetail.value.comments,
+        mapComment(comment),
+      ],
+    }
+  }
+
+  function removeCommentFromDetail(commentId) {
+    if (!postDetail.value) return
+    postDetail.value = {
+      ...postDetail.value,
+      comments: postDetail.value.comments.filter((comment) => String(comment.commentId) !== String(commentId)),
+    }
   }
 
   return {
@@ -145,5 +178,7 @@ export const usePostStore = defineStore('post', () => {
     vote,
     createSharedPost,
     deletePost,
+    addCommentToDetail,
+    removeCommentFromDetail,
   }
 })

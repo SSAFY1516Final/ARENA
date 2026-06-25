@@ -21,7 +21,7 @@
         <div v-else class="message-list debate-message-stream">
           <div v-if="showInitialGenerationLoading" class="debate-room-start-loading" role="status" aria-live="polite">
             <strong>토론 대결을 준비중입니다</strong>
-            <span>AI가 첫 발화를 준비하고 있어요. 1분 정도 소요될 수 있습니다. 화면을 떠나도 서버에서 계속 저장됩니다.</span>
+            <span>토론을 준비중입니다. 30초에서 1분 정도 소요됩니다. 화면을 떠나도 중단되지 않습니다.</span>
             <div class="new-generation-loading__progress" aria-hidden="true">
               <span></span>
             </div>
@@ -144,8 +144,10 @@ const flowStep = ref('chat')
 const turnGenerationError = ref('')
 let revealTimer = null
 let unmounted = false
+let removeNavigationGuard = null
 const MESSAGE_TYPING_DELAY_MS = 2000
 const GENERATION_POLL_INTERVAL_MS = 2000
+const INITIAL_GENERATION_TIMEOUT_MS = 90000
 const CHOICE_TRANSITION_DELAY_MS = 250
 
 const openedFromRecentDebates = computed(() => route.query.from === 'recent')
@@ -207,6 +209,7 @@ const displayTypingSpeaker = computed(() => {
   if (
     flowStep.value === 'chat' &&
     debateStore.currentDebate.status === 'ACTIVE' &&
+    !turnGenerationError.value &&
     !autoRunning.value &&
     !debateStore.turnLoading &&
     !openedFromRecentDebates.value &&
@@ -229,6 +232,7 @@ const debateMessages = computed(() => {
 })
 
 onMounted(async () => {
+  installNavigationGuard()
   await debateStore.fetchDebate(route.params.debateId)
   visibleMessages.value = []
   turnGenerationError.value = ''
@@ -258,7 +262,28 @@ onBeforeUnmount(() => {
   if (revealTimer) {
     clearTimeout(revealTimer)
   }
+  if (removeNavigationGuard) {
+    removeNavigationGuard()
+    removeNavigationGuard = null
+  }
 })
+
+function installNavigationGuard() {
+  if (removeNavigationGuard) return
+  removeNavigationGuard = router.beforeEach((to, from) => {
+    if (from.path !== route.path) return true
+    const isReturningToCandidateSelection = to.path === '/new' && to.fullPath !== '/new'
+    if (
+      !openedFromRecentDebates.value &&
+      route.query.starting === '1' &&
+      !selectedSide.value &&
+      isReturningToCandidateSelection
+    ) {
+      return false
+    }
+    return true
+  })
+}
 
 function wait(ms) {
   return new Promise((resolve) => {
@@ -292,13 +317,22 @@ async function revealStoredMessages() {
 }
 
 async function waitForInitialGenerationToComplete() {
+  const startedAt = Date.now()
   while (!unmounted && debateMessages.value.length < targetTurnCount.value) {
+    if (Date.now() - startedAt >= INITIAL_GENERATION_TIMEOUT_MS) {
+      setInitialGenerationError()
+      return false
+    }
     await wait(GENERATION_POLL_INTERVAL_MS)
     if (unmounted) return false
     try {
-      await debateStore.fetchDebate(route.params.debateId)
+      const generation = await debateStore.generateInitialTurns(route.params.debateId)
+      if (generation.status === 'FAILED') {
+        setInitialGenerationError()
+        return false
+      }
     } catch {
-      turnGenerationError.value = 'AI response generation failed. Please try again.'
+      setInitialGenerationError()
       return false
     }
   }
@@ -316,12 +350,16 @@ async function runAutoDebate() {
       initialGenerationPending.value = true
       try {
         const generation = await debateStore.generateInitialTurns(route.params.debateId)
+        if (generation.status === 'FAILED') {
+          setInitialGenerationError()
+          return
+        }
         if (generation.status !== 'COMPLETE' || debateMessages.value.length < targetTurnCount.value) {
           const completed = await waitForInitialGenerationToComplete()
           if (!completed) return
         }
       } catch (error) {
-        turnGenerationError.value = 'AI response generation failed. Please try again.'
+        setInitialGenerationError()
         return
       } finally {
         initialGenerationPending.value = false
@@ -334,6 +372,10 @@ async function runAutoDebate() {
     autoRunning.value = false
     openDecisionStepIfReady()
   }
+}
+
+function setInitialGenerationError() {
+  turnGenerationError.value = '토론 생성에 실패했습니다. 잠시 후 다시 시도해주세요.'
 }
 
 function openDecisionStepIfReady() {

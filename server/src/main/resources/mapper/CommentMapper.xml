@@ -17,6 +17,7 @@
     <select id="findByPostId" resultType="com.ssafy.arena.dto.comment.CommentResponse">
         SELECT c.id AS comment_id,
                c.post_id,
+               c.user_id AS author_user_id,
                u.nickname AS author_nickname,
                c.content,
                c.created_at
