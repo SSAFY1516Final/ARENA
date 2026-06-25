@@ -1,196 +1,165 @@
-# ARENA - AI Debate Community
+# ARENA
 
-SSAFY 15기 서울 16반 관통 프로젝트 제출 저장소입니다. ARENA는 사용자가 선택하기 어려운 주제를 입력하면 두 AI 페르소나가 서로 다른 관점으로 토론하고, 토론 결과를 게시글로 공유해 다른 사용자의 투표와 의견을 받을 수 있는 서비스입니다.
+AI가 대신 싸워주는 선택형 토론 커뮤니티
 
-## 제출 요약
+ARENA는 혼자 결정하기 애매한 주제를 입력하면 AI가 서로 다른 관점으로 토론하고, 사용자는 그 과정을 보며 더 나은 선택을 할 수 있도록 돕는 서비스입니다. 토론이 끝난 뒤에는 결과를 게시판에 공유해 다른 사용자들의 투표와 댓글까지 받을 수 있습니다.
 
-| 항목 | 위치 | 상태 |
-| --- | --- | --- |
-| Spring Boot 백엔드 | `server/` | Spring Security, JWT, Kakao OAuth, MyBatis, Spring AI 베이스 환경 반영 |
-| Vue 프론트엔드 | `client/` | Kakao 로그인, 닉네임 수정, 선택형 토론 생성 목업, 게시글 화면 흐름 반영 |
-| 요구사항 정의서 | `docs/deliverables/requirements/arena-requirements.md` | 현재 서비스 방향 기준 보정 완료 |
-| 유즈케이스 다이어그램 | `docs/deliverables/use-cases/arena-use-cases.md` | Actor, 주요 기능, Mermaid 원본 포함 |
-| ERD | `docs/deliverables/erd/arena-erd.md` | Kakao OAuth 사용자 모델 및 JWT 인증 흐름 기준 보정 |
-| WBS | `docs/deliverables/wbs/arena-wbs.xlsx` | 카카오 로그인, 관리자 기능, Spring AI 베이스 기준 보정 |
-| 간트차트 | `docs/deliverables/gantt/arena-gantt.xlsx` | 현재 개발 흐름 기준 보정 |
-| 화면설계서 | `docs/deliverables/screen-definition/figma-screen-definition.md` | Vue 화면 구조와 사용자 흐름 기준 보정 |
-| API 설계서 | `docs/deliverables/api/arena-rest-api.md` | 현재 REST API 기준 보정 |
-| 최종 검증 기록 | `docs/deliverables/test-report.md` | 테스트/빌드/브라우저 확인 결과 정리 |
+## 한 줄 소개
 
-전체 산출물 색인은 [docs/deliverables/README.md](docs/deliverables/README.md)를 참고합니다.
+> "오늘 점심 뭐 먹지?" 같은 가벼운 고민부터 여행, 소비, 생활 선택까지 AI 토론과 커뮤니티 반응으로 결정 과정을 구조화하는 서비스
 
-## 프로젝트 개요
+## 왜 만들었나
 
-- 프로젝트명: ARENA
-- 팀: Java_Seoul_16_Jaeyoung_Minyong
-- 주제: AI 기반 선택 토론 커뮤니티
-- 인증 방식: Kakao OAuth 로그인 후 자체 JWT 발급
-- 핵심 기능: 선택형 후보 기반 토론 생성, AI 토론 진행/요약, 게시글 공유, 투표/댓글, 관리자 권한 관리
-- 제출 범위: Spring Boot REST API, Vue 3 프론트엔드, Spring Security + JWT, MyBatis, Spring AI 베이스 환경, 제출 산출물
+일상적인 선택은 단순해 보여도 막상 결정하려면 기준이 흩어지기 쉽습니다.
 
-## 기술 스택
+- 선택지가 많을수록 비교 기준이 흐려집니다.
+- 주변 의견을 묻더라도 근거가 정리되지 않는 경우가 많습니다.
+- AI에게 물어보면 답은 얻을 수 있지만, 찬반 관점의 충돌 과정은 잘 보이지 않습니다.
 
-| 영역 | 기술 |
+ARENA는 이 문제를 "AI 토론" 형식으로 풀었습니다. 한쪽 결론만 제시하는 대신 서로 다른 입장이 라운드별로 주장하고, 사용자는 그 흐름을 보며 판단할 수 있습니다.
+
+## 핵심 사용자 흐름
+
+1. 카카오 로그인으로 서비스에 입장합니다.
+2. 고민 중인 큰 주제를 입력합니다.
+3. AI가 토론하기 좋은 세부 질문 후보를 생성합니다.
+4. 사용자는 후보 중 하나를 선택해 토론을 시작합니다.
+5. 두 AI 페르소나가 서로 다른 입장에서 라운드별로 토론합니다.
+6. 사용자는 토론을 중단하고 AI 요약 결과를 확인합니다.
+7. 결과를 게시판에 공유해 투표와 댓글을 받을 수 있습니다.
+
+## 주요 화면
+
+| 화면 | 역할 |
 | --- | --- |
-| Server | Java 17, Spring Boot 3, Spring Security, Spring AI |
-| Auth | Kakao OAuth 2.0, JWT |
-| Persistence | MySQL 8, MyBatis |
-| Infra | Docker Compose |
-| Client | Vue 3, Vite, Pinia, Axios |
-| Docs | Markdown, Mermaid, Excel, PNG |
+| 메인/새 토론 | 사용자가 주제를 입력하고 AI가 생성한 세부 토론 후보를 선택 |
+| 토론방 | 두 AI 페르소나의 라운드별 발화를 확인 |
+| 결과 페이지 | 토론 요약, 선택 근거, 공유 진입점을 제공 |
+| 내 토론 | 내가 만든 토론을 다시 열람하고 이어보기 |
+| 게시판 | 공유된 토론 결과를 보고 투표와 댓글로 참여 |
 
-## 주요 기능
+## 핵심 기능
 
-### 사용자 기능
+### AI 토론 생성
 
-- 카카오 OAuth 로그인
+- 사용자가 입력한 주제를 기반으로 토론 가능한 세부 질문 후보를 생성합니다.
+- 각 후보는 선택 기준이 분명한 형태로 제시되어 바로 토론으로 이어질 수 있습니다.
+- AI 응답은 프롬프트 템플릿과 응답 파싱 계층을 통해 서비스 흐름에 맞게 정리됩니다.
+
+### 라운드형 AI 토론
+
+- 두 AI 페르소나가 서로 다른 선택지를 대표합니다.
+- 토론은 라운드 단위로 진행되며, 사용자는 중간에 종료하고 요약을 받을 수 있습니다.
+- 진행 라운드와 선택 현황을 통해 토론의 흐름을 쉽게 파악할 수 있습니다.
+
+### 커뮤니티 공유
+
+- 종료된 토론 결과는 게시글로 공유할 수 있습니다.
+- 다른 사용자는 게시글에서 투표하고 댓글을 남길 수 있습니다.
+- 개인의 선택 고민이 커뮤니티의 판단 데이터로 확장됩니다.
+
+### 사용자 경험
+
+- 카카오 OAuth 기반 로그인
 - JWT 기반 API 인증
-- 내 닉네임 조회 및 수정
-- 내 토론 목록 조회
-- 주제/상황/세부조건 기반 후보 선택형 토론 생성
-- AI 발화 요청
-- 토론 중단 후 AI 요약 생성
-- 요약 결과 게시글 공유
-- 공개 게시글 조회, 투표, 댓글 작성
+- 닉네임 수정
+- 내 토론 목록 관리
+- 반응형 Vue UI
 
-### 관리자 기능
+## 기술 구성
 
-- 전체 사용자 조회
-- 사용자 권한 변경
-- 게시글 공개 여부 관리
-- 사용자/콘텐츠 관리 기능 확장 기반 제공
+| 영역 | 사용 기술 |
+| --- | --- |
+| Frontend | Vue 3, Vite, Pinia, Axios, Naive UI |
+| Backend | Java 17, Spring Boot 3, Spring Security |
+| AI | Spring AI 기반 AI 클라이언트, 프롬프트 템플릿, 응답 파싱 |
+| Database | MySQL 8, MyBatis |
+| Auth | Kakao OAuth, JWT |
+| Infra | Docker Compose |
+| Test | Vitest, JUnit |
 
-### AI 기능
+## 아키텍처 개요
 
-- Spring AI 연동을 위한 최소 베이스 환경 구성
-- 토론 발화 생성 및 요약 생성을 담당하는 AI 클라이언트 추상화
-- `/new` 화면은 선택형 후보 파이프라인을 목업으로 노출
-- 실제 선택형 주제 후보 생성 등 고도화 파이프라인은 `ai-experiment-choice-pipeline` 브랜치에 별도 보존
-
-## 실행 환경 변수
-
-실행 전 `.env` 또는 실행 환경에 다음 값을 설정합니다. 실제 키 값은 저장소에 커밋하지 않습니다.
-
-```bash
-JWT_SECRET=change-this-to-a-long-random-secret-key-32chars
-JWT_EXPIRATION_SECONDS=86400
-
-GMS_KEY=...
-GMS_BASE_URL=https://gms.ssafy.io/gmsapi/api.openai.com
-GMS_COMPLETIONS_PATH=/v1/chat/completions
-GMS_MODEL=gpt-5.4-mini
-CORS_ALLOWED_ORIGINS=http://localhost:5173,http://127.0.0.1:5173,http://localhost:15173
-
-KAKAO_REST_API_KEY=...
-KAKAO_CLIENT_SECRET=...
-KAKAO_REDIRECT_URI=http://localhost:5173/auth/kakao/callback
+```text
+User
+  │
+  ▼
+Vue Client
+  │  Kakao OAuth / JWT
+  ▼
+Spring Boot API
+  ├─ Auth / User
+  ├─ Debate
+  ├─ AI Prompt Pipeline
+  ├─ Post / Vote / Comment
+  └─ Admin
+  │
+  ├─ MySQL
+  └─ External AI API
 ```
 
-프론트 개발 서버를 `15173` 포트로 실행하는 경우 Kakao Developers에도 다음 값을 함께 등록합니다.
+상세 아키텍처와 다이어그램은 [docs/architecture](docs/architecture)를 참고합니다.
 
-- Redirect URI: `http://localhost:15173/auth/kakao/callback`
-- Web domain: `http://localhost:15173`
+## 시연 포인트
 
-## 실행 방법
+발표나 데모에서는 아래 흐름으로 보면 서비스 의도가 가장 잘 드러납니다.
 
-Docker Compose를 사용하는 경우:
-
-```bash
-docker compose up -d --build
-```
-
-백엔드만 로컬로 실행하는 경우:
-
-```bash
-cd server
-./gradlew bootRun
-```
-
-프론트 개발 서버:
-
-```bash
-cd client
-npm ci
-npm run dev
-```
-
-테스트:
-
-```bash
-cd server
-./gradlew test
-
-cd ../client
-npm ci
-npm test -- --run
-```
+1. 로그인 후 새 토론 화면에서 고민 주제를 입력합니다.
+2. AI가 생성한 세부 질문 후보를 확인합니다.
+3. 후보를 선택해 토론방으로 이동합니다.
+4. AI 양측의 발화를 보고 토론을 종료합니다.
+5. 결과 페이지에서 요약과 선택 근거를 확인합니다.
+6. 게시판에 공유된 토론에서 투표/댓글 참여 흐름을 확인합니다.
+7. 내 토론에서 이전 토론이 관리되는 방식을 확인합니다.
 
 ## 프로젝트 구조
 
 ```text
 .
-├── client/                 # Vue 3 + Vite 프론트엔드
+├── client/                 # Vue 3 프론트엔드
 ├── server/                 # Spring Boot 백엔드
-├── docs/                   # 설계 문서 및 제출 산출물
-│   ├── auth-design.md      # 인증/인가 설계
-│   ├── ai-design.md        # Spring AI 설계
-│   ├── api.md              # API 명세
-│   └── deliverables/       # 요구사항, ERD, WBS, 간트차트, 화면설계서
-├── docker-compose.yml      # MySQL + Spring Boot 실행
+├── docs/                   # 설계 문서와 발표/제출 산출물
+│   ├── architecture/       # 아키텍처, 기술 스택, AI 파이프라인 문서
+│   └── deliverables/       # 요구사항, ERD, API, WBS, 간트차트 등
+├── docker-compose.yml      # MySQL + API + Client 실행 구성
 └── README.md
 ```
 
-## Kakao OAuth 로컬 설정
+## 문서 바로가기
 
-Kakao Developers 콘솔에서 다음 설정이 필요합니다.
+- [요구사항 정의서](docs/deliverables/requirements/arena-requirements.md)
+- [API 설계서](docs/deliverables/api/arena-rest-api.md)
+- [ERD](docs/deliverables/erd/arena-erd.md)
+- [유즈케이스](docs/deliverables/use-cases/arena-use-cases.md)
+- [화면설계서](docs/deliverables/screen-definition/figma-screen-definition.md)
+- [최종 검증 기록](docs/deliverables/test-report.md)
+- [산출물 목록](docs/deliverables/README.md)
 
-- 카카오 로그인 사용 설정: ON
-- REST API 키의 카카오 로그인 리다이렉트 URI:
-  - `http://localhost:5173/auth/kakao/callback`
-- 웹 도메인:
-  - `http://localhost:5173`
-- 클라이언트 시크릿을 ON으로 둔 경우 백엔드 `KAKAO_CLIENT_SECRET`에 동일 값 설정
+## 실행 방법
 
-## API 요약
+전체 서비스를 Docker Compose로 실행할 수 있습니다.
 
-| Method | Path | 설명 | 인증 |
-| --- | --- | --- | --- |
-| POST | `/api/auth/kakao` | 카카오 인가 코드로 JWT 발급 | Public |
-| POST | `/api/auth/logout` | 클라이언트 토큰 폐기 흐름 | USER |
-| GET | `/api/users/me` | 내 프로필 조회 | USER |
-| PATCH | `/api/users/me/nickname` | 내 닉네임 수정 | USER |
-| GET | `/api/debates` | 내 토론 목록 조회 | USER |
-| POST | `/api/debates` | 토론 생성 | USER |
-| POST | `/api/debates/{id}/turns` | AI 다음 발화 생성 | USER |
-| POST | `/api/debates/{id}/stop` | 토론 종료 및 요약 생성 | USER |
-| POST | `/api/debates/{id}/share` | 토론 요약 게시글 공유 | USER |
-| GET | `/api/posts` | 공개 게시글 목록 | Public |
-| POST | `/api/posts/{id}/votes` | 게시글 투표 | USER |
-| POST | `/api/posts/{id}/comments` | 댓글 작성 | USER |
-| GET | `/api/admin/users` | 사용자 목록 관리 | ADMIN |
+```bash
+docker compose up -d --build
+```
 
-상세 내용은 [docs/deliverables/api/arena-rest-api.md](docs/deliverables/api/arena-rest-api.md)를 참고합니다.
+기본 접속 주소:
 
-## 제출 체크리스트
+- Client: `http://localhost:15173`
+- API: `http://localhost:8080`
+- MySQL: `localhost:3306`
 
-- [x] 요구사항 정의서
-- [x] 유즈케이스 문서 및 다이어그램
-- [x] ERD
-- [x] WBS
-- [x] 간트차트
-- [x] 화면설계서
-- [x] 인증/인가 설계 문서
-- [x] 사용자 권한 설계
-- [x] Spring AI 베이스 설계
-- [x] API 설계서
-- [x] README 정리
-- [x] 선택형 토론 생성 화면 목업 반영
-- [x] 닉네임 수정 기능 문서 반영
-- [x] 최종 실행 캡처 또는 테스트 로그 정리
+실행에는 Kakao OAuth 키, JWT secret, AI API 키가 필요합니다. 실제 키 값은 저장소에 포함하지 않습니다.
 
-## 브랜치 전략
+## 팀과 제출 범위
 
-- `master`: 제출 및 최종 안정 버전
-- `dev`: 문서/기능 통합 작업 브랜치
-- `ai-experiment-choice-pipeline`: 고도화 AI 파이프라인 실험 브랜치
-- 기능 작업 브랜치는 필요 시 `feat/*`, `fix/*`, `docs/*` 형식 사용
+- 프로젝트명: ARENA
+- 팀: Java_Seoul_16_Jaeyoung_Minyong
+- 주제: AI 기반 선택 토론 커뮤니티
+- 제출 범위: Vue 프론트엔드, Spring Boot REST API, Kakao OAuth/JWT 인증, MySQL/MyBatis, Spring AI 기반 토론 생성 흐름, 설계 산출물
+
+## 브랜치 기준
+
+- `master`: 최종 제출 및 안정 버전
+- `dev`: 통합 개발 브랜치
+- 실험성 AI 파이프라인은 별도 브랜치에서 비교 개발 후 필요한 범위만 통합합니다.

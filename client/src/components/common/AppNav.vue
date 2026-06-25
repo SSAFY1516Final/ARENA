@@ -11,7 +11,6 @@
     </nav>
 
     <div class="nav-user">
-      <RouterLink v-if="auth.isAuthenticated" class="nav-action-link" to="/new">토론 만들기</RouterLink>
       <div v-if="auth.isAuthenticated" class="profile-menu">
         <button
           class="profile-chip"

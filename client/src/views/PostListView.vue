@@ -6,10 +6,9 @@
         <h1>공유된 토론</h1>
         <p class="page-copy">토론 결과가 커뮤니티로 이어집니다. 공유된 판단 기준과 투표 흐름을 확인하세요.</p>
       </div>
-      <RouterLink class="button" to="/new">새 토론</RouterLink>
     </section>
 
-    <section class="toolbar" aria-label="게시글 검색과 필터">
+    <section class="toolbar post-toolbar" aria-label="게시글 검색과 필터">
       <input v-model="filters.keyword" class="input" placeholder="검색어를 입력하세요" @keyup.enter="search" />
       <select v-model="filters.mode" class="select" @change="search">
         <option value="ALL">전체</option>

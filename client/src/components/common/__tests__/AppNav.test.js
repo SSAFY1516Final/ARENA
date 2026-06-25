@@ -46,7 +46,7 @@ describe('AppNav', () => {
     expect(wrapper.find('.profile-chip').text()).toContain('kakao_12345')
     expect(wrapper.find('.profile-chip').classes()).not.toContain('router-link-active')
     expect(wrapper.find('a.nav-create-link[href="/new"]').exists()).toBe(false)
-    expect(wrapper.get('a.nav-action-link[href="/new"]').text()).toContain('토론 만들기')
+    expect(wrapper.find('a.nav-action-link[href="/new"]').exists()).toBe(false)
     expect(wrapper.get('button.logout-button').text()).toContain('로그아웃')
   })
 

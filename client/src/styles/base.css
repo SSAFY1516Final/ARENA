@@ -3063,16 +3063,37 @@ p {
   margin-bottom: 0;
 }
 
+.post-toolbar {
+  width: min(100%, 430px);
+  justify-content: flex-end;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.post-toolbar .input {
+  flex: 1 1 150px;
+  min-width: 0;
+}
+
+.post-toolbar .select {
+  width: 82px;
+}
+
+.post-toolbar .button {
+  min-height: 42px;
+  padding: 0 14px;
+}
+
 .post-card {
   position: relative;
   display: block;
   min-height: 236px;
-  padding: 24px 24px 22px;
+  padding: 25px 25px 22px;
   overflow: hidden;
-  border: 1px solid #d8e3f0;
+  border: 1px solid #d7e0eb;
   border-radius: var(--radius-card);
-  background: #ffffff;
-  box-shadow: 0 1px 2px rgba(25, 31, 40, 0.03), 0 8px 18px rgba(25, 31, 40, 0.035);
+  background: linear-gradient(180deg, #ffffff 0%, #fbfcfe 100%);
+  box-shadow: 0 1px 2px rgba(25, 31, 40, 0.035), 0 10px 24px rgba(25, 31, 40, 0.045);
   transition:
     background 0.16s ease,
     border-color 0.16s ease,
@@ -3084,9 +3105,9 @@ p {
   content: "";
   position: absolute;
   inset: 0 0 auto 0;
-  height: 2px;
-  background: linear-gradient(90deg, #3182f6 0%, rgba(49, 130, 246, 0.18) 100%);
-  opacity: 0.72;
+  height: 3px;
+  background: linear-gradient(90deg, #64748b 0%, rgba(100, 116, 139, 0.16) 100%);
+  opacity: 0.8;
 }
 
 .debates-page {
@@ -3104,6 +3125,7 @@ p {
 
 .debates-header h1 {
   margin-top: 4px;
+  margin-bottom: 10px;
   color: var(--ink);
   font-size: 36px;
   line-height: 1.14;
@@ -3111,12 +3133,12 @@ p {
 }
 
 .debates-board-card {
-  border: 1px solid rgba(199, 210, 223, 0.78);
+  border: 1px solid #d7e0eb;
   border-radius: 8px;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.99) 0%, rgba(249, 251, 254, 0.99) 100%),
-    radial-gradient(circle at 0% 0%, rgba(49, 130, 246, 0.06), transparent 34%);
-  box-shadow: var(--shadow-card);
+    linear-gradient(180deg, #ffffff 0%, #fbfcff 100%),
+    radial-gradient(circle at 0% 0%, rgba(49, 130, 246, 0.045), transparent 35%);
+  box-shadow: 0 1px 2px rgba(25, 31, 40, 0.035), 0 12px 28px rgba(25, 31, 40, 0.055);
 }
 
 .debates-board-card .n-card__content {
@@ -3158,10 +3180,10 @@ p {
   height: 100%;
   min-height: 194px;
   overflow: hidden;
-  border: 1px solid #d8e3f0;
+  border: 1px solid #d7e0eb;
   border-radius: var(--radius-card);
-  background: #ffffff;
-  box-shadow: 0 1px 2px rgba(25, 31, 40, 0.04), 0 8px 20px rgba(25, 31, 40, 0.04);
+  background: linear-gradient(180deg, #ffffff 0%, #fbfdff 100%);
+  box-shadow: 0 1px 2px rgba(25, 31, 40, 0.035), 0 10px 24px rgba(25, 31, 40, 0.045);
   cursor: pointer;
   transition:
     background 0.16s ease,
@@ -3175,8 +3197,8 @@ p {
   position: absolute;
   inset: 0 0 auto 0;
   height: 3px;
-  background: #3182f6;
-  opacity: 0.85;
+  background: linear-gradient(90deg, #3182f6 0%, rgba(49, 130, 246, 0.18) 100%);
+  opacity: 0.88;
 }
 
 .my-debate-card::after {
@@ -3439,8 +3461,8 @@ p {
 .post-card:hover {
   transform: translateY(-1px);
   border-color: #b8cbe2;
-  background: #fbfdff;
-  box-shadow: 0 12px 28px rgba(25, 31, 40, 0.065);
+  background: #ffffff;
+  box-shadow: 0 14px 30px rgba(25, 31, 40, 0.075);
 }
 
 .post-card h2 {
@@ -3519,9 +3541,9 @@ p {
   align-items: center;
   padding: 0 11px;
   border-radius: 999px;
-  border: 1px solid #dce6f1;
-  background: #ffffff;
-  color: #4e5968;
+  border: 1px solid #d8e1ec;
+  background: #f8fafc;
+  color: #475569;
   font-size: 12px;
   font-weight: 900;
 }

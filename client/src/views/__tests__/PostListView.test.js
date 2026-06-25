@@ -47,6 +47,9 @@ describe('PostListView', () => {
 
     expect(wrapper.text()).toContain('공유된 토론')
     expect(wrapper.text()).toContain('토론 결과가 커뮤니티로 이어집니다')
+    expect(wrapper.find('.post-toolbar').exists()).toBe(true)
+    expect(wrapper.find('.new-debate-button-link').exists()).toBe(false)
+    expect(wrapper.text()).not.toContain('새 토론 시작')
     expect(wrapper.text()).toContain('댓글 2')
     expect(wrapper.text()).toContain('점심을 고르는 기준이 매번 달라져서 공유합니다.')
     expect(wrapper.findAll('.tag')).toHaveLength(1)

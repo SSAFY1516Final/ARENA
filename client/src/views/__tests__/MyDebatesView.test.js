@@ -98,6 +98,7 @@ describe('MyDebatesView', () => {
 
     expect(wrapper.find('.debates-page').exists()).toBe(true)
     expect(wrapper.find('.debates-header').exists()).toBe(true)
+    expect(wrapper.find('.debates-header .eyebrow').text()).toBe('Recent debates')
     expect(wrapper.find('.debates-board-card').exists()).toBe(true)
     expect(wrapper.findComponent(NGrid).exists()).toBe(true)
     expect(wrapper.findAllComponents(NGridItem)).toHaveLength(3)
