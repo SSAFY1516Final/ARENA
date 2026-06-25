@@ -16,6 +16,15 @@
     </section>
 
     <template v-else>
+      <div class="result-topbar">
+        <button
+          class="debate-action-button debate-action-button--secondary result-exit-button"
+          type="button"
+          @click="exitToMyDebates"
+        >
+          나가기
+        </button>
+      </div>
       <section class="result-summary-card result-hero-card">
         <div class="result-topic-copy">
           <span class="section-label">토론 결과</span>
@@ -35,9 +44,9 @@
               </div>
             </div>
           </div>
-          <div v-if="summaryText" class="result-summary-note">
+          <div v-if="summaryText || isSummaryPending" class="result-summary-note">
             <span class="section-label">요약</span>
-            <p>{{ summaryText }}</p>
+            <p>{{ summaryText || '요약 중...' }}</p>
           </div>
           <div v-if="selectedRoundMessages.length" class="message-list debate-message-stream">
             <DebateMessage
@@ -176,15 +185,25 @@ const roomTopic = computed(() => debateStore.currentDebate.topic || '토론 결�
 const resultHeaderTitle = computed(() => {
   return originalTopic.value || debateStore.currentDebate.originalTopic || debateStore.currentDebate.topic || '토론 결과'
 })
-const selectedSide = computed(() => {
-  if (debateStore.currentDebate.selectedSide === 'PASSIONATE') return 'PASSIONATE'
-  if (debateStore.currentDebate.selectedSide === 'COOL_HEADED') return 'COOL_HEADED'
+const frontendSelectedSide = computed(() => {
   if (route.query.choice === 'PASSIONATE') return 'PASSIONATE'
   if (route.query.choice === 'COOL_HEADED') return 'COOL_HEADED'
   if (storedChoice.value === 'PASSIONATE') return 'PASSIONATE'
   if (storedChoice.value === 'COOL_HEADED') return 'COOL_HEADED'
   return ''
 })
+const serverSelectedSide = computed(() => {
+  if (debateStore.currentDebate.selectedSide === 'PASSIONATE') return 'PASSIONATE'
+  if (debateStore.currentDebate.selectedSide === 'COOL_HEADED') return 'COOL_HEADED'
+  return ''
+})
+const selectedSide = computed(() => {
+  if (debateStore.currentDebate.status === 'ACTIVE' && frontendSelectedSide.value) {
+    return frontendSelectedSide.value
+  }
+  return serverSelectedSide.value || frontendSelectedSide.value
+})
+const isPendingFrontendSelection = computed(() => debateStore.currentDebate.status === 'ACTIVE' && Boolean(frontendSelectedSide.value))
 const selectedRoundSide = computed(() => sideForRound(selectedRound.value))
 const selectedRoundSideLabel = computed(() => sideLabels.value[selectedRoundSide.value] || '선택 기록 없음')
 const selectedSidePillClass = computed(() => `result-selected-side-pill--${toneForSide(selectedRoundSide.value)}`)
@@ -224,7 +243,7 @@ const selectedRoundMessages = computed(() => {
 })
 const choiceScore = computed(() => {
   return rounds.value.reduce((score, round) => {
-    const side = normalizedSide(round.selectedSide)
+    const side = sideForRound(round)
     if (side === 'COOL_HEADED') {
       score.cool += 1
     }
@@ -260,6 +279,7 @@ const selectedDetailDescription = computed(() => {
 })
 const selectedRoundSummary = computed(() => selectedRound.value?.summary || null)
 const summaryText = computed(() => selectedRoundSummary.value?.summaryText || debateStore.summary?.summaryText || '')
+const isSummaryPending = computed(() => !summaryText.value && debateStore.currentDebate.status === 'ACTIVE')
 const canShareSelectedRound = computed(() => {
   return Boolean(
     selectedRoundMessages.value.length
@@ -287,9 +307,11 @@ async function loadDebateResult(options = {}) {
 
   try {
     await debateStore.fetchDebate(route.params.debateId)
-    const persistedRoundNo = normalizeRoundNo(debateStore.currentDebate.selectedRoundNo)
-    const fallbackRoundNo = availableRoundNos.value[availableRoundNos.value.length - 1] || 1
-    selectedRoundNo.value = availableRoundNos.value.includes(persistedRoundNo)
+    const persistedRoundNo = persistedSelectedRoundNo()
+    const fallbackRoundNo = isPendingFrontendSelection.value
+      ? availableRoundNos.value[availableRoundNos.value.length - 1] || 1
+      : availableRoundNos.value[0] || 1
+    selectedRoundNo.value = persistedRoundNo && availableRoundNos.value.includes(persistedRoundNo)
       ? persistedRoundNo
       : fallbackRoundNo
     fetchError.value = ''
@@ -326,6 +348,11 @@ function normalizeRoundNo(roundNo) {
   return Number.isFinite(normalized) && normalized > 0 ? normalized : 1
 }
 
+function persistedSelectedRoundNo() {
+  const normalized = Number(debateStore.currentDebate.selectedRoundNo)
+  return Number.isFinite(normalized) && normalized > 0 ? normalized : null
+}
+
 function normalizedSide(side) {
   if (side === 'PASSIONATE') return 'PASSIONATE'
   if (side === 'COOL_HEADED') return 'COOL_HEADED'
@@ -342,6 +369,13 @@ function sideForRound(round) {
   const explicitSide = normalizedSide(round?.selectedSide)
   if (explicitSide) {
     return explicitSide
+  }
+  if (
+    debateStore.currentDebate.status === 'ACTIVE' &&
+    frontendSelectedSide.value &&
+    round?.roundNo === selectedRoundNo.value
+  ) {
+    return frontendSelectedSide.value
   }
   if (!hasExplicitRoundSelection.value && round?.roundNo === selectedRoundNo.value) {
     return selectedSide.value
@@ -379,6 +413,10 @@ function goNewDebate() {
     path: '/new',
     query,
   })
+}
+
+function exitToMyDebates() {
+  router.replace('/debates')
 }
 
 function openShareModal() {

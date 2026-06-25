@@ -36,8 +36,8 @@ public class PostController {
     }
 
     @GetMapping("/{postId}")
-    public PostDetailResponse detail(@PathVariable Long postId) {
-        return postService.detail(postId);
+    public PostDetailResponse detail(@AuthenticationPrincipal UserPrincipal user, @PathVariable Long postId) {
+        return postService.detail(postId, user == null ? null : user.getId());
     }
 
     @DeleteMapping("/{postId}")

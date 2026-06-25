@@ -1,6 +1,7 @@
 package com.ssafy.arena.service;
 
 import com.ssafy.arena.domain.*;
+import com.ssafy.arena.dto.comment.CommentResponse;
 import com.ssafy.arena.dto.post.*;
 import com.ssafy.arena.mapper.*;
 
@@ -94,9 +95,58 @@ class PostServiceTest {
                 .isPublic(false)
                 .build());
 
-        org.assertj.core.api.Assertions.assertThatThrownBy(() -> postService.detail(5L))
+        org.assertj.core.api.Assertions.assertThatThrownBy(() -> postService.detail(5L, 7L))
                 .isInstanceOf(ApiException.class)
                 .extracting("status")
                 .isEqualTo(HttpStatus.NOT_FOUND);
+    }
+
+    @Test
+    void detailIncludesViewerVoteChoiceAndOwnershipFlags() {
+        Post post = Post.builder()
+                .id(5L)
+                .userId(7L)
+                .debateSessionId(11L)
+                .shareRoundNo(2)
+                .isPublic(true)
+                .build();
+        PostListItem item = new PostListItem();
+        item.setPostId(5L);
+        item.setVoteOptionA("제육");
+        item.setVoteOptionB("돈까스");
+        CommentResponse ownComment = new CommentResponse();
+        ownComment.setCommentId(30L);
+        ownComment.setAuthorUserId(7L);
+        CommentResponse otherComment = new CommentResponse();
+        otherComment.setCommentId(31L);
+        otherComment.setAuthorUserId(8L);
+
+        when(postMapper.findById(5L)).thenReturn(post);
+        when(postMapper.findListItemById(5L)).thenReturn(item);
+        when(postMapper.findVoteChoice(5L, 7L)).thenReturn(VoteChoice.B);
+        when(debateMapper.findSummary(11L)).thenReturn(DebateSummary.builder()
+                .summaryText("돈까스가 안정적입니다.")
+                .build());
+        when(debateMapper.findSessionById(11L)).thenReturn(DebateSession.builder()
+                .id(11L)
+                .selectedSide(Speaker.PASSIONATE)
+                .roundTitle("점심 안정성")
+                .topic("오늘 점심 제육 vs 돈까스, 지금 바로 선택해야 한다면 무엇이 더 나은가")
+                .debateAxis("안정성 vs 만족감")
+                .build());
+        when(debateMapper.findMessages(11L)).thenReturn(List.of());
+        when(commentMapper.findByPostId(5L)).thenReturn(List.of(ownComment, otherComment));
+
+        PostDetailResponse response = postService.detail(5L, 7L);
+
+        assertThat(response.post().getUserVoteChoice()).isEqualTo(VoteChoice.B);
+        assertThat(response.post().getIsOwner()).isTrue();
+        assertThat(response.round().roundNo()).isEqualTo(2);
+        assertThat(response.round().title()).isEqualTo("점심 안정성");
+        assertThat(response.round().topic()).contains("제육 vs 돈까스");
+        assertThat(response.round().description()).isEqualTo("안정성 vs 만족감");
+        assertThat(response.round().summary().summaryText()).isEqualTo("돈까스가 안정적입니다.");
+        assertThat(response.comments()).extracting(CommentResponse::getIsOwner)
+                .containsExactly(true, false);
     }
 }

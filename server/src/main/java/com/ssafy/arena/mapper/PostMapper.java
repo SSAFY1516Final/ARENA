@@ -25,5 +25,7 @@ public interface PostMapper {
 
     Integer countVotes(@Param("postId") Long postId, @Param("choice") VoteChoice choice);
 
+    VoteChoice findVoteChoice(@Param("postId") Long postId, @Param("userId") Long userId);
+
     void upsertVote(@Param("postId") Long postId, @Param("userId") Long userId, @Param("choice") VoteChoice choice);
 }

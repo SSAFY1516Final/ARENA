@@ -3,6 +3,7 @@
     <section class="debates-header">
       <div>
         <h1>내 토론</h1>
+        <p class="page-copy">진행 중이거나 종료된 토론을 다시 확인하고 다음 라운드로 이어갈 수 있습니다.</p>
       </div>
       <RouterLink class="new-debate-button-link" to="/new">
         <NButton class="new-debate-button" type="primary" size="large" strong>

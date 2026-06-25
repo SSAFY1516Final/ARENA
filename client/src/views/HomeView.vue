@@ -3,6 +3,7 @@
     <section class="workspace-header new-template-header">
       <div>
         <h1>토론 생성하기</h1>
+        <p class="page-copy">주제 입력 후 선택지를 고르면 AI 토론이 바로 시작됩니다.</p>
       </div>
     </section>
 
@@ -33,6 +34,7 @@
                 placeholder="예: 오늘 점심 제육 vs 돈까스"
                 :disabled="isTopicInputLocked"
                 :input-props="{ id: 'topic', required: true }"
+                @keydown.enter.exact.prevent="submitTopicFromKeyboard"
               />
             </div>
 
@@ -159,6 +161,7 @@ const selectedCandidate = computed(() => {
 
 async function generateCandidates() {
   if (isGeneratingCandidates.value || hasGeneratedCandidates.value) return
+  if (!topic.value.trim()) return
 
   hasGeneratedCandidates.value = false
   isGeneratingCandidates.value = true
@@ -173,6 +176,11 @@ async function generateCandidates() {
   } finally {
     isGeneratingCandidates.value = false
   }
+}
+
+function submitTopicFromKeyboard() {
+  if (isTopicInputLocked.value || !topic.value.trim()) return
+  generateCandidates()
 }
 
 async function loadExistingCandidateRun(runId) {
@@ -221,7 +229,7 @@ async function startDebate() {
       candidateRunId: debateStore.candidateRunId || null,
       selectedCandidateId: selectedCandidate.value.candidateId || null,
     })
-    router.push({
+    await router.push({
       path: `/debates/${debate.debateId}`,
       query: { starting: '1' },
     })

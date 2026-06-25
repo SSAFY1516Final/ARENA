@@ -114,6 +114,13 @@
           AND choice = #{choice}
     </select>
 
+    <select id="findVoteChoice" resultType="com.ssafy.arena.domain.VoteChoice">
+        SELECT choice
+        FROM post_votes
+        WHERE post_id = #{postId}
+          AND user_id = #{userId}
+    </select>
+
     <insert id="upsertVote">
         INSERT INTO post_votes (post_id, user_id, choice)
         VALUES (#{postId}, #{userId}, #{choice})

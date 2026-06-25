@@ -287,9 +287,9 @@ class DebateServiceTest {
         assertThat(savedPost.getTitle()).isEqualTo("오늘 점심 제육 vs 돈까스");
         assertThat(savedPost.getShareRoundNo()).isEqualTo(1);
         assertThat(savedPost.getSummaryCard()).isEqualTo("AI가 생성한 토론 요약");
-        assertThat(savedPost.getShareBody()).contains("세부주제\n점심 안정성");
-        assertThat(savedPost.getShareBody()).contains("상세설명\n오늘 점심 제육 vs 돈까스, 지금 바로 선택해야 한다면 무엇이 더 나은가");
-        assertThat(savedPost.getShareBody()).contains("본문\n내가 게시글에 직접 작성한 본문");
+        assertThat(savedPost.getShareBody()).isEqualTo("내가 게시글에 직접 작성한 본문");
+        assertThat(savedPost.getShareBody()).doesNotContain("세부주제");
+        assertThat(savedPost.getShareBody()).doesNotContain("상세설명");
         assertThat(savedPost.getShareBody()).doesNotContain("제육파:");
     }
 
@@ -327,7 +327,7 @@ class DebateServiceTest {
         ArgumentCaptor<Post> postCaptor = ArgumentCaptor.forClass(Post.class);
         verify(postMapper).insert(postCaptor.capture());
         assertThat(response.postId()).isEqualTo(78L);
-        assertThat(postCaptor.getValue().getShareBody()).contains("본문\n두 번째 공유 본문");
+        assertThat(postCaptor.getValue().getShareBody()).isEqualTo("두 번째 공유 본문");
     }
 
     @Test

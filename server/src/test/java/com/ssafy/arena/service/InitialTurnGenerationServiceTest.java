@@ -81,7 +81,7 @@ class InitialTurnGenerationServiceTest {
     }
 
     @Test
-    void failedBackgroundWorkIsRemovedSoLaterRequestsCanRetry() {
+    void failedBackgroundWorkIsReportedOnceBeforeLaterRequestsRetry() {
         when(debateService.initialTurnGenerationSnapshot(7L, 3L)).thenReturn(
                 new InitialTurnGenerationResponse(InitialTurnGenerationStatus.GENERATING, List.of())
         );
@@ -91,8 +91,13 @@ class InitialTurnGenerationServiceTest {
 
         generationService.requestGeneration(7L, 3L);
         executor.tasks.get(0).run();
-        generationService.requestGeneration(7L, 3L);
 
+        InitialTurnGenerationResponse failed = generationService.requestGeneration(7L, 3L);
+
+        assertThat(failed.status()).isEqualTo(InitialTurnGenerationStatus.FAILED);
+        assertThat(executor.tasks).hasSize(1);
+
+        generationService.requestGeneration(7L, 3L);
         assertThat(executor.tasks).hasSize(2);
     }
 

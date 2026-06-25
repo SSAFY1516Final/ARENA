@@ -44,16 +44,27 @@ public class PostService {
         );
     }
 
-    public PostDetailResponse detail(Long postId) {
+    public PostDetailResponse detail(Long postId, Long viewerUserId) {
         Post post = requirePost(postId);
         if (!Boolean.TRUE.equals(post.getIsPublic())) {
             throw new ApiException(HttpStatus.NOT_FOUND, "post not found");
         }
         PostListItem item = postMapper.findListItemById(postId);
+        if (viewerUserId != null) {
+            item.setUserVoteChoice(postMapper.findVoteChoice(postId, viewerUserId));
+            item.setIsOwner(post.getUserId().equals(viewerUserId));
+        } else {
+            item.setIsOwner(false);
+        }
         DebateSummary summary = debateMapper.findSummary(post.getDebateSessionId());
+        DebateSummaryResponse summaryResponse = summary == null ? null : DebateSummaryResponse.from(summary);
+        DebateRoundResponse roundResponse = sharedRoundResponse(post, summaryResponse);
         List<DebateMessage> messages = debateMapper.findMessages(post.getDebateSessionId());
         List<CommentResponse> comments = commentMapper.findByPostId(postId);
-        return new PostDetailResponse(item, DebateSummaryResponse.from(summary), messages, comments);
+        comments.forEach((comment) -> comment.setIsOwner(
+                viewerUserId != null && viewerUserId.equals(comment.getAuthorUserId())
+        ));
+        return new PostDetailResponse(item, summaryResponse, roundResponse, messages, comments);
     }
 
     @Transactional
@@ -99,6 +110,31 @@ public class PostService {
 
     private String blankToNull(String value) {
         return value == null || value.isBlank() ? null : value;
+    }
+
+    private DebateRoundResponse sharedRoundResponse(Post post, DebateSummaryResponse summaryResponse) {
+        DebateSession session = debateMapper.findSessionById(post.getDebateSessionId());
+        if (session == null) {
+            return null;
+        }
+        return new DebateRoundResponse(
+                post.getShareRoundNo() == null || post.getShareRoundNo() < 1 ? 1 : post.getShareRoundNo(),
+                session.getId(),
+                session.getSelectedSide(),
+                firstPresent(session.getRoundTitle(), session.getTopic(), session.getOriginalTopic()),
+                session.getTopic(),
+                firstPresent(session.getDebateAxis(), session.getBasicConditions(), ""),
+                summaryResponse
+        );
+    }
+
+    private String firstPresent(String... values) {
+        for (String value : values) {
+            if (value != null && !value.isBlank()) {
+                return value;
+            }
+        }
+        return "";
     }
 
     private int nullToZero(Integer value) {

@@ -15,6 +15,7 @@ public class InitialTurnGenerationService {
     private final DebateService debateService;
     private final Executor executor;
     private final ConcurrentMap<Long, Boolean> runningJobs = new ConcurrentHashMap<>();
+    private final ConcurrentMap<Long, Boolean> failedJobs = new ConcurrentHashMap<>();
 
     public InitialTurnGenerationService(
             DebateService debateService,
@@ -28,7 +29,11 @@ public class InitialTurnGenerationService {
         InitialTurnGenerationResponse snapshot = debateService.initialTurnGenerationSnapshot(userId, debateId);
         if (snapshot.status() == InitialTurnGenerationStatus.COMPLETE) {
             runningJobs.remove(debateId);
+            failedJobs.remove(debateId);
             return snapshot;
+        }
+        if (Boolean.TRUE.equals(failedJobs.remove(debateId))) {
+            return new InitialTurnGenerationResponse(InitialTurnGenerationStatus.FAILED, snapshot.messages());
         }
 
         runningJobs.computeIfAbsent(debateId, key -> {
@@ -41,7 +46,9 @@ public class InitialTurnGenerationService {
     private void runGeneration(Long userId, Long debateId) {
         try {
             debateService.generateInitialTurns(userId, debateId);
+            failedJobs.remove(debateId);
         } catch (RuntimeException error) {
+            failedJobs.put(debateId, true);
             log.warn("Initial debate turn generation failed. debateId={}, userId={}", debateId, userId, error);
         } finally {
             runningJobs.remove(debateId);
