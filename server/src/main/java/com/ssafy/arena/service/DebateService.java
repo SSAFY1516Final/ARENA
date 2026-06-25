@@ -73,7 +73,16 @@ public class DebateService {
         );
 
         return latestSessionsByOriginalQuestion.values().stream()
-                .map(DebateListItem::from)
+                .map(session -> DebateListItem.from(session, roundSessionsFor(sessions, session)))
+                .toList();
+    }
+
+    private List<DebateSession> roundSessionsFor(List<DebateSession> sessions, DebateSession anchorSession) {
+        return sessions.stream()
+                .filter(session -> originalQuestionKey(session).equals(originalQuestionKey(anchorSession)))
+                .sorted(Comparator
+                        .comparing(DebateService::createdAtOf)
+                        .thenComparing(DebateService::sessionIdOf))
                 .toList();
     }
 

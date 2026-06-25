@@ -55,8 +55,29 @@
             @keydown.enter="openDebate(debate)"
           >
             <div class="my-debate-card__body">
-              <div>
+              <div class="my-debate-card__content">
+                <div class="my-debate-card__meta">
+                  <span v-if="formattedUpdatedAt(debate)" class="my-debate-card__date">
+                    {{ formattedUpdatedAt(debate) }}
+                  </span>
+                </div>
                 <h2>{{ debateTitle(debate) }}</h2>
+                <p v-if="debateDetail(debate)" class="my-debate-card__detail">
+                  {{ debateDetail(debate) }}
+                </p>
+                <div class="my-debate-card__footer">
+                  <div class="my-debate-card__stats">
+                    <span>
+                      <em>진행 라운드</em>
+                      <strong>{{ roundProgressText(debate) }}</strong>
+                    </span>
+                    <span>
+                      <em>선택 현황</em>
+                      <strong>{{ scoreText(debate) }}</strong>
+                    </span>
+                  </div>
+                  <span class="my-debate-card__hint">{{ debateActionHint(debate) }}</span>
+                </div>
               </div>
               <div class="my-debate-card__actions">
                 <button
@@ -105,6 +126,36 @@ function openDebate(debate) {
 
 function debateTitle(debate) {
   return debate.originalTopic || debate.topic
+}
+
+function debateDetail(debate) {
+  const title = debateTitle(debate)
+  if (!debate.topic || debate.topic === title) return ''
+  return debate.topic
+}
+
+function debateActionHint(debate) {
+  return debate.status === 'ACTIVE' ? '이어가기' : '결과 보기'
+}
+
+function roundProgressText(debate) {
+  return `${Math.min(Number(debate.roundCount) || 0, 5)}/5`
+}
+
+function scoreText(debate) {
+  const sideA = debate.sideALabel || 'A'
+  const sideB = debate.sideBLabel || 'B'
+  return `${sideA} ${Number(debate.coolCount) || 0} : ${Number(debate.hotCount) || 0} ${sideB}`
+}
+
+function formattedUpdatedAt(debate) {
+  if (!debate.updatedAt) return ''
+  const updatedAt = new Date(debate.updatedAt)
+  if (Number.isNaN(updatedAt.getTime())) return ''
+  return new Intl.DateTimeFormat('ko-KR', {
+    month: '2-digit',
+    day: '2-digit',
+  }).format(updatedAt)
 }
 
 async function deleteDebate(debate) {

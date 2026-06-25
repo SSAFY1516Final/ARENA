@@ -96,6 +96,16 @@
         </if>
     </select>
 
+    <delete id="deleteVotesByPostId">
+        DELETE FROM post_votes
+        WHERE post_id = #{postId}
+    </delete>
+
+    <delete id="deleteCommentsByPostId">
+        DELETE FROM comments
+        WHERE post_id = #{postId}
+    </delete>
+
     <delete id="deleteById">
         DELETE FROM posts
         WHERE id = #{id}

@@ -99,4 +99,16 @@ describe('postStore', () => {
     expect(store.posts).toHaveLength(0)
     expect(store.postDetail).toBeNull()
   })
+
+  it('does not add the same detail comment twice', () => {
+    const store = usePostStore()
+    store.postDetail = {
+      postId: 5,
+      comments: [{ commentId: 12, postId: 5, authorNickname: '나', content: '이미 있는 댓글' }],
+    }
+
+    store.addCommentToDetail({ commentId: 12, postId: 5, authorNickname: '나', content: '이미 있는 댓글' })
+
+    expect(store.postDetail.comments).toHaveLength(1)
+  })
 })

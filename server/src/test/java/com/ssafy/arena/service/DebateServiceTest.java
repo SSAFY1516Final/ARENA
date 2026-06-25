@@ -160,6 +160,60 @@ class DebateServiceTest {
     }
 
     @Test
+    void listMyDebatesIncludesRoundProgressAndSelectionScore() {
+        when(debateMapper.findSessionsByUserId(7L)).thenReturn(List.of(
+                DebateSession.builder()
+                        .id(3L)
+                        .userId(7L)
+                        .originalTopic("오늘 점심 제육 vs 돈까스")
+                        .topic("안정성 기준")
+                        .sideALabel("제육")
+                        .sideBLabel("돈까스")
+                        .mode(DebateMode.PRACTICAL)
+                        .status(DebateStatus.STOPPED)
+                        .selectedSide(Speaker.COOL_HEADED)
+                        .selectedRoundNo(1)
+                        .createdAt(LocalDateTime.of(2026, 6, 11, 12, 0))
+                        .stoppedAt(LocalDateTime.of(2026, 6, 11, 12, 30))
+                        .build(),
+                DebateSession.builder()
+                        .id(4L)
+                        .userId(7L)
+                        .originalTopic("오늘 점심 제육 vs 돈까스")
+                        .topic("만족감 기준")
+                        .sideALabel("제육")
+                        .sideBLabel("돈까스")
+                        .mode(DebateMode.PRACTICAL)
+                        .status(DebateStatus.STOPPED)
+                        .selectedSide(Speaker.PASSIONATE)
+                        .selectedRoundNo(2)
+                        .createdAt(LocalDateTime.of(2026, 6, 11, 13, 0))
+                        .stoppedAt(LocalDateTime.of(2026, 6, 11, 13, 30))
+                        .build(),
+                DebateSession.builder()
+                        .id(5L)
+                        .userId(7L)
+                        .originalTopic("오늘 점심 제육 vs 돈까스")
+                        .topic("회복 가능성 기준")
+                        .sideALabel("제육")
+                        .sideBLabel("돈까스")
+                        .mode(DebateMode.PRACTICAL)
+                        .status(DebateStatus.ACTIVE)
+                        .createdAt(LocalDateTime.of(2026, 6, 11, 14, 0))
+                        .build()
+        ));
+
+        DebateListItem item = debateService.listMyDebates(7L).get(0);
+
+        assertThat(item.debateId()).isEqualTo(5L);
+        assertThat(item.roundCount()).isEqualTo(3);
+        assertThat(item.coolCount()).isEqualTo(1);
+        assertThat(item.hotCount()).isEqualTo(1);
+        assertThat(item.sideALabel()).isEqualTo("제육");
+        assertThat(item.sideBLabel()).isEqualTo("돈까스");
+    }
+
+    @Test
     void createStoresPersistedSideLabels() {
         debateService.create(7L, new CreateDebateRequest(
                 "Lunch",

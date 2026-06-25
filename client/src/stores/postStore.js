@@ -147,6 +147,7 @@ export const usePostStore = defineStore('post', () => {
 
   function addCommentToDetail(comment) {
     if (!postDetail.value) return
+    if (postDetail.value.comments.some((item) => String(item.commentId) === String(comment.commentId))) return
     postDetail.value = {
       ...postDetail.value,
       comments: [

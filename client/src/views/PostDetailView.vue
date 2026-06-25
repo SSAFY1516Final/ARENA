@@ -14,10 +14,6 @@
           삭제
         </button>
       </div>
-      <div class="tag-row">
-        <span class="tag tag--teal">토론</span>
-        <span class="tag tag--blue">SHARED</span>
-      </div>
       <h1>{{ post.title }}</h1>
 
       <section v-if="post.shareBody" class="post-share-body-box">
@@ -115,9 +111,9 @@
           class="textarea"
           placeholder="댓글을 입력하세요"
           required
-          @keydown.enter.exact.prevent="addComment"
+          @keyup.enter.exact.prevent="addComment"
         ></textarea>
-        <button class="button button--full" type="submit">등록</button>
+        <button class="button button--full" type="submit" :disabled="isAddingComment">등록</button>
       </form>
       <div v-else class="post-login-prompt post-login-prompt--comment">
         <p>로그인 후 댓글을 작성할 수 있습니다.</p>
@@ -149,6 +145,7 @@ const authStore = useAuthStore()
 const postStore = usePostStore()
 const commentStore = useCommentStore()
 const commentContent = ref('')
+const isAddingComment = ref(false)
 
 const post = computed(() => postStore.postDetail)
 const isPostOwner = computed(() => Boolean(post.value?.isOwner || post.value?.owner))
@@ -181,8 +178,7 @@ const postSummaryText = computed(() => (
 ))
 const visibleComments = computed(() => {
   if (!post.value) return []
-  const localComments = commentStore.comments.filter((comment) => comment.postId === post.value.postId)
-  return [...post.value.comments, ...localComments.filter((comment) => !post.value.comments.some((item) => item.commentId === comment.commentId))]
+  return post.value.comments
 })
 
 onMounted(() => {
@@ -199,15 +195,21 @@ async function vote(choice) {
 }
 
 async function addComment() {
+  if (isAddingComment.value) return
   if (!canParticipate.value) {
     goLogin()
     return
   }
   const content = commentContent.value.trim()
   if (!content) return
-  const comment = await commentStore.createComment(post.value.postId, { content })
-  postStore.addCommentToDetail(comment)
-  commentContent.value = ''
+  isAddingComment.value = true
+  try {
+    const comment = await commentStore.createComment(post.value.postId, { content })
+    postStore.addCommentToDetail({ ...comment, isOwner: true })
+    commentContent.value = ''
+  } finally {
+    isAddingComment.value = false
+  }
 }
 
 async function deleteComment(commentId) {

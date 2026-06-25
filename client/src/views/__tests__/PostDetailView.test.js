@@ -123,6 +123,8 @@ describe('PostDetailView', () => {
     expect(wrapper.get('.log-box .post-log-summary').text()).toContain('AI가 생성한 토론 요약입니다.')
     expect(wrapper.find('.page-copy').exists()).toBe(false)
     expect(wrapper.find('.summary-detail').exists()).toBe(false)
+    expect(wrapper.find('.tag-row').exists()).toBe(false)
+    expect(text).not.toContain('SHARED')
     expect(text).not.toContain('핵심 주장')
     expect(text).not.toContain('선택 기준')
     expect(text.indexOf('내가 직접 작성한 게시글 본문입니다.')).toBeLessThan(text.indexOf('공유 라운드 토론 로그'))
@@ -246,17 +248,58 @@ describe('PostDetailView', () => {
     await flushPromises()
 
     await wrapper.get('.comment-form textarea').setValue('엔터로 등록한 댓글')
-    await wrapper.get('.comment-form textarea').trigger('keydown', { key: 'Enter' })
+    await wrapper.get('.comment-form textarea').trigger('keyup', { key: 'Enter' })
     await flushPromises()
 
     expect(commentApi.create).toHaveBeenCalledWith(5, { content: '엔터로 등록한 댓글' })
     expect(wrapper.text()).toContain('엔터로 등록한 댓글')
+    expect(wrapper.findAll('.comment').filter((comment) => comment.text().includes('엔터로 등록한 댓글'))).toHaveLength(1)
+    expect(wrapper.findAll('.comment-delete-button')).toHaveLength(2)
 
     await wrapper.get('.comment-delete-button').trigger('click')
     await flushPromises()
 
     expect(commentApi.remove).toHaveBeenCalledWith(12)
     expect(wrapper.text()).not.toContain('삭제할 댓글')
+  })
+
+  it('ignores duplicate comment submission while the first request is pending', async () => {
+    let resolveCreate
+    commentApi.create.mockReturnValueOnce(new Promise((resolve) => {
+      resolveCreate = resolve
+    }))
+    const router = createRouter({
+      history: createWebHistory(),
+      routes: [{ path: '/posts/:postId', component: PostDetailView }],
+    })
+    await router.push('/posts/5')
+    await router.isReady()
+
+    const wrapper = mount(PostDetailView, {
+      global: {
+        plugins: [createTestPinia(true), router],
+      },
+    })
+    await flushPromises()
+
+    await wrapper.get('.comment-form textarea').setValue('중복 방지 댓글')
+    await wrapper.get('.comment-form textarea').trigger('keyup', { key: 'Enter' })
+    await wrapper.get('.comment-form').trigger('submit')
+
+    expect(commentApi.create).toHaveBeenCalledTimes(1)
+
+    resolveCreate({
+      data: {
+        commentId: 100,
+        postId: 5,
+        authorNickname: '나',
+        content: '중복 방지 댓글',
+        isOwner: true,
+      },
+    })
+    await flushPromises()
+
+    expect(wrapper.findAll('.comment').filter((comment) => comment.text().includes('중복 방지 댓글'))).toHaveLength(1)
   })
 
   it('deletes an owner post and returns to the post list', async () => {

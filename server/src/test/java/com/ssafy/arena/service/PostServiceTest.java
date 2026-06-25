@@ -7,6 +7,7 @@ import com.ssafy.arena.mapper.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -18,6 +19,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
+import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
@@ -86,6 +88,21 @@ class PostServiceTest {
 
         verify(postMapper).updateVisibility(5L, false);
         assertThat(updated.getIsPublic()).isFalse();
+    }
+
+    @Test
+    void deleteOwnedPostRemovesVotesAndCommentsBeforePost() {
+        when(postMapper.findById(5L)).thenReturn(Post.builder()
+                .id(5L)
+                .userId(7L)
+                .build());
+
+        postService.delete(7L, 5L);
+
+        InOrder inOrder = inOrder(postMapper);
+        inOrder.verify(postMapper).deleteVotesByPostId(5L);
+        inOrder.verify(postMapper).deleteCommentsByPostId(5L);
+        inOrder.verify(postMapper).deleteById(5L);
     }
 
     @Test

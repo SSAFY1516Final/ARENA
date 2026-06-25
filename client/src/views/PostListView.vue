@@ -35,16 +35,13 @@
         :to="`/posts/${post.postId}`"
       >
         <div class="tag-row">
-          <span class="tag" :class="post.mode === 'PRACTICAL' ? 'tag--teal' : 'tag--amber'">
-            토론
-          </span>
           <span class="tag">댓글 {{ post.commentCount }}</span>
         </div>
         <h2>{{ post.title }}</h2>
         <p>{{ post.body }}</p>
         <div class="post-card__meta">
-          <span>{{ post.voteOptionA }} {{ post.voteA }}</span>
-          <span>{{ post.voteOptionB }} {{ post.voteB }}</span>
+          <span>{{ post.voteOptionA }} {{ votePercent(post, 'A') }}%</span>
+          <span>{{ post.voteOptionB }} {{ votePercent(post, 'B') }}%</span>
         </div>
       </RouterLink>
     </section>
@@ -74,5 +71,12 @@ onMounted(() => {
 
 function search() {
   postStore.fetchPosts(filters)
+}
+
+function votePercent(post, side) {
+  const total = Number(post.voteA || 0) + Number(post.voteB || 0)
+  if (!total) return 0
+  if (side === 'A') return Math.round((Number(post.voteA || 0) / total) * 100)
+  return Math.round((Number(post.voteB || 0) / total) * 100)
 }
 </script>

@@ -50,6 +50,11 @@ describe('MyDebatesView', () => {
           topic: 'Which lunch standard is stronger?',
           mode: 'PRACTICAL',
           status: 'ACTIVE',
+          sideALabel: '제육',
+          sideBLabel: '돈까스',
+          roundCount: 3,
+          coolCount: 2,
+          hotCount: 1,
           updatedAt: '2026-06-11T12:00:00',
         },
       ],
@@ -65,6 +70,11 @@ describe('MyDebatesView', () => {
           topic: 'Which lunch standard is stronger?',
           mode: 'PRACTICAL',
           status: 'ACTIVE',
+          sideALabel: '제육',
+          sideBLabel: '돈까스',
+          roundCount: 3,
+          coolCount: 2,
+          hotCount: 1,
           updatedAt: '2026-06-11T12:00:00',
         },
         {
@@ -95,6 +105,10 @@ describe('MyDebatesView', () => {
     expect(wrapper.findComponent(NButton).exists()).toBe(true)
     expect(wrapper.findAll('.my-debate-card')).toHaveLength(3)
     expect(wrapper.text()).toContain('Lunch')
+    expect(wrapper.text()).toContain('진행 라운드')
+    expect(wrapper.text()).toContain('3/5')
+    expect(wrapper.text()).toContain('제육 2 : 1 돈까스')
+    expect(wrapper.text()).toContain('이어가기')
     expect(wrapper.text()).toContain('Commute timing')
     expect(wrapper.text()).toContain('Trip lodging')
     expect(wrapper.text()).not.toContain('9001')

@@ -73,6 +73,8 @@ public class PostService {
         if (!post.getUserId().equals(userId)) {
             throw new ApiException(HttpStatus.FORBIDDEN, "not post owner");
         }
+        postMapper.deleteVotesByPostId(postId);
+        postMapper.deleteCommentsByPostId(postId);
         postMapper.deleteById(postId);
     }
 

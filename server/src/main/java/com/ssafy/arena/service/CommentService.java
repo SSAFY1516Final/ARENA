@@ -30,7 +30,7 @@ public class CommentService {
                 .content(request.content())
                 .build();
         commentMapper.insert(comment);
-        return commentMapper.findByPostId(postId).stream()
+        CommentResponse response = commentMapper.findByPostId(postId).stream()
                 .filter(item -> item.getCommentId().equals(comment.getId()))
                 .findFirst()
                 .orElseThrow(() -> {
@@ -38,6 +38,8 @@ public class CommentService {
                             comment.getId(), postId, userId);
                     return new ApiException(HttpStatus.INTERNAL_SERVER_ERROR, "comment creation failed");
                 });
+        response.setIsOwner(true);
+        return response;
     }
 
     @Transactional
