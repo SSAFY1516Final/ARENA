@@ -413,6 +413,7 @@ public class DebateService {
         debateMapper.deletePostVotesByDebateId(debateId);
         debateMapper.deleteCommentsByDebateId(debateId);
         debateMapper.deletePostByDebateId(debateId);
+        debateMapper.deleteAiDebateTurnLogsByDebateId(debateId);
         debateMapper.deleteSummaryByDebateId(debateId);
         debateMapper.deleteMessagesByDebateId(debateId);
         debateMapper.deleteSessionById(debateId);

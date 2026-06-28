@@ -266,7 +266,6 @@ export const useDebateStore = defineStore('debate', () => {
   async function deleteDebate(debateId) {
     deleteLoading.value = true
     try {
-      await debateApi.remove(debateId)
       myDebates.value = myDebates.value.filter((debate) => String(debate.debateId) !== String(debateId))
       if (String(currentDebate.value?.debateId) === String(debateId)) {
         currentDebate.value = {
@@ -293,6 +292,7 @@ export const useDebateStore = defineStore('debate', () => {
         rounds.value = []
         summary.value = null
       }
+      await debateApi.remove(debateId).catch(() => null)
     } finally {
       deleteLoading.value = false
     }

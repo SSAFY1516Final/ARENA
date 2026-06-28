@@ -136,6 +136,40 @@ describe('debateStore', () => {
     expect(store.currentDebate.debateId).toBeNull()
   })
 
+  it('removes a debate from the local list before the backend delete finishes', async () => {
+    const store = useDebateStore()
+    store.myDebates = [
+      { debateId: 2, topic: 'delete me', status: 'ACTIVE' },
+      { debateId: 3, topic: 'keep me', status: 'STOPPED' },
+    ]
+    let resolveDelete
+    debateApi.remove.mockReturnValue(new Promise((resolve) => {
+      resolveDelete = resolve
+    }))
+
+    const deleteRequest = store.deleteDebate(2)
+
+    expect(store.myDebates.map((debate) => debate.debateId)).toEqual([3])
+    expect(debateApi.remove).toHaveBeenCalledWith(2)
+
+    resolveDelete({ status: 204 })
+    await deleteRequest
+  })
+
+  it('keeps a debate removed locally even when the backend delete fails', async () => {
+    const store = useDebateStore()
+    store.myDebates = [
+      { debateId: 2, topic: 'delete me', status: 'ACTIVE' },
+      { debateId: 3, topic: 'keep me', status: 'STOPPED' },
+    ]
+    debateApi.remove.mockRejectedValue(new Error('delete failed'))
+
+    await store.deleteDebate(2)
+
+    expect(store.myDebates.map((debate) => debate.debateId)).toEqual([3])
+    expect(store.deleteLoading).toBe(false)
+  })
+
   it('maps initial turn generation status responses from the backend', async () => {
     const store = useDebateStore()
     store.currentDebate = { debateId: 3, topic: 'Lunch', status: 'ACTIVE' }

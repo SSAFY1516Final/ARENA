@@ -39,6 +39,8 @@ public interface DebateMapper {
 
     void deletePostByDebateId(@Param("debateSessionId") Long debateSessionId);
 
+    void deleteAiDebateTurnLogsByDebateId(@Param("debateSessionId") Long debateSessionId);
+
     void deleteSummaryByDebateId(@Param("debateSessionId") Long debateSessionId);
 
     void deleteMessagesByDebateId(@Param("debateSessionId") Long debateSessionId);

@@ -293,6 +293,7 @@ class DebateServiceTest {
         inOrder.verify(debateMapper).deletePostVotesByDebateId(3L);
         inOrder.verify(debateMapper).deleteCommentsByDebateId(3L);
         inOrder.verify(debateMapper).deletePostByDebateId(3L);
+        inOrder.verify(debateMapper).deleteAiDebateTurnLogsByDebateId(3L);
         inOrder.verify(debateMapper).deleteSummaryByDebateId(3L);
         inOrder.verify(debateMapper).deleteMessagesByDebateId(3L);
         inOrder.verify(debateMapper).deleteSessionById(3L);

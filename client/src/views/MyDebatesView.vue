@@ -3,7 +3,7 @@
     <section class="debates-header">
       <div>
         <span class="eyebrow">Recent debates</span>
-        <h1>내 토론</h1>
+        <h1>최근 토론</h1>
         <p class="page-copy">진행 중이거나 종료된 토론을 다시 확인하고 다음 라운드로 이어갈 수 있습니다.</p>
       </div>
       <RouterLink class="new-debate-button-link" to="/new">
@@ -17,13 +17,6 @@
     </section>
 
     <NCard class="debates-board-card" :bordered="false">
-      <div class="debates-board-header">
-        <div>
-          <span class="section-label">Recent debates</span>
-          <h2>최근 토론</h2>
-        </div>
-      </div>
-
       <section v-if="debateStore.loading" class="loading-state">
         내 토론을 불러오는 중입니다.
       </section>

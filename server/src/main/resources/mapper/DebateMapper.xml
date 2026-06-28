@@ -111,6 +111,11 @@
         WHERE debate_session_id = #{debateSessionId}
     </delete>
 
+    <delete id="deleteAiDebateTurnLogsByDebateId">
+        DELETE FROM ai_debate_turn_logs
+        WHERE debate_session_id = #{debateSessionId}
+    </delete>
+
     <delete id="deleteSummaryByDebateId">
         DELETE FROM debate_summaries
         WHERE debate_session_id = #{debateSessionId}
